@@ -1,0 +1,36 @@
+name: Publish GitHub Pages
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      # Needed for peaceiris/actions-gh-pages@v3
+      contents: write
+    concurrency:
+        group: ${{ github.workflow }}-${{ github.ref }}      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: OCaml 5.2.x
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 5.2.x
+          dune-cache: false # true does not publish pages consistently
+      - name: Install Opam dependencies
+        # Must wait for opam 2.2 on setup-ocaml for opam install --subpath option to work.
+        run: |
+            cp src/DkStdRestApis_NotStripe.opam .
+            opam install . --deps-only --with-doc
+      - name: Build odoc
+        run: opam exec -- dune build @doc
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: _build/default/_doc/_html
