@@ -1,0 +1,7 @@
+#require "DkStdRestApis_NotStripe" ;;
+#require "DkStdRestApis_NotStripe.X" ;;
+open DkStdRestApis_NotStripe ;;
+open DkStdRestApis_NotStripe_X ;;
+
+module Agent = (val CurlCmd.create_agent ~server_url:"https://api.stripe.com" ~bearer:"YOUR_STRIPE_API_TEST_SECRET_KEY" ~headers:[("stripe-version", "2024-04-10")] ()) ;;
+module StripeClient = Stripe.Client (Agent) ;;
