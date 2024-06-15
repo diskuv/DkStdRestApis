@@ -1,0 +1,25 @@
+# DkCoder build artifacts
+/_build/
+/#s/
+/dune-project
+
+# Docker volumes
+/data
+/letsencrypt
+
+# Docker secrets
+secret.*
+/.env
+
+# exploratory specs
+/openapi-*/openapi
+
+# Opam and conventional OCaml development
+/_opam/
+/src/*/dune
+
+# vim
+*.swp
+
+# vscode
+/.vscode/settings-local.json
