@@ -21,7 +21,14 @@ The `dk`, `dk.cmd` and `__dk.cmake` build tools are [LICENSE-OSL3](./LICENSE-OSL
 
 > Prerequisites: opam 2.2.0+. On Unix that is `bash -c "sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) --version 2.2.0~beta3"` and on Windows that is `winget install opam`
 
-In a Unix shell we'll create an exploratory opam switch:
+Checkout the project:
+
+```shell
+git clone https://github.com/diskuv/DkStdRestApis.git
+cd DkStdRestApis
+```
+
+and create an exploratory opam switch:
 
 ```sh
 # Tr1RestApis requires OCaml 5.2.0+ until OCaml 4.12.3
@@ -48,7 +55,6 @@ and then start exploring the [Stripe REST API](https://docs.stripe.com/api)
 from its [OpenAPI 3.0.0 specification](https://github.com/stripe/openapi#readme):
 
 ```ocaml
-$ git clone XXXX
 $ opam exec dune utop
 
 #require "DkStdRestApis_NotStripe" ;;
