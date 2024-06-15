@@ -124,9 +124,9 @@ let create_agent ?server_url ?cacerts ?verbose ?bearer ?(headers = []) () =
         let nv = Format.asprintf "%s: %s" n v in
         a
           (`P
-            ( (fun ppf (n, v) ->
-                Format.fprintf ppf "@[-H%a%s@]" br () (Filename.quote nv) )
-            , (n, v) ) ) )
+            ( (fun ppf nv' ->
+                Format.fprintf ppf "@[-H%a%s@]" br () (Filename.quote nv') )
+            , nv ) ) )
       !current_headers ;
     (* [--json ...] *)
     ( match !current_request_body with

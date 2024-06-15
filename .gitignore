@@ -1,7 +1,7 @@
 # DkCoder build artifacts
 /_build/
 /#s/
-/dune-project
+#/dune-project
 
 # Docker volumes
 /data
@@ -16,7 +16,7 @@ secret.*
 
 # Opam and conventional OCaml development
 /_opam/
-/src/*/dune
+#/src/*/dune
 
 # vim
 *.swp

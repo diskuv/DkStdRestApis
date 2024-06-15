@@ -2,4 +2,13 @@
 #require "ptime" ;;
 #require "ezjsonm";;
 #require "routes";;
+
+(* Be prepared to wait several minutes for the OCaml interpreter
+   to compile the Stripe expressions. The ocaml.opt bytecode compiler
+   runs significantly faster (10s of seconds). *)
 #mod_use "src/DkStdRestApis_NotStripe/Stripe.ml" ;;
+
+#require "cohttp-curl-lwt" ;;
+#mod_use "src/DkStdRestApis_NotStripe/Curl2.ml" ;;
+
+#mod_use "src/DkStdRestApis_NotStripe/CurlCmd.ml" ;;

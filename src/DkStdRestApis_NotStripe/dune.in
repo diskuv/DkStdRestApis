@@ -1,5 +1,0 @@
-(library
- (name DkStdRestApis_Std)
- (public_name DkStdRestApis_Std)
- (modules (:standard \ open__))
- (libraries ptime json-data-encoding ezjsonm))

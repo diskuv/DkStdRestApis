@@ -119,7 +119,7 @@ let create_cohttp_curl_lwt_agent ?server_url ?(timeout_ms = 5000) ?cacerts
         | Some level when level >= 1 ->
             Curl0.set_verbose curl0 true ;
             if level >= 2 then
-              Curl0.set_debugfunction curl0 (fun curl0 dtype s ->
+              Curl0.set_debugfunction curl0 (fun _curl0 dtype s ->
                   match dtype with
                   | Curl0.DEBUGTYPE_DATA_IN ->
                       prerr_endline ("CURLIN: " ^ s)
@@ -127,7 +127,7 @@ let create_cohttp_curl_lwt_agent ?server_url ?(timeout_ms = 5000) ?cacerts
                       prerr_endline ("CURLOUT: " ^ s)
                   | _ ->
                       () )
-        | None ->
+        | _ ->
             () ) ;
         ( match !current_request_body with
         | Some data ->
