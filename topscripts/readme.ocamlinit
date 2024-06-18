@@ -4,4 +4,12 @@ open DkStdRestApis_NotStripe ;;
 open DkStdRestApis_NotStripe_X ;;
 
 module Agent = (val CurlCmd.create_agent ~server_url:"https://api.stripe.com" ~bearer:"YOUR_STRIPE_API_TEST_SECRET_KEY" ~headers:[("stripe-version", "2024-04-10")] ()) ;;
-module StripeClient = Stripe.Client (Agent) ;;
+
+module StripeClient = Stripe.Client (Agent) 
+let () = ignore "do not print huge StripeClient signature" ;;
+
+let print = function
+| `Curl_command s -> print_endline s
+| `Never _ -> assert false ;;
+ 
+print @@ StripeClient.postCustomers (Some {address=Some (T_383944b86d {  city=Some "New York"; country=Some "USA"; line1=None; line2=None; postal_code=None; state=Some "NY"; additional=Ezjsonm.value_from_string {| {"random":"metadata"} |}  }); balance=Some 1234; cash_balance=None; coupon=None; description=None; email=Some "test@example.com"; expand=None; invoice_prefix=None; invoice_settings=None; metadata=None; name=Some "Luke Skywalker"; next_invoice_sequence=None; payment_method=None; phone=None; preferred_locales=None; promotion_code=None; shipping=None; source=None; tax=None; tax_exempt=None; tax_id_data=None; test_clock=None} );;
