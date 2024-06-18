@@ -16,6 +16,6 @@ print @@ StripeClient.postCustomers
   (Some {
     address=Some (T_383944b86d {  city=Some "New York"; country=Some "USA"; line1=None; line2=None; postal_code=None; state=Some "NY"; additional=[] });
     balance=Some 1234; cash_balance=None; coupon=None; description=None; email=Some "test@example.com"; expand=None; invoice_prefix=None; invoice_settings=None;
-    metadata=Some (T_053c3afba8 {additional=[("random", "some value")]});
+    metadata=Some (T_053c3afba8 {additional=[("somekey", "somevalue")]});
     name=Some "Luke Skywalker"; next_invoice_sequence=None; payment_method=None; phone=None;
     preferred_locales=None; promotion_code=None; shipping=None; source=None; tax=None; tax_exempt=None; tax_id_data=None; test_clock=None} );;
