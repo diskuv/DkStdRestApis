@@ -7,7 +7,7 @@ module type AGENT = sig
        | `Method of
          [`DELETE | `GET | `HEAD | `OPTIONS | `PATCH | `POST | `PUT | `TRACE]
        | `Path of string
-       | `RequestBody of string
+       | `RequestBody of string * string
        | `Server of string ]
        list
     -> ( [> `Headers of (string * string) list
@@ -25,6 +25,10 @@ module type AGENT = sig
 
   val return : 'c -> 'c thread
 end
+
+type term =
+  | S : string -> term
+  | P : (Format.formatter -> 'a -> unit) * 'a -> term
 
 (** [create_agent ?server_url ?bearer ?headers ()] creates a
     web agent which returns an [Curl command] with the [command]
@@ -61,6 +65,7 @@ let create_agent ?server_url ?cacerts ?verbose ?bearer ?(headers = []) () =
       ref None
     in
     let current_request_body : string option ref = ref None in
+    let current_request_mediatype : string option ref = ref None in
     let args0 = ref [] in
     List.iter
       (function
@@ -72,7 +77,8 @@ let create_agent ?server_url ?cacerts ?verbose ?bearer ?(headers = []) () =
             current_path := Some path
         | `Method method_ ->
             current_method := Some method_
-        | `RequestBody body ->
+        | `RequestBody (mediatype, body) ->
+            current_request_mediatype := Some mediatype ;
             current_request_body := Some body
         | `HttpVersion_1_1 ->
             (* The HTTP version is not part of the OpenAPI spec, but need to
@@ -100,19 +106,18 @@ let create_agent ?server_url ?cacerts ?verbose ?bearer ?(headers = []) () =
     (* Queue up the GET/POST/etc. command *)
     let pre = Queue.create () in
     let main = Queue.create () in
-    let pre_a v = Queue.add v pre in
-    let a v = Queue.add v main in
+    let pre_a (v : term) = Queue.add v pre in
+    let a (v : term) = Queue.add v main in
     (* [curl] *)
-    a (`S "curl") ;
+    a (S "curl") ;
     (* [https://...] *)
-    a (`Q uri) ;
+    a (S uri) ;
     (* [-v] *)
     ( match verbose with
     | Some 1 ->
-        a (`S "-v")
+        a (S "-v")
     | Some level when level >= 2 ->
-        a (`S "-v") ;
-        a (`S "--trace-ascii -")
+        a (S "-v") ; a (S "--trace-ascii -")
     | _ ->
         () ) ;
     (* [-H ...] *)
@@ -123,60 +128,68 @@ let create_agent ?server_url ?cacerts ?verbose ?bearer ?(headers = []) () =
            -H and 'name: value'. *)
         let nv = Format.asprintf "%s: %s" n v in
         a
-          (`P
-            ( (fun ppf nv' ->
-                Format.fprintf ppf "@[-H%a%s@]" br () (Filename.quote nv') )
-            , nv ) ) )
+          (P
+             ( (fun ppf nv' ->
+                 Format.fprintf ppf "@[-H%a%s@]" br () (Filename.quote nv') )
+             , nv ) ) )
       !current_headers ;
-    (* [--json ...] *)
-    ( match !current_request_body with
-    | None ->
-        ()
-    | Some body ->
+    (* [--json ...] or [--data-binary ...] *)
+    let is_post_implied = ref false in
+    let print_body body =
+      (* format stdin *)
+      let quoted_body = Filename.quote body in
+      let br' ppf () =
+        (* When there is a break in the line, add a ['\ '] where the
+           space is a newline character. That only works on Unix. *)
+        Format.pp_print_custom_break ~fits:("", 1, "") ~breaks:("'\\", 0, "' ")
+          ppf
+      in
+      let terms = String.split_on_char ' ' quoted_body in
+      pre_a (S {|printf "%s"|}) ;
+      pre_a (P (Format.pp_print_list ~pp_sep:br' Format.pp_print_string, terms)) ;
+      pre_a (S "|")
+    in
+    ( match (!current_request_mediatype, !current_request_body) with
+    | Some "application/json", Some body ->
         (* [@-] reads from stdin *)
-        a (`S "--json @-") ;
-        (* format stdin *)
-        let quoted_body = Filename.quote body in
-        let br' ppf () =
-          (* When there is a break in the line, add a ['\ '] where the
-             space is a newline character. That only works on Unix. *)
-          Format.pp_print_custom_break ~fits:("", 1, "")
-            ~breaks:("'\\", 0, "' ") ppf
-        in
-        let terms = String.split_on_char ' ' quoted_body in
-        pre_a (`S {|printf "%s\n"|}) ;
-        pre_a
-          (`P (Format.pp_print_list ~pp_sep:br' Format.pp_print_string, terms)) ;
-        pre_a (`S "|") ) ;
+        a (S "--json @-") ;
+        is_post_implied := true ;
+        print_body body
+    | Some "application/x-www-form-urlencoded", Some body ->
+        (* [@-] reads from stdin *)
+        a (S "--data-binary @-") ;
+        is_post_implied := true ;
+        print_body body
+    | _ ->
+        () ) ;
     (* [-X POST] *)
     ( match meth with
     | `GET ->
         ()
     | _ ->
-        a (`S (Format.asprintf "-X %a" Http.Method.pp meth)) ) ;
+        (* Avoid: Note: Unnecessary use of -X or --request, POST is already inferred. *)
+        if not !is_post_implied then
+          a (S (Format.asprintf "-X %a" Http.Method.pp meth)) ) ;
     (* [--http1.1 ...] *)
-    List.iter (fun i -> a (`S i)) !args0 ;
+    List.iter (fun i -> a (S i)) !args0 ;
     (* [--cacert] *)
     ( match cacerts with
     | Some cacerts ->
-        a (`S ("--cacert " ^ cacerts))
+        a (S ("--cacert " ^ cacerts))
     | None ->
         () ) ;
     (* Render the command with formatting and line continuation characters *)
-    let dump_q q =
+    let dump_cmd_list =
       Format.pp_print_list ~pp_sep:br
         (fun ppf -> function
-          | `S s ->
+          | S s ->
               Format.pp_print_string ppf s
-          | `Q s ->
-              Format.pp_print_string ppf (Filename.quote s)
-          | `P (pp, v) ->
+          | P (pp, v) ->
               pp ppf v )
         ppf
-        (Queue.to_seq q |> List.of_seq)
     in
-    dump_q pre ;
-    dump_q main ;
+    dump_cmd_list
+      (List.of_seq (Queue.to_seq pre) @ List.of_seq (Queue.to_seq main)) ;
     Format.pp_print_flush ppf () ;
     let cmd = Buffer.to_bytes buf |> String.of_bytes in
     `Curl_command cmd

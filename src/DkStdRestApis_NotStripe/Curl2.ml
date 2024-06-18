@@ -15,7 +15,7 @@ module type AGENT = sig
        | `Method of
          [`DELETE | `GET | `HEAD | `OPTIONS | `PATCH | `POST | `PUT | `TRACE]
        | `Path of string
-       | `RequestBody of string
+       | `RequestBody of string * string
        | `Server of string ]
        list
     -> ( [> `Headers of (string * string) list
@@ -75,6 +75,7 @@ let create_cohttp_curl_lwt_agent ?server_url ?(timeout_ms = 5000) ?cacerts
       ref None
     in
     let current_request_body : string option ref = ref None in
+    let current_request_mediatype : string option ref = ref None in
     let current_http_version = ref None in
     List.iter
       (function
@@ -86,7 +87,8 @@ let create_cohttp_curl_lwt_agent ?server_url ?(timeout_ms = 5000) ?cacerts
             current_path := Some path
         | `Method method_ ->
             current_method := Some method_
-        | `RequestBody body ->
+        | `RequestBody (mediatype, body) ->
+            current_request_mediatype := Some mediatype ;
             current_request_body := Some body
         | `HttpVersion_1_1 ->
             (* The HTTP version is not part of the OpenAPI spec, but need to
@@ -96,6 +98,14 @@ let create_cohttp_curl_lwt_agent ?server_url ?(timeout_ms = 5000) ?cacerts
         | _ ->
             () )
       attributes ;
+    (* set content-type *)
+    ( match !current_request_mediatype with
+    | Some mediatype ->
+        current_headers :=
+          Http.Header.add !current_headers "content-type" mediatype
+    | None ->
+        current_headers :=
+          Http.Header.add !current_headers "content-type" "application/json" ) ;
     try
       let uri =
         of_ref "Missing `Server" current_server
