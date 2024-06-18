@@ -23,9 +23,12 @@ jobs:
           ocaml-compiler: 5.2.x
           dune-cache: false # true does not publish pages consistently
       - name: Install Opam dependencies
-        # Must wait for opam 2.2 on setup-ocaml for opam install --subpath option to work.
+        # Must wait for opam 2.2 on setup-ocaml for:
+        # 1. opam install --subpath option to work.
+        # 2. {with-dev-setup} filter to work.
         run: |
-            cp src/DkStdRestApis_NotStripe.opam .
+            sudo apt install libcurl4-openssl-dev
+            sed s/with-dev-setup/with-doc/g src/DkStdRestApis_NotStripe.opam | tee DkStdRestApis_NotStripe.opam
             opam install . --deps-only --with-doc
       - name: Build odoc
         run: opam exec -- dune build @doc
