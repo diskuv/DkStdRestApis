@@ -7,12 +7,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    # Why not ubuntu-22.04? I get from GitHub:
+    #   **************************************************************
+    #   * Press Control+C again quickly to perform an emergency exit *
+    #   **************************************************************
+    #
+    #   Error: The operation was canceled.
+    runs-on: macos-latest
     permissions:
       # Needed for peaceiris/actions-gh-pages@v3
       contents: write
     concurrency:
-        group: ${{ github.workflow }}-${{ github.ref }}      
+        group: ${{ github.workflow }}-${{ github.ref }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,16 +28,21 @@ jobs:
         with:
           ocaml-compiler: 5.2.x
           dune-cache: false # true does not publish pages consistently
+      - name: Install Opam prereqs
+        if: runner.os == 'Linux'
+        run: sudo apt install libcurl4-openssl-dev
+      # - name: Install Opam prereqs
+      #   if: runner.os == 'macOS'
+      #   run: brew install XXX
       - name: Install Opam dependencies
         # Must wait for opam 2.2 on setup-ocaml for:
         # 1. opam install --subpath option to work.
         # 2. {with-dev-setup} filter to work.
         run: |
-            sudo apt install libcurl4-openssl-dev
             sed s/with-dev-setup/with-doc/g src/DkStdRestApis_NotStripe.opam | tee DkStdRestApis_NotStripe.opam
             opam install . --deps-only --with-doc
       - name: Build odoc
-        run: opam exec -- dune build @doc
+        run: opam exec -- dune build --verbose @doc
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
