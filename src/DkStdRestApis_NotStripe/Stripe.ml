@@ -5588,7 +5588,7 @@ end
 struct
 
   open StripeTypes
-  open StripeReqs
+  open StripeBodies
   open StripeEncdrs
   open StripeParams
   
