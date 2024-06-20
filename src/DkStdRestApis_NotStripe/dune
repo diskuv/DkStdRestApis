@@ -2,7 +2,8 @@
  (name DkStdRestApis_NotStripe)
  (public_name DkStdRestApis_NotStripe)
  (modules (:standard \ open__ Curl2 CurlCmd ServerTiny))
- (ocamlopt_flags (:standard -verbose -compact -inline 0 -linscan -match-context-rows 8))
+ ; (ocamlopt_flags (:standard -verbose -compact -inline 0 -linscan -match-context-rows 8))
+ (ocamlopt_flags (:standard -verbose))
  (libraries ezjsonm json-data-encoding ptime routes))
 
 (library
@@ -15,4 +16,5 @@
  (name ServerTiny)
  (public_name stripe-tiny-server)
  (modules ServerTiny)
+ (modes native)
  (libraries DkStdRestApis_NotStripe tiny_httpd))
