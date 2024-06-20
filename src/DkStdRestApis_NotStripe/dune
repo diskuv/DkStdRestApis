@@ -16,5 +16,5 @@
  (name ServerTiny)
  (public_name stripe-tiny-server)
  (modules ServerTiny)
- (modes native)
+ (modes byte)
  (libraries DkStdRestApis_NotStripe tiny_httpd))
