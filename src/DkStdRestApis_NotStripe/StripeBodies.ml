@@ -1,6 +1,6 @@
-(** {1 Request Bodies} *)
+(** {1 Request and Response Bodies} *)
 
-module ReqBodySerDe' = struct
+module BodySerDe' = struct
 
   open StripeTypes
   open StripeEncdrs
