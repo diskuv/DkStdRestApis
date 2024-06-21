@@ -5612,7 +5612,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_d3efdb60c5
+           BodySerDe'.body_of_t_ef97b53327
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -5689,7 +5689,7 @@ struct
     let _op = "/v1/webhook_endpoints" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_252917a9ed * [`Http_header of string * string] list)
+          ([`CH_OK of (t_009f7b6355 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -5766,7 +5766,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_252917a9ed j) with
+              begin match (Json_encoding.destruct Encoders'.t_009f7b6355 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -5806,7 +5806,7 @@ struct
     let _k _path ?created ?ending_before ?expand ~financial_account ?limit
         ?order_by ?starting_after ?status ?status_transitions
         _req :
-          ([`CH_OK of (t_dc33734541 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_7daf65bc51 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -5825,7 +5825,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e0080bc683 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_2bb01eccbd ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -5857,7 +5857,7 @@ struct
       let _uri =
         match order_by with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_04484736af ~p:"order_by" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_65e58eb6da ~p:"order_by" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -5871,14 +5871,14 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_6695658151 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_6f04380d09 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match status_transitions with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f88b9725ad ~p:"status_transitions" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b458f1b6fb ~p:"status_transitions" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -5915,7 +5915,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_dc33734541 j) with
+              begin match (Json_encoding.destruct Encoders'.t_7daf65bc51 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -5966,7 +5966,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_13a556529f
+           BodySerDe'.body_of_t_d051225f0e
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -6044,7 +6044,7 @@ struct
     let _k _path ?ending_before ?expand ~financial_account ?limit
         ?starting_after ?status
         _req :
-          ([`CH_OK of (t_13bfd89306 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_4c6dd8f0e1 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -6095,7 +6095,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f9dbcc1790 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_bda61eb198 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -6132,7 +6132,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_13bfd89306 j) with
+              begin match (Json_encoding.destruct Encoders'.t_4c6dd8f0e1 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -6183,7 +6183,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_c61693ce20
+           BodySerDe'.body_of_t_82a5266788
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -6261,7 +6261,7 @@ struct
     let _k _path ?ending_before ?expand ~financial_account ?limit
         ?received_debit ?resolution ?starting_after ?status
         _req :
-          ([`CH_OK of (t_802c688d56 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_85b19d50f4 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -6312,7 +6312,7 @@ struct
       let _uri =
         match resolution with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_8c672cee18 ~p:"resolution" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ed1d428d1e ~p:"resolution" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -6326,7 +6326,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_8d4454e1e7 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e27a5a13e2 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -6363,7 +6363,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_802c688d56 j) with
+              begin match (Json_encoding.destruct Encoders'.t_85b19d50f4 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -6414,7 +6414,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_bf072f4eca
+           BodySerDe'.body_of_t_4088bc30cc
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -6492,7 +6492,7 @@ struct
     let _op = "/v1/reviews" in
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_d6d7f5a1b7 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_4b4add6b74 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -6511,7 +6511,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_977617a7a1 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_91991d11ce ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -6576,7 +6576,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_d6d7f5a1b7 j) with
+              begin match (Json_encoding.destruct Encoders'.t_4b4add6b74 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -6627,7 +6627,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_c9fb8c6ce1
+           BodySerDe'.body_of_t_7db5a18132
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -6704,7 +6704,7 @@ struct
     let _k _path ?active ?created ?currency ?ending_before ?expand ?limit
         ?lookup_keys ?product ?recurring ?starting_after ?type_
         _req :
-          ([`CH_OK of (t_375233a8d0 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_74158d6312 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -6730,7 +6730,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_6bdfe70bb0 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_5c423aae2d ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -6779,7 +6779,7 @@ struct
       let _uri =
         match recurring with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_0aad2a8fdd ~p:"recurring" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_54d3503cdb ~p:"recurring" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -6793,7 +6793,7 @@ struct
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_2774ea4fcd ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_806c738ca8 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -6830,7 +6830,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_375233a8d0 j) with
+              begin match (Json_encoding.destruct Encoders'.t_74158d6312 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -6869,7 +6869,7 @@ struct
     let _op = "/v1/exchange_rates" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_251285a4d6 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_7fe89e0e5d * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -6946,7 +6946,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_251285a4d6 j) with
+              begin match (Json_encoding.destruct Encoders'.t_7fe89e0e5d j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -7000,7 +7000,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_6b60a3205c
+             BodySerDe'.body_of_t_5a1ce40dda
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -7079,7 +7079,7 @@ struct
         ?limit ?payment_intent ?payment_link ?starting_after ?status
         ?subscription
         _req :
-          ([`CH_OK of (t_740648d584 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_be210268f2 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -7098,7 +7098,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_aa139a393a ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_0b0b7bdb7e ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -7112,7 +7112,7 @@ struct
       let _uri =
         match customer_details with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_26c973347b ~p:"customer_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_12bf81c281 ~p:"customer_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -7161,7 +7161,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_b373919511 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_976c399de7 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -7205,7 +7205,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_740648d584 j) with
+              begin match (Json_encoding.destruct Encoders'.t_be210268f2 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -7256,7 +7256,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_41547624db
+           BodySerDe'.body_of_t_2a790f7673
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -7334,7 +7334,7 @@ struct
     let _k _path ?ending_before ?expand ?limit ?lookup_keys ?preferences
         ?starting_after ?status
         _req :
-          ([`CH_OK of (t_7892444c6d * [`Http_header of string * string] list)
+          ([`CH_OK of (t_a6474a2d5e * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -7381,7 +7381,7 @@ struct
       let _uri =
         match preferences with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_1a2156a726 ~p:"preferences" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_6565ec2878 ~p:"preferences" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -7395,7 +7395,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e7cf5da208 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_386a8a09fc ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -7432,7 +7432,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_7892444c6d j) with
+              begin match (Json_encoding.destruct Encoders'.t_a6474a2d5e j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -7483,7 +7483,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_b6ba8d726e
+           BodySerDe'.body_of_t_8fdaacf028
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -7560,7 +7560,7 @@ struct
     let _k _path ?created ?customer ?ending_before ?expand ?invoice ?limit
         ?pending ?starting_after
         _req :
-          ([`CH_OK of (t_902a88f96d * [`Http_header of string * string] list)
+          ([`CH_OK of (t_fc9322fc50 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -7579,7 +7579,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f1cfc81a85 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_7181394bbb ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -7665,7 +7665,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_902a88f96d j) with
+              begin match (Json_encoding.destruct Encoders'.t_fc9322fc50 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -7814,7 +7814,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_ae77b5e4c1
+             BodySerDe'.body_of_t_6c44d9c7d2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -7893,7 +7893,7 @@ struct
     let _op = "/v1/customers/search" in
     let _k _path ?expand ?limit ?page ~query
         _req :
-          ([`CH_OK of (t_652672e09b * [`Http_header of string * string] list)
+          ([`CH_OK of (t_ada489b57e * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -7967,7 +7967,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_652672e09b j) with
+              begin match (Json_encoding.destruct Encoders'.t_ada489b57e j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -8114,7 +8114,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_2c6b2540ea
+           BodySerDe'.body_of_t_0f1eb7e9e5
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -8194,7 +8194,7 @@ struct
     let _op = "/v1/subscriptions/search" in
     let _k _path ?expand ?limit ?page ~query
         _req :
-          ([`CH_OK of (t_06d3ee40b9 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_511c6be270 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -8268,7 +8268,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_06d3ee40b9 j) with
+              begin match (Json_encoding.destruct Encoders'.t_511c6be270 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -8332,7 +8332,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_0cf8eea095
+             BodySerDe'.body_of_t_3131e049b3
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -8409,7 +8409,7 @@ struct
     let _k _path ?charge ?created ?ending_before ?expand ?limit
         ?payment_intent ?starting_after
         _req :
-          ([`CH_OK of (t_1d0b24c5ca * [`Http_header of string * string] list)
+          ([`CH_OK of (t_84023f4c8c * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -8435,7 +8435,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_94f3045432 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c862988285 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -8507,7 +8507,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_1d0b24c5ca j) with
+              begin match (Json_encoding.destruct Encoders'.t_84023f4c8c j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -8558,7 +8558,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_188ad0945d
+           BodySerDe'.body_of_t_63665b08a9
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -8634,7 +8634,7 @@ struct
     let _op = "/v1/apps/secrets" in
     let _k _path ?ending_before ?expand ?limit ~scope ?starting_after
         _req :
-          ([`CH_OK of (t_4e2af14f7a * [`Http_header of string * string] list)
+          ([`CH_OK of (t_a753848072 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -8672,7 +8672,7 @@ struct
         | None -> _uri
       in
       let _uri =
-        let _nv = ParamSerDe'.namevalues_of_t_890cf6dfd5 ~p:"scope" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true scope in
+        let _nv = ParamSerDe'.namevalues_of_t_4ce91395e3 ~p:"scope" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true scope in
         List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         in 
       let _uri =
@@ -8715,7 +8715,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_4e2af14f7a j) with
+              begin match (Json_encoding.destruct Encoders'.t_a753848072 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -8757,7 +8757,7 @@ struct
     let _op = "/v1/payment_intents/search" in
     let _k _path ?expand ?limit ?page ~query
         _req :
-          ([`CH_OK of (t_be21454efd * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2b5089e91b * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -8831,7 +8831,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_be21454efd j) with
+              begin match (Json_encoding.destruct Encoders'.t_2b5089e91b j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -8870,7 +8870,7 @@ struct
     let _op = "/v1/entitlements/active_entitlements" in
     let _k _path ~customer ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_dda955c993 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_a59bf7d41a * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -8951,7 +8951,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_dda955c993 j) with
+              begin match (Json_encoding.destruct Encoders'.t_a59bf7d41a j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -9005,7 +9005,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_d7c04a246f
+             BodySerDe'.body_of_t_be0ad9b5f5
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -9083,7 +9083,7 @@ struct
     let _k _path ?ending_before ?expand ?is_account_default ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_d9695e35f7 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_a974b789de * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -9167,7 +9167,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_d9695e35f7 j) with
+              begin match (Json_encoding.destruct Encoders'.t_a974b789de j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -9221,7 +9221,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_fadd71181a
+             BodySerDe'.body_of_t_7e9ce92a64
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -9299,7 +9299,7 @@ struct
     let _k _path ?canceled_at ?completed_at ?created ?customer ?ending_before
         ?expand ?limit ?released_at ?scheduled ?starting_after
         _req :
-          ([`CH_OK of (t_c0519b9226 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_131d8d58f6 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -9318,21 +9318,21 @@ struct
       let _uri =
         match canceled_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_b40f11dd64 ~p:"canceled_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_edb9c04aba ~p:"canceled_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match completed_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_9e8c6bcf30 ~p:"completed_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b053f4a10e ~p:"completed_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_a1fe692430 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_8dd946adeb ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -9367,7 +9367,7 @@ struct
       let _uri =
         match released_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_9aa6380ae2 ~p:"released_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e65a202262 ~p:"released_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -9418,7 +9418,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_c0519b9226 j) with
+              begin match (Json_encoding.destruct Encoders'.t_131d8d58f6 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -9469,7 +9469,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_0d53ea1e47
+           BodySerDe'.body_of_t_45244250b0
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -9546,7 +9546,7 @@ struct
     let _op = "/v1/reporting/report_runs" in
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_ddce341ee6 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_c990e5bff8 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -9565,7 +9565,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_bfeba0d067 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_95b7b73ff8 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -9630,7 +9630,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_ddce341ee6 j) with
+              begin match (Json_encoding.destruct Encoders'.t_c990e5bff8 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -9682,7 +9682,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_be9da0bd64
+           BodySerDe'.body_of_t_e0d65e6591
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -9759,7 +9759,7 @@ struct
     let _op = "/v1/climate/orders" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_384bb1c8f4 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_9c934593c9 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -9836,7 +9836,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_384bb1c8f4 j) with
+              begin match (Json_encoding.destruct Encoders'.t_9c934593c9 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -9887,7 +9887,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_e64c12fea8
+           BodySerDe'.body_of_t_2757ce4894
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -9964,7 +9964,7 @@ struct
     let _k _path ?active ?created ?ending_before ?expand ?limit ?product
         ?starting_after
         _req :
-          ([`CH_OK of (t_efd274ca1a * [`Http_header of string * string] list)
+          ([`CH_OK of (t_dd09d84db3 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -9990,7 +9990,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_d4fbe66228 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c85fb118c6 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10062,7 +10062,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_efd274ca1a j) with
+              begin match (Json_encoding.destruct Encoders'.t_dd09d84db3 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -10102,7 +10102,7 @@ struct
     let _k _path ~card ?created ?ending_before ?expand ?limit ?starting_after
         ?status
         _req :
-          ([`CH_OK of (t_7447d49ad1 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_d442622ac0 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -10125,7 +10125,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_16deab6c5d ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_a985a64df2 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10160,7 +10160,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_11e340ed02 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_9463e4703f ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10197,7 +10197,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_7447d49ad1 j) with
+              begin match (Json_encoding.destruct Encoders'.t_d442622ac0 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -10245,7 +10245,7 @@ struct
         ?subscription_resume_at ?subscription_start_date
         ?subscription_trial_end
         _req :
-          ([`CH_OK of (t_daed770de0 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_298a5f6377 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -10264,7 +10264,7 @@ struct
       let _uri =
         match automatic_tax with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_2fbe7f660e ~p:"automatic_tax" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_25cc6e6754 ~p:"automatic_tax" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10292,14 +10292,14 @@ struct
       let _uri =
         match customer_details with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f6eb04d2e3 ~p:"customer_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_428991b112 ~p:"customer_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match discounts with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_81e673c9db ~p:"discounts" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ec12d0adc5 ~p:"discounts" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10320,14 +10320,14 @@ struct
       let _uri =
         match invoice_items with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e3fa4586a5 ~p:"invoice_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_6de1e50279 ~p:"invoice_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match issuer with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_d7df29a1b1 ~p:"issuer" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_f2803c8215 ~p:"issuer" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10341,14 +10341,14 @@ struct
       let _uri =
         match on_behalf_of with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_fa6f579b99 ~p:"on_behalf_of" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_d3294049d8 ~p:"on_behalf_of" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match preview_mode with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_3122be5d2a ~p:"preview_mode" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_f90350482b ~p:"preview_mode" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10362,7 +10362,7 @@ struct
       let _uri =
         match schedule_details with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_fd8d01a560 ~p:"schedule_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_4592f6749b ~p:"schedule_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10383,14 +10383,14 @@ struct
       let _uri =
         match subscription_billing_cycle_anchor with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_10fbc38ff9 ~p:"subscription_billing_cycle_anchor" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ed69666899 ~p:"subscription_billing_cycle_anchor" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_cancel_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_cfe86625c3 ~p:"subscription_cancel_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_1d44572454 ~p:"subscription_cancel_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10411,28 +10411,28 @@ struct
       let _uri =
         match subscription_default_tax_rates with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_0852729626 ~p:"subscription_default_tax_rates" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_8f5fa696e4 ~p:"subscription_default_tax_rates" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_details with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_79f4876735 ~p:"subscription_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_7cca4f7dbf ~p:"subscription_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_items with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e14347739f ~p:"subscription_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_1d8dcb799a ~p:"subscription_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_proration_behavior with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_c3d0e8c5c0 ~p:"subscription_proration_behavior" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b3cdff625a ~p:"subscription_proration_behavior" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10446,7 +10446,7 @@ struct
       let _uri =
         match subscription_resume_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_04983d6adf ~p:"subscription_resume_at" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_f0d6f3faa7 ~p:"subscription_resume_at" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10460,7 +10460,7 @@ struct
       let _uri =
         match subscription_trial_end with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_2952cd25d0 ~p:"subscription_trial_end" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_8a9e68982d ~p:"subscription_trial_end" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10497,7 +10497,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_daed770de0 j) with
+              begin match (Json_encoding.destruct Encoders'.t_298a5f6377 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -10548,7 +10548,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_e3a7c57d4a
+           BodySerDe'.body_of_t_5682e7ca57
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -10637,7 +10637,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_964deea341
+           BodySerDe'.body_of_t_5d025dbec5
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -10727,7 +10727,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_b12f762f7a
+           BodySerDe'.body_of_t_0372bf8c09
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -10822,7 +10822,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_5694d68ef9
+           BodySerDe'.body_of_t_43ba264db4
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -10900,7 +10900,7 @@ struct
         ?current_period_end ?current_period_start ?customer ?ending_before
         ?expand ?limit ?price ?starting_after ?status ?test_clock
         _req :
-          ([`CH_OK of (t_85c84aa482 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2f50dabf8e * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -10919,35 +10919,35 @@ struct
       let _uri =
         match automatic_tax with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_0a6220e696 ~p:"automatic_tax" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b1188f80a4 ~p:"automatic_tax" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match collection_method with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f32678b2ef ~p:"collection_method" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_d2098cac25 ~p:"collection_method" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_9e4c050846 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_900f55e0e4 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match current_period_end with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_ab910df305 ~p:"current_period_end" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_dad4a4ac5b ~p:"current_period_end" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match current_period_start with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_81e3b88aad ~p:"current_period_start" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_dce85b0bb2 ~p:"current_period_start" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -10996,7 +10996,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_21215fdec6 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_a6b80cd539 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -11040,7 +11040,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_85c84aa482 j) with
+              begin match (Json_encoding.destruct Encoders'.t_2f50dabf8e j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -11080,7 +11080,7 @@ struct
     let _k _path ?created ?delivery_success ?ending_before ?expand ?limit
         ?starting_after ?type_ ?types
         _req :
-          ([`CH_OK of (t_9e272137fe * [`Http_header of string * string] list)
+          ([`CH_OK of (t_a9fe829193 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -11099,7 +11099,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_8159efcced ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_194d7f2624 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -11185,7 +11185,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9e272137fe j) with
+              begin match (Json_encoding.destruct Encoders'.t_a9fe829193 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -11236,7 +11236,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_4d654213e3
+           BodySerDe'.body_of_t_a30c2d9c78
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -11314,7 +11314,7 @@ struct
     let _k _path ?active ?ending_before ?expand ?is_default ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_f9d252d636 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_f3884ce0bf * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -11405,7 +11405,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_f9d252d636 j) with
+              begin match (Json_encoding.destruct Encoders'.t_f3884ce0bf j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -11447,7 +11447,7 @@ struct
     let _k _path ?created ?currency ?ending_before ?expand ?limit ?payout
         ?source ?starting_after ?type_
         _req :
-          ([`CH_OK of (t_fe3932c3f5 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2202d52174 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -11466,7 +11466,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_d867b2e5ee ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_01b97bcd1e ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -11559,7 +11559,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_fe3932c3f5 j) with
+              begin match (Json_encoding.destruct Encoders'.t_2202d52174 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -11619,7 +11619,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_fa9ecaf73f
+             BodySerDe'.body_of_t_794a4d2df8
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -11707,7 +11707,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_13c67f66b9
+           BodySerDe'.body_of_t_a6ac4c70d5
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -11799,7 +11799,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_821e6a1748
+             BodySerDe'.body_of_t_2752bc4d8e
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -11876,7 +11876,7 @@ struct
     let _op = "/v1/issuing/physical_bundles" in
     let _k _path ?ending_before ?expand ?limit ?starting_after ?status ?type_
         _req :
-          ([`CH_OK of (t_2db3b7fa50 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_93afe9bb1d * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -11923,14 +11923,14 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_8fef9d57c9 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_3d82a38285 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_849ed17da9 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_00d4956c80 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -11967,7 +11967,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_2db3b7fa50 j) with
+              begin match (Json_encoding.destruct Encoders'.t_93afe9bb1d j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -12034,7 +12034,7 @@ struct
         List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         in 
       let _uri =
-        let _nv = ParamSerDe'.namevalues_of_t_e9c8494c48 ~p:"scope" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true scope in
+        let _nv = ParamSerDe'.namevalues_of_t_4a4b8daa1f ~p:"scope" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true scope in
         List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         in 
       let _attrs = `Path (Uri.to_string _uri) :: _attrs in
@@ -12121,7 +12121,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_defb802725
+           BodySerDe'.body_of_t_899a7d7058
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -12199,7 +12199,7 @@ struct
     let _k _path ?archived ?ending_before ?expand ?limit ?lookup_key
         ?starting_after
         _req :
-          ([`CH_OK of (t_0e0730e721 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_5c8bbeb9fe * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -12290,7 +12290,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_0e0730e721 j) with
+              begin match (Json_encoding.destruct Encoders'.t_5c8bbeb9fe j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -12341,7 +12341,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_7a9057bca1
+           BodySerDe'.body_of_t_3f26729ec9
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -12417,7 +12417,7 @@ struct
     let _op = "/v1/payment_links" in
     let _k _path ?active ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_a78ab7caef * [`Http_header of string * string] list)
+          ([`CH_OK of (t_909266bbb4 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -12501,7 +12501,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_a78ab7caef j) with
+              begin match (Json_encoding.destruct Encoders'.t_909266bbb4 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -12552,7 +12552,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_fce0724e2a
+           BodySerDe'.body_of_t_7e0601cf2e
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -12630,7 +12630,7 @@ struct
     let _k _path ?created ?email ?ending_before ?expand ?limit ?phone_number
         ?starting_after ?status ?type_
         _req :
-          ([`CH_OK of (t_eef5a5dacb * [`Http_header of string * string] list)
+          ([`CH_OK of (t_159106836c * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -12649,7 +12649,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_c208f0f2be ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_5e23dd8315 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -12698,14 +12698,14 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_42e95c716a ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_d05018810d ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_04f985ad81 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_9b139b4e87 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -12742,7 +12742,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_eef5a5dacb j) with
+              begin match (Json_encoding.destruct Encoders'.t_159106836c j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -12783,7 +12783,7 @@ struct
         ~invoice ?limit ?lines ?memo ?metadata ?out_of_band_amount ?reason
         ?refund ?refund_amount ?shipping_cost ?starting_after
         _req :
-          ([`CH_OK of (t_dbb369ec1b * [`Http_header of string * string] list)
+          ([`CH_OK of (t_78e52fa8e7 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -12848,7 +12848,7 @@ struct
       let _uri =
         match lines with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_302b4fc4e4 ~p:"lines" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_3acf43dc3b ~p:"lines" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -12862,7 +12862,7 @@ struct
       let _uri =
         match metadata with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_0821868d84 ~p:"metadata" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_2551b208c1 ~p:"metadata" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -12876,7 +12876,7 @@ struct
       let _uri =
         match reason with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_defa071e89 ~p:"reason" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_5780adc875 ~p:"reason" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -12897,7 +12897,7 @@ struct
       let _uri =
         match shipping_cost with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_5116f50be5 ~p:"shipping_cost" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_7d4b84944c ~p:"shipping_cost" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -12941,7 +12941,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_dbb369ec1b j) with
+              begin match (Json_encoding.destruct Encoders'.t_78e52fa8e7 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -12995,7 +12995,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2b617be94b
+             BodySerDe'.body_of_t_1ce9291b18
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -13178,7 +13178,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_057722e648
+           BodySerDe'.body_of_t_28f1ad2c87
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -13255,7 +13255,7 @@ struct
     let _k _path ?charge ?created ?ending_before ?expand ?limit
         ?payment_intent ?starting_after
         _req :
-          ([`CH_OK of (t_f737374a69 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_922afa3fe7 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -13281,7 +13281,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_9387af353f ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_d8f80ab533 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13353,7 +13353,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_f737374a69 j) with
+              begin match (Json_encoding.destruct Encoders'.t_922afa3fe7 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -13425,7 +13425,7 @@ struct
       let _uri =
         match automatic_tax with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_8a5fd2de38 ~p:"automatic_tax" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_a51466ec35 ~p:"automatic_tax" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13453,14 +13453,14 @@ struct
       let _uri =
         match customer_details with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e3f1f34a06 ~p:"customer_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c87881fc5c ~p:"customer_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match discounts with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_ec989090c2 ~p:"discounts" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_873409613d ~p:"discounts" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13474,28 +13474,28 @@ struct
       let _uri =
         match invoice_items with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f80679d274 ~p:"invoice_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_96382fbbc2 ~p:"invoice_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match issuer with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_32a68f7fa5 ~p:"issuer" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_266682ce3a ~p:"issuer" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match on_behalf_of with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_a83913a4f2 ~p:"on_behalf_of" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_9aa5bd9e73 ~p:"on_behalf_of" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match preview_mode with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_ec4c522682 ~p:"preview_mode" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_50aa3198c9 ~p:"preview_mode" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13509,7 +13509,7 @@ struct
       let _uri =
         match schedule_details with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e00ab899ed ~p:"schedule_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c4767cb749 ~p:"schedule_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13523,14 +13523,14 @@ struct
       let _uri =
         match subscription_billing_cycle_anchor with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_c97f96140a ~p:"subscription_billing_cycle_anchor" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_312ad6306f ~p:"subscription_billing_cycle_anchor" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_cancel_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_991e5f6179 ~p:"subscription_cancel_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b9ba448b2f ~p:"subscription_cancel_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13551,28 +13551,28 @@ struct
       let _uri =
         match subscription_default_tax_rates with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_0948902ade ~p:"subscription_default_tax_rates" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_0178e1face ~p:"subscription_default_tax_rates" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_details with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_5bdcc41c2a ~p:"subscription_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_baccbfb036 ~p:"subscription_details" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_items with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_b0fda171f8 ~p:"subscription_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_671de99c34 ~p:"subscription_items" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match subscription_proration_behavior with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_876fb1bc40 ~p:"subscription_proration_behavior" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_6dff880c24 ~p:"subscription_proration_behavior" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13586,7 +13586,7 @@ struct
       let _uri =
         match subscription_resume_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_9ad9bd5605 ~p:"subscription_resume_at" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_50e9f09abe ~p:"subscription_resume_at" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13600,7 +13600,7 @@ struct
       let _uri =
         match subscription_trial_end with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_915f11076c ~p:"subscription_trial_end" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_30748e2d12 ~p:"subscription_trial_end" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -13688,7 +13688,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_54c2b31b26
+           BodySerDe'.body_of_t_578ee3d1db
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -13765,7 +13765,7 @@ struct
     let _op = "/v1/apple_pay/domains" in
     let _k _path ?domain_name ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_8a1b6c7e06 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2c4769bee6 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -13849,7 +13849,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8a1b6c7e06 j) with
+              begin match (Json_encoding.destruct Encoders'.t_2c4769bee6 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -13900,7 +13900,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_4612538979
+           BodySerDe'.body_of_t_95acbcd7ae
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -13978,7 +13978,7 @@ struct
     let _k _path ?alias ?contains ?created ?ending_before ?expand ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_195fd8c3c6 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_46113411f3 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -14011,7 +14011,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_485be60dff ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b205fb898b ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14076,7 +14076,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_195fd8c3c6 j) with
+              begin match (Json_encoding.destruct Encoders'.t_46113411f3 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -14127,7 +14127,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_4d9f8cf633
+           BodySerDe'.body_of_t_5ccaf92d75
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -14216,7 +14216,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_a43adb5ae7
+           BodySerDe'.body_of_t_89239a72fa
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -14293,7 +14293,7 @@ struct
     let _k _path ?created ?ending_before ?expand ?expired ?file ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_46c07ba785 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_725237f1c4 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -14312,7 +14312,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f4a5e75dbf ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_76bf2704bf ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14391,7 +14391,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_46c07ba785 j) with
+              begin match (Json_encoding.destruct Encoders'.t_725237f1c4 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -14447,7 +14447,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_fb73b03a51
+             BodySerDe'.body_of_t_fd91397b06
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -14523,7 +14523,7 @@ struct
     let _op = "/v1/coupons" in
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_937be87fd9 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_06d31e05e4 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -14542,7 +14542,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f9a2efc89d ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_8efa015a15 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14607,7 +14607,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_937be87fd9 j) with
+              begin match (Json_encoding.destruct Encoders'.t_06d31e05e4 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -14647,7 +14647,7 @@ struct
     let _k _path ?card ?cardholder ?created ?ending_before ?expand ?limit
         ?starting_after ?type_
         _req :
-          ([`CH_OK of (t_42d2bbd5db * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b1e8ec8e7f * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -14680,7 +14680,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_0e1a6c56e3 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_a6ed41322f ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14715,7 +14715,7 @@ struct
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_a6d8c1a3b9 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_a13fab6ce7 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14752,7 +14752,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_42d2bbd5db j) with
+              begin match (Json_encoding.destruct Encoders'.t_b1e8ec8e7f j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -14792,7 +14792,7 @@ struct
     let _k _path ?card ?cardholder ?created ?ending_before ?expand ?limit
         ?starting_after ?status
         _req :
-          ([`CH_OK of (t_ff45cb4767 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_426671dc03 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -14825,7 +14825,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_696a3e9ebe ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_28b874eafa ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14860,7 +14860,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_4eafe4d677 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e7c047a717 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14897,7 +14897,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_ff45cb4767 j) with
+              begin match (Json_encoding.destruct Encoders'.t_426671dc03 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -14937,7 +14937,7 @@ struct
     let _k _path ?created ?effective_at ?ending_before ?expand
         ~financial_account ?limit ?order_by ?starting_after ?transaction
         _req :
-          ([`CH_OK of (t_f743b869ea * [`Http_header of string * string] list)
+          ([`CH_OK of (t_6433a1491c * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -14956,14 +14956,14 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_4c0b4f6fc6 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_01243047ea ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match effective_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_4316f9bdd6 ~p:"effective_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_fa33b5a2bd ~p:"effective_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -14995,7 +14995,7 @@ struct
       let _uri =
         match order_by with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_bc07bb4360 ~p:"order_by" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_1f08681071 ~p:"order_by" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -15046,7 +15046,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_f743b869ea j) with
+              begin match (Json_encoding.destruct Encoders'.t_6433a1491c j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -15086,7 +15086,7 @@ struct
     let _k _path ?ending_before ?expand ~financial_account ?limit
         ?starting_after ?status
         _req :
-          ([`CH_OK of (t_99a380d872 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_15e9354091 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -15137,7 +15137,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_50ce7697c2 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_fe86a832fb ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -15174,7 +15174,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_99a380d872 j) with
+              begin match (Json_encoding.destruct Encoders'.t_15e9354091 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -15225,7 +15225,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_906bfeffcd
+           BodySerDe'.body_of_t_d78871063c
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -15303,7 +15303,7 @@ struct
     let _k _path ?ending_before ?expand ~financial_account ?limit
         ?starting_after ?status
         _req :
-          ([`CH_OK of (t_78c96de6fe * [`Http_header of string * string] list)
+          ([`CH_OK of (t_7f08263a31 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -15354,7 +15354,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_57ebe3c863 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_7e023d3347 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -15391,7 +15391,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_78c96de6fe j) with
+              begin match (Json_encoding.destruct Encoders'.t_7f08263a31 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -15442,7 +15442,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_4b36d2503f
+           BodySerDe'.body_of_t_304ca2adbe
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -15519,7 +15519,7 @@ struct
     let _k _path ?created ?destination ?ending_before ?expand ?limit
         ?starting_after ?transfer_group
         _req :
-          ([`CH_OK of (t_1b1d010c01 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_33072f36c2 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -15538,7 +15538,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_48bbea3497 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c5c22bba1c ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -15617,7 +15617,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_1b1d010c01 j) with
+              begin match (Json_encoding.destruct Encoders'.t_33072f36c2 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -15668,7 +15668,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_da508546f5
+           BodySerDe'.body_of_t_1a73a34312
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -15745,7 +15745,7 @@ struct
     let _k _path ?active ?created ?currency ?ending_before ?expand ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_215d3c5b64 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_455e067f38 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -15771,7 +15771,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_098e02745c ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_3115fde6ed ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -15843,7 +15843,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_215d3c5b64 j) with
+              begin match (Json_encoding.destruct Encoders'.t_455e067f38 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -15894,7 +15894,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_01c0ada085
+           BodySerDe'.body_of_t_7ea94600eb
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -15972,7 +15972,7 @@ struct
         ?expand ?last4 ?limit ?personalization_design ?starting_after ?status
         ?type_
         _req :
-          ([`CH_OK of (t_a7a9ff7183 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_c504de1304 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -15998,7 +15998,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e67ab51d5e ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_fd32e6450f ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16061,14 +16061,14 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_5cacf53388 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e2b1b56eac ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_b413e28022 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e42a3414c1 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16105,7 +16105,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_a7a9ff7183 j) with
+              begin match (Json_encoding.destruct Encoders'.t_c504de1304 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -16197,7 +16197,7 @@ struct
       let _uri =
         match lines with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_ea63e9747c ~p:"lines" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c086813c51 ~p:"lines" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16211,7 +16211,7 @@ struct
       let _uri =
         match metadata with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_1449eb52f2 ~p:"metadata" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_fa0c590277 ~p:"metadata" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16225,7 +16225,7 @@ struct
       let _uri =
         match reason with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_b994932726 ~p:"reason" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_935a453a3f ~p:"reason" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16246,7 +16246,7 @@ struct
       let _uri =
         match shipping_cost with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_537f0b2797 ~p:"shipping_cost" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c4284eadfd ~p:"shipping_cost" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16334,7 +16334,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_9cca83d3ce
+           BodySerDe'.body_of_t_67905fe2c6
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -16411,7 +16411,7 @@ struct
     let _k _path ?account_holder ?ending_before ?expand ?limit ?session
         ?starting_after
         _req :
-          ([`CH_OK of (t_09e53dc9ce * [`Http_header of string * string] list)
+          ([`CH_OK of (t_6583320a34 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -16430,7 +16430,7 @@ struct
       let _uri =
         match account_holder with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_7916492c96 ~p:"account_holder" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_89676accde ~p:"account_holder" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16502,7 +16502,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_09e53dc9ce j) with
+              begin match (Json_encoding.destruct Encoders'.t_6583320a34 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -16542,7 +16542,7 @@ struct
     let _k _path ?account_holder ?ending_before ?expand ?limit ?session
         ?starting_after
         _req :
-          ([`CH_OK of (t_254cd07e4e * [`Http_header of string * string] list)
+          ([`CH_OK of (t_f2a503228b * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -16561,7 +16561,7 @@ struct
       let _uri =
         match account_holder with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f7bfa4b4d1 ~p:"account_holder" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_32de9e954f ~p:"account_holder" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -16633,7 +16633,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_254cd07e4e j) with
+              begin match (Json_encoding.destruct Encoders'.t_f2a503228b j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -16675,7 +16675,7 @@ struct
     let _op = "/v1/charges/search" in
     let _k _path ?expand ?limit ?page ~query
         _req :
-          ([`CH_OK of (t_3d95db33b6 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_54d21de021 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -16749,7 +16749,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_3d95db33b6 j) with
+              begin match (Json_encoding.destruct Encoders'.t_54d21de021 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -16800,7 +16800,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_99c4cd28e2
+           BodySerDe'.body_of_t_b8bc4c75fe
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -16877,7 +16877,7 @@ struct
     let _op = "/v1/test_helpers/test_clocks" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_ceda428226 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_56aeea4dc2 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -16954,7 +16954,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_ceda428226 j) with
+              begin match (Json_encoding.destruct Encoders'.t_56aeea4dc2 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -17005,7 +17005,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_6bb178a0d2
+           BodySerDe'.body_of_t_ff9dfe3c27
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -17096,7 +17096,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_90a3b32557
+             BodySerDe'.body_of_t_ee2c09384f
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -17173,7 +17173,7 @@ struct
     let _op = "/v1/payment_method_configurations" in
     let _k _path ?application ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_7fd6b1af74 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_4aa3de8048 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -17192,7 +17192,7 @@ struct
       let _uri =
         match application with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_6fdb9283b0 ~p:"application" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_41b2207b76 ~p:"application" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -17257,7 +17257,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_7fd6b1af74 j) with
+              begin match (Json_encoding.destruct Encoders'.t_4aa3de8048 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -17317,7 +17317,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_5f225de92f
+             BodySerDe'.body_of_t_c3c4ee4be6
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -17395,7 +17395,7 @@ struct
     let _k _path ?client_reference_id ?created ?ending_before ?expand ?limit
         ?starting_after ?status
         _req :
-          ([`CH_OK of (t_90e494ee79 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_611fc95c22 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -17421,7 +17421,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_cd28c8e916 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_8333ac0d50 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -17456,7 +17456,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_80086f9abe ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_060ea1562f ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -17493,7 +17493,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_90e494ee79 j) with
+              begin match (Json_encoding.destruct Encoders'.t_611fc95c22 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -17532,7 +17532,7 @@ struct
     let _op = "/v1/climate/suppliers" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_d34f4090f4 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_9108407aa1 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -17609,7 +17609,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_d34f4090f4 j) with
+              begin match (Json_encoding.destruct Encoders'.t_9108407aa1 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -17651,7 +17651,7 @@ struct
     let _k _path ?created ?currency ?ending_before ?expand ?limit ?payout
         ?source ?starting_after ?type_
         _req :
-          ([`CH_OK of (t_87a948937c * [`Http_header of string * string] list)
+          ([`CH_OK of (t_8c2090b0f2 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -17670,7 +17670,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_04deb19963 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e84cc44f8f ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -17763,7 +17763,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_87a948937c j) with
+              begin match (Json_encoding.destruct Encoders'.t_8c2090b0f2 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -17817,7 +17817,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_1046acf59a
+             BodySerDe'.body_of_t_e3c236c6f0
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -17894,7 +17894,7 @@ struct
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         ?status ?transaction
         _req :
-          ([`CH_OK of (t_038802c5c2 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_bd998bd157 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -17913,7 +17913,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_1179a06704 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_be86c12b19 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -17948,7 +17948,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_1da3cd165a ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_4b1fd7d313 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -17992,7 +17992,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_038802c5c2 j) with
+              begin match (Json_encoding.destruct Encoders'.t_bd998bd157 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -18043,7 +18043,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_348c84e9d9
+           BodySerDe'.body_of_t_8abffeff82
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -18119,7 +18119,7 @@ struct
     let _op = "/v1/billing/meters" in
     let _k _path ?ending_before ?expand ?limit ?starting_after ?status
         _req :
-          ([`CH_OK of (t_24d0aaf342 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_7cdca19673 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -18166,7 +18166,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_c9c8b6e8e4 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b478178155 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -18203,7 +18203,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_24d0aaf342 j) with
+              begin match (Json_encoding.destruct Encoders'.t_7cdca19673 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -18254,7 +18254,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_735d572a21
+           BodySerDe'.body_of_t_13373ed36b
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -18334,7 +18334,7 @@ struct
     let _op = "/v1/products/search" in
     let _k _path ?expand ?limit ?page ~query
         _req :
-          ([`CH_OK of (t_4bff460fa1 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_be54f3678d * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -18408,7 +18408,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_4bff460fa1 j) with
+              begin match (Json_encoding.destruct Encoders'.t_be54f3678d j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -18459,7 +18459,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_5298a074bf
+           BodySerDe'.body_of_t_4793eca8c7
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -18536,7 +18536,7 @@ struct
     let _op = "/v1/forwarding/requests" in
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_fb8858a6be * [`Http_header of string * string] list)
+          ([`CH_OK of (t_893b63e1ac * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -18555,7 +18555,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_7806695d68 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_a63e6bd7de ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -18620,7 +18620,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_fb8858a6be j) with
+              begin match (Json_encoding.destruct Encoders'.t_893b63e1ac j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -18671,7 +18671,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_bb9f43b8e8
+           BodySerDe'.body_of_t_7853ce0404
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -18748,7 +18748,7 @@ struct
     let _op = "/v1/treasury/financial_accounts" in
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_2d8c9e2e4a * [`Http_header of string * string] list)
+          ([`CH_OK of (t_03e433631d * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -18767,7 +18767,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_3d6f926201 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_9096085c5b ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -18832,7 +18832,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_2d8c9e2e4a j) with
+              begin match (Json_encoding.destruct Encoders'.t_03e433631d j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -18887,7 +18887,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_44a0d32017
+             BodySerDe'.body_of_t_a20dfc8c22
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -18975,7 +18975,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_87901b9b08
+           BodySerDe'.body_of_t_0b4946f6fc
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -19052,7 +19052,7 @@ struct
     let _k _path ?active ?created ?ending_before ?expand ?inclusive ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_8293c82abc * [`Http_header of string * string] list)
+          ([`CH_OK of (t_6d5428228f * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -19078,7 +19078,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_08f3f13308 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ef1df523db ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -19150,7 +19150,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8293c82abc j) with
+              begin match (Json_encoding.destruct Encoders'.t_6d5428228f j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -19189,7 +19189,7 @@ struct
     let _op = "/v1/sigma/scheduled_query_runs" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_77458162af * [`Http_header of string * string] list)
+          ([`CH_OK of (t_eca50da3b0 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -19266,7 +19266,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_77458162af j) with
+              begin match (Json_encoding.destruct Encoders'.t_eca50da3b0 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -19320,7 +19320,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_0b99ff77ee
+             BodySerDe'.body_of_t_59e65fb449
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -19397,7 +19397,7 @@ struct
     let _k _path ?customer ?ending_before ?expand ?limit ?starting_after
         ?status ?test_clock
         _req :
-          ([`CH_OK of (t_ebe1872334 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_6abafa8ff5 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -19451,7 +19451,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_2bdd288b56 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b2c88d22a6 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -19495,7 +19495,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_ebe1872334 j) with
+              begin match (Json_encoding.destruct Encoders'.t_6abafa8ff5 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -19549,7 +19549,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_3a3685bf8b
+             BodySerDe'.body_of_t_e376b878c0
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -19626,7 +19626,7 @@ struct
     let _k _path ?created ?email ?ending_before ?expand ?limit
         ?starting_after ?test_clock
         _req :
-          ([`CH_OK of (t_8c057a85ae * [`Http_header of string * string] list)
+          ([`CH_OK of (t_37ec4334cc * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -19645,7 +19645,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_3d8261ebd7 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_8cd3871a8a ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -19724,7 +19724,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8c057a85ae j) with
+              begin match (Json_encoding.destruct Encoders'.t_37ec4334cc j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -19764,7 +19764,7 @@ struct
     let _k _path ?charge ?created ?ending_before ?expand ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_f0831ca579 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_0a9659a95b * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -19790,7 +19790,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e12c761965 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_9d68bdd713 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -19855,7 +19855,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_f0831ca579 j) with
+              begin match (Json_encoding.destruct Encoders'.t_0a9659a95b j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -19909,7 +19909,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_129504cf36
+             BodySerDe'.body_of_t_ceefb946bc
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -19986,7 +19986,7 @@ struct
     let _k _path ?created ?ending_before ?expand ?limit ~setup_intent
         ?starting_after
         _req :
-          ([`CH_OK of (t_304a69fdd6 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_7e943f39e7 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -20005,7 +20005,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_55fe964136 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_62ebe57aa0 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -20074,7 +20074,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_304a69fdd6 j) with
+              begin match (Json_encoding.destruct Encoders'.t_7e943f39e7 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -20134,7 +20134,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_00fe61059b
+           BodySerDe'.body_of_t_52bf04ba74
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -20211,7 +20211,7 @@ struct
     let _k _path ?created ?customer ?ending_before ?expand ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_0fc40631a2 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_35ca92ace5 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -20230,7 +20230,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_ccfa0625d1 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_94e066c621 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -20302,7 +20302,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_0fc40631a2 j) with
+              begin match (Json_encoding.destruct Encoders'.t_35ca92ace5 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -20342,7 +20342,7 @@ struct
     let _k _path ~account ?ending_before ?expand ?limit ?starting_after
         ?transacted_at ?transaction_refresh
         _req :
-          ([`CH_OK of (t_8438390028 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_3224eff6ab * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -20393,14 +20393,14 @@ struct
       let _uri =
         match transacted_at with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_057e427287 ~p:"transacted_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_656d49aac0 ~p:"transacted_at" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match transaction_refresh with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_c07bfc89dd ~p:"transaction_refresh" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_83d5590180 ~p:"transaction_refresh" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -20437,7 +20437,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8438390028 j) with
+              begin match (Json_encoding.destruct Encoders'.t_3224eff6ab j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -20476,7 +20476,7 @@ struct
     let _op = "/v1/tax_codes" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_678c4452f9 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_766d30cb77 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -20553,7 +20553,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_678c4452f9 j) with
+              begin match (Json_encoding.destruct Encoders'.t_766d30cb77 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -20604,7 +20604,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_64330ebf8c
+           BodySerDe'.body_of_t_b53a42e3b7
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -20681,7 +20681,7 @@ struct
     let _k _path ?active ?created ?ending_before ?expand ?ids ?limit
         ?shippable ?starting_after ?url
         _req :
-          ([`CH_OK of (t_f3e9d75b68 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_23767204da * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -20707,7 +20707,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_08493db080 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_c04b129744 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -20793,7 +20793,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_f3e9d75b68 j) with
+              begin match (Json_encoding.destruct Encoders'.t_23767204da j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -20844,7 +20844,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_8dad7d97a8
+           BodySerDe'.body_of_t_7157acb4f8
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -20938,7 +20938,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_fa006cbf88
+             BodySerDe'.body_of_t_110aeba15a
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -21015,7 +21015,7 @@ struct
     let _k _path ?created ?customer ?ending_before ?expand ?limit
         ?payment_intent ?starting_after ?transfer_group
         _req :
-          ([`CH_OK of (t_4561d424fd * [`Http_header of string * string] list)
+          ([`CH_OK of (t_e9250fb72c * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -21034,7 +21034,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_97be7ade17 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_9b9d8d63ef ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -21120,7 +21120,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_4561d424fd j) with
+              begin match (Json_encoding.destruct Encoders'.t_e9250fb72c j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -21171,7 +21171,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_a44e2930e0
+           BodySerDe'.body_of_t_a1c266101e
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -21249,7 +21249,7 @@ struct
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         ?value ~value_list
         _req :
-          ([`CH_OK of (t_f3cfcc8598 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_8856fbd6de * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -21268,7 +21268,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_9ab8527734 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_438f8e3e47 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -21344,7 +21344,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_f3cfcc8598 j) with
+              begin match (Json_encoding.destruct Encoders'.t_8856fbd6de j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -21395,7 +21395,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_3902b0d8d0
+           BodySerDe'.body_of_t_ed10fbf1d5
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -21473,7 +21473,7 @@ struct
     let _k _path ?domain_name ?enabled ?ending_before ?expand ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_22ecb630ca * [`Http_header of string * string] list)
+          ([`CH_OK of (t_ae8386a4f0 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -21564,7 +21564,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_22ecb630ca j) with
+              begin match (Json_encoding.destruct Encoders'.t_ae8386a4f0 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -21604,7 +21604,7 @@ struct
     let _k _path ?ending_before ?expand ~financial_account ?limit
         ?linked_flows ?starting_after ?status
         _req :
-          ([`CH_OK of (t_65d250deea * [`Http_header of string * string] list)
+          ([`CH_OK of (t_f5d8852fd7 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -21648,7 +21648,7 @@ struct
       let _uri =
         match linked_flows with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_d7899c5733 ~p:"linked_flows" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_99ae8c4576 ~p:"linked_flows" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -21662,7 +21662,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_e5e83a4d6b ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ae96c50be4 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -21699,7 +21699,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_65d250deea j) with
+              begin match (Json_encoding.destruct Encoders'.t_f5d8852fd7 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -21750,7 +21750,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_718889bcd7
+           BodySerDe'.body_of_t_d8144f8c6c
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -21828,7 +21828,7 @@ struct
     let _k _path ?created ?customer ?ending_before ?expand ~financial_account
         ?limit ?starting_after ?status
         _req :
-          ([`CH_OK of (t_8591db44a1 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b6ddc430a3 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -21847,7 +21847,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_940f841aad ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_fd0b444db8 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -21893,7 +21893,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_05ed840b39 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e134f021a2 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -21930,7 +21930,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8591db44a1 j) with
+              begin match (Json_encoding.destruct Encoders'.t_b6ddc430a3 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -21981,7 +21981,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_0f4b675519
+           BodySerDe'.body_of_t_51e4bf726b
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -22058,7 +22058,7 @@ struct
     let _k _path ?device_type ?ending_before ?expand ?limit ?location
         ?serial_number ?starting_after ?status
         _req :
-          ([`CH_OK of (t_bf0f7290c4 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_a08011fc7e * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -22077,7 +22077,7 @@ struct
       let _uri =
         match device_type with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_b35c50c323 ~p:"device_type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_477c159e47 ~p:"device_type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -22126,7 +22126,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_cdedbe876a ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_76a6cf8994 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -22163,7 +22163,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_bf0f7290c4 j) with
+              begin match (Json_encoding.destruct Encoders'.t_a08011fc7e j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -22214,7 +22214,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_5da70e880a
+           BodySerDe'.body_of_t_6b2866cf6b
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -22290,7 +22290,7 @@ struct
     let _op = "/v1/tax_ids" in
     let _k _path ?ending_before ?expand ?limit ?owner ?starting_after
         _req :
-          ([`CH_OK of (t_a2a7e1df38 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_dd3507c4bc * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -22330,7 +22330,7 @@ struct
       let _uri =
         match owner with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f47c871206 ~p:"owner" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_17690afaaf ~p:"owner" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -22374,7 +22374,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_a2a7e1df38 j) with
+              begin match (Json_encoding.destruct Encoders'.t_dd3507c4bc j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -22425,7 +22425,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_99f7102425
+           BodySerDe'.body_of_t_d4cfd141aa
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -22502,7 +22502,7 @@ struct
     let _op = "/v1/tax/registrations" in
     let _k _path ?ending_before ?expand ?limit ?starting_after ?status
         _req :
-          ([`CH_OK of (t_340fa81528 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_d15b8e2101 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -22549,7 +22549,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_8df96af889 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_66eb6371e3 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -22586,7 +22586,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_340fa81528 j) with
+              begin match (Json_encoding.destruct Encoders'.t_d15b8e2101 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -22637,7 +22637,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_b253a05bdd
+           BodySerDe'.body_of_t_be3cd11bea
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -22732,7 +22732,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_eaa27c41ea
+             BodySerDe'.body_of_t_0ec470b3d8
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -22809,7 +22809,7 @@ struct
     let _k _path ?attach_to_self ?created ?customer ?ending_before ?expand
         ?limit ?payment_method ?starting_after
         _req :
-          ([`CH_OK of (t_d350bf2abb * [`Http_header of string * string] list)
+          ([`CH_OK of (t_239fb21d51 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -22835,7 +22835,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_a26042e7d2 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_47dcc46a23 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -22914,7 +22914,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_d350bf2abb j) with
+              begin match (Json_encoding.destruct Encoders'.t_239fb21d51 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -22973,7 +22973,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_873da709f0
+             BodySerDe'.body_of_t_ccb3a5d119
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -23049,7 +23049,7 @@ struct
     let _op = "/v1/accounts" in
     let _k _path ?created ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_ebc4a60f44 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_e9e70482f6 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -23068,7 +23068,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_fd1c57d9a7 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ab8d71cc96 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -23133,7 +23133,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_ebc4a60f44 j) with
+              begin match (Json_encoding.destruct Encoders'.t_e9e70482f6 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -23175,7 +23175,7 @@ struct
     let _op = "/v1/prices/search" in
     let _k _path ?expand ?limit ?page ~query
         _req :
-          ([`CH_OK of (t_5aa4d4b80d * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b12b4b0777 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -23249,7 +23249,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_5aa4d4b80d j) with
+              begin match (Json_encoding.destruct Encoders'.t_b12b4b0777 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -23374,7 +23374,7 @@ struct
     let _k _path ?created ?ending_before ?expand ?limit ?purpose
         ?starting_after
         _req :
-          ([`CH_OK of (t_764815d6fc * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2a634191d6 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -23393,7 +23393,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_60f6463eff ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_2657bcad54 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -23421,7 +23421,7 @@ struct
       let _uri =
         match purpose with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_9b3a32e051 ~p:"purpose" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_512e4129fd ~p:"purpose" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -23465,7 +23465,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_764815d6fc j) with
+              begin match (Json_encoding.destruct Encoders'.t_2a634191d6 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -23504,7 +23504,7 @@ struct
     let _op = "/v1/reporting/report_types" in
     let _k _path ?expand
         _req :
-          ([`CH_OK of (t_09577393d0 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_e7f85dc1b8 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -23560,7 +23560,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_09577393d0 j) with
+              begin match (Json_encoding.destruct Encoders'.t_e7f85dc1b8 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -23614,7 +23614,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_d7648dc25d
+             BodySerDe'.body_of_t_f4dd4bd97f
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -23691,7 +23691,7 @@ struct
     let _k _path ?collection_method ?created ?customer ?due_date
         ?ending_before ?expand ?limit ?starting_after ?status ?subscription
         _req :
-          ([`CH_OK of (t_e40c94c32d * [`Http_header of string * string] list)
+          ([`CH_OK of (t_3fdedd95af * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -23710,14 +23710,14 @@ struct
       let _uri =
         match collection_method with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_279dfd61af ~p:"collection_method" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_3d308e0087 ~p:"collection_method" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_aa3d2b4be3 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_5fae893ff7 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -23731,7 +23731,7 @@ struct
       let _uri =
         match due_date with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_66ac0a8f50 ~p:"due_date" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e8ff8d2aa0 ~p:"due_date" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -23766,7 +23766,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_1247e44e67 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_2e0259263b ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -23810,7 +23810,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_e40c94c32d j) with
+              begin match (Json_encoding.destruct Encoders'.t_3fdedd95af j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -23849,7 +23849,7 @@ struct
     let _op = "/v1/country_specs" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_9ebb81e19f * [`Http_header of string * string] list)
+          ([`CH_OK of (t_dae1032511 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -23926,7 +23926,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9ebb81e19f j) with
+              begin match (Json_encoding.destruct Encoders'.t_dae1032511 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -23977,7 +23977,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_9825dbfdb8
+           BodySerDe'.body_of_t_612edc5ff6
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -24065,7 +24065,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_077fe43399
+           BodySerDe'.body_of_t_af021e5cb9
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -24158,7 +24158,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_24dc407bac
+             BodySerDe'.body_of_t_e421cf319c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -24235,7 +24235,7 @@ struct
     let _k _path ?customer ?ending_before ?expand ?limit ?starting_after
         ?type_
         _req :
-          ([`CH_OK of (t_9dee8ea5ab * [`Http_header of string * string] list)
+          ([`CH_OK of (t_74744e00a9 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -24289,7 +24289,7 @@ struct
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_cecc48b8cb ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_735ee27343 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -24326,7 +24326,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9dee8ea5ab j) with
+              begin match (Json_encoding.destruct Encoders'.t_74744e00a9 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -24377,7 +24377,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_1c3f01e00e
+           BodySerDe'.body_of_t_cde4466fd6
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -24466,7 +24466,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_145080d61a
+           BodySerDe'.body_of_t_a5c801e05a
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -24544,7 +24544,7 @@ struct
     let _k _path ?ending_before ?expand ~financial_account ?limit
         ?received_credit ?starting_after ?status
         _req :
-          ([`CH_OK of (t_1d16f92e70 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_cd83af3254 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -24602,7 +24602,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_bc1bb0e62b ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_de06274f51 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -24639,7 +24639,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_1d16f92e70 j) with
+              begin match (Json_encoding.destruct Encoders'.t_cd83af3254 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -24690,7 +24690,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_462f995cf7
+           BodySerDe'.body_of_t_022e0bcd29
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -24767,7 +24767,7 @@ struct
     let _k _path ?amount ?created ?ending_before ?expand ?limit
         ?starting_after ?status
         _req :
-          ([`CH_OK of (t_c006153cc6 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b3bb6e49c1 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -24786,14 +24786,14 @@ struct
       let _uri =
         match amount with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_c4b1ad0571 ~p:"amount" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_6684cf5aa7 ~p:"amount" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_0ffc3b1d59 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ca787dca43 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -24828,7 +24828,7 @@ struct
       let _uri =
         match status with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_09df6faafb ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_ce1d711154 ~p:"status" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -24865,7 +24865,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_c006153cc6 j) with
+              begin match (Json_encoding.destruct Encoders'.t_b3bb6e49c1 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -24917,7 +24917,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_7a449b20b9
+           BodySerDe'.body_of_t_37595dc516
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -24994,7 +24994,7 @@ struct
     let _op = "/v1/terminal/locations" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_938fe8b78d * [`Http_header of string * string] list)
+          ([`CH_OK of (t_18896ee670 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -25071,7 +25071,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_938fe8b78d j) with
+              begin match (Json_encoding.destruct Encoders'.t_18896ee670 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -25113,7 +25113,7 @@ struct
     let _op = "/v1/invoices/search" in
     let _k _path ?expand ?limit ?page ~query
         _req :
-          ([`CH_OK of (t_1e6be27544 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_0dd02c6566 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -25187,7 +25187,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_1e6be27544 j) with
+              begin match (Json_encoding.destruct Encoders'.t_0dd02c6566 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -25238,7 +25238,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_f7a6d3b9e7
+           BodySerDe'.body_of_t_dffa1193e7
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -25315,7 +25315,7 @@ struct
     let _k _path ?charge ?created ?ending_before ?expand ?limit
         ?payment_intent ?starting_after
         _req :
-          ([`CH_OK of (t_3b81be4f83 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_c75c63afbf * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -25341,7 +25341,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_33d7eada29 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_902cd52d55 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -25413,7 +25413,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_3b81be4f83 j) with
+              begin match (Json_encoding.destruct Encoders'.t_c75c63afbf j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -25468,7 +25468,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_38947bfb23
+           BodySerDe'.body_of_t_14881ac1de
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -25545,7 +25545,7 @@ struct
     let _k _path ?arrival_date ?created ?destination ?ending_before ?expand
         ?limit ?starting_after ?status
         _req :
-          ([`CH_OK of (t_5360e37a67 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_1db4f9e6c3 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -25564,14 +25564,14 @@ struct
       let _uri =
         match arrival_date with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_bd57aeef7a ~p:"arrival_date" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_dfda23638e ~p:"arrival_date" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_d3ce6eb417 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_78f6837d46 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -25650,7 +25650,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_5360e37a67 j) with
+              begin match (Json_encoding.destruct Encoders'.t_1db4f9e6c3 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -25701,7 +25701,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_0a58ca78fd
+           BodySerDe'.body_of_t_cd74e8c628
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -25778,7 +25778,7 @@ struct
     let _k _path ?active ?code ?coupon ?created ?customer ?ending_before
         ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_b66ebe9c67 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2bf486f9cb * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -25818,7 +25818,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_4c5ec3b7e2 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_1d3358b59f ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -25890,7 +25890,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_b66ebe9c67 j) with
+              begin match (Json_encoding.destruct Encoders'.t_2bf486f9cb j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -25944,7 +25944,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_54156d3480
+             BodySerDe'.body_of_t_c84b074f55
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -26033,7 +26033,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_e73d9ab028
+           BodySerDe'.body_of_t_bfa35cdc31
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -26110,7 +26110,7 @@ struct
     let _op = "/v1/subscription_items" in
     let _k _path ?ending_before ?expand ?limit ?starting_after ~subscription
         _req :
-          ([`CH_OK of (t_55938f5237 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_d9f7fccdc8 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -26191,7 +26191,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_55938f5237 j) with
+              begin match (Json_encoding.destruct Encoders'.t_d9f7fccdc8 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -26231,7 +26231,7 @@ struct
     let _k _path ?client_reference_id ?created ?ending_before ?expand ?limit
         ?starting_after ?type_ ?verification_session
         _req :
-          ([`CH_OK of (t_1472974276 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_29f9765270 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -26257,7 +26257,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_d8bdb49bf5 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_b566f1b6bc ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -26292,7 +26292,7 @@ struct
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_f9a8042762 ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_53be0c51ff ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -26336,7 +26336,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_1472974276 j) with
+              begin match (Json_encoding.destruct Encoders'.t_29f9765270 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -26400,7 +26400,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_334f1359d4
+           BodySerDe'.body_of_t_e1077cf4c3
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -26477,7 +26477,7 @@ struct
     let _k _path ?created ?customer ?ending_before ?expand ?invoice ?limit
         ?starting_after
         _req :
-          ([`CH_OK of (t_ceac9fab01 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_4187904f5b * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -26496,7 +26496,7 @@ struct
       let _uri =
         match created with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_d09edd25a8 ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_d1452a2e6d ~p:"created" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -26575,7 +26575,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_ceac9fab01 j) with
+              begin match (Json_encoding.destruct Encoders'.t_4187904f5b j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -26614,7 +26614,7 @@ struct
     let _op = "/v1/climate/products" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_9e4497abc5 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b683fe32c7 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -26691,7 +26691,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9e4497abc5 j) with
+              begin match (Json_encoding.destruct Encoders'.t_b683fe32c7 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -26838,7 +26838,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_45afaed75a
+             BodySerDe'.body_of_t_9298cf8106
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -27027,7 +27027,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_ebc7fa3111
+           BodySerDe'.body_of_t_080ebc81a7
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -27215,7 +27215,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b67e1395de
+             BodySerDe'.body_of_t_ccfda63fd5
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -27292,7 +27292,7 @@ struct
     let _op = "/v1/customers/{customer}" in
     let _k _path ?expand
         _req :
-          ([`CH_OK of (t_a6e5da797f * [`Http_header of string * string] list)
+          ([`CH_OK of (t_a33375052d * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -27348,7 +27348,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_a6e5da797f j) with
+              begin match (Json_encoding.destruct Encoders'.t_a33375052d j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -27494,7 +27494,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_45ab6bbf15
+             BodySerDe'.body_of_t_1f7b8fed6b
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -27791,7 +27791,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2df1edec70
+             BodySerDe'.body_of_t_89178ede20
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -27979,7 +27979,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_6395fa1e87
+             BodySerDe'.body_of_t_6f63e55d30
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -28151,7 +28151,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_9daf41289f * [`Http_header of string * string] list)
+                       (t_d5eeab4c25 * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -28165,7 +28165,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_8257cc3b6e
+             BodySerDe'.body_of_t_171e2b03d7
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -28202,7 +28202,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9daf41289f j) with
+              begin match (Json_encoding.destruct Encoders'.t_d5eeab4c25 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -28242,7 +28242,7 @@ struct
     let _op = "/v1/terminal/configurations/{configuration}" in
     let _k _path ?expand
         _req :
-          ([`CH_OK of (t_841484184d * [`Http_header of string * string] list)
+          ([`CH_OK of (t_95f3d529c1 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -28298,7 +28298,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_841484184d j) with
+              begin match (Json_encoding.destruct Encoders'.t_95f3d529c1 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -28452,7 +28452,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_db4496c47a
+             BodySerDe'.body_of_t_5702cbe755
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -28541,7 +28541,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_5105b308ac
+           BodySerDe'.body_of_t_791a007bd3
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -28619,7 +28619,7 @@ struct
     let _op = "/v1/sources/{source}/source_transactions" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_7c733df727 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_f3516c2ed7 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -28696,7 +28696,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_7c733df727 j) with
+              begin match (Json_encoding.destruct Encoders'.t_f3516c2ed7 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -28751,7 +28751,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_cefa9c09fc
+             BodySerDe'.body_of_t_0e88b91b2f
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -28939,7 +28939,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_d37b238f78
+             BodySerDe'.body_of_t_9b926cecf2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -29223,7 +29223,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_f7e4bf7173
+           BodySerDe'.body_of_t_a55a65347d
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -29317,7 +29317,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_1961e701de
+             BodySerDe'.body_of_t_75107ffbeb
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -29512,7 +29512,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_727310e605
+             BodySerDe'.body_of_t_194f6521ef
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -29707,7 +29707,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_45d221f917
+             BodySerDe'.body_of_t_60145a641e
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -29993,7 +29993,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_814a9b52c9
+           BodySerDe'.body_of_t_eafcec1a11
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -30178,7 +30178,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_426f73e626
+             BodySerDe'.body_of_t_878209b421
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -30372,7 +30372,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b6e0844000
+             BodySerDe'.body_of_t_aa5914890d
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -30743,7 +30743,7 @@ struct
     let _op = "/v1/tax/transactions/{transaction}/line_items" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_c862733aed * [`Http_header of string * string] list)
+          ([`CH_OK of (t_ff63b43cc3 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -30820,7 +30820,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_c862733aed j) with
+              begin match (Json_encoding.destruct Encoders'.t_ff63b43cc3 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -30877,7 +30877,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_a9be044c3d
+             BodySerDe'.body_of_t_20e4e9cd0c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -30969,7 +30969,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_7daa9b70fa
+             BodySerDe'.body_of_t_55d5f288f2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -31058,7 +31058,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_5f128bf227
+           BodySerDe'.body_of_t_dd895638f0
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -31152,7 +31152,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_766e276734
+             BodySerDe'.body_of_t_c64a825721
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -31244,7 +31244,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_594de95ea4
+             BodySerDe'.body_of_t_0700419bcc
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -31438,7 +31438,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_bef740eaba
+             BodySerDe'.body_of_t_4a360b8862
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -31830,7 +31830,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_3c4f9109b8
+             BodySerDe'.body_of_t_d10dfee0d1
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -32015,7 +32015,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_565c6ef2d9
+           BodySerDe'.body_of_t_b230fe05a9
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -32109,7 +32109,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_caa29d89b9
+             BodySerDe'.body_of_t_3d31dce950
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -32298,7 +32298,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_b5962a6fa7
+           BodySerDe'.body_of_t_b31edc1c47
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -32391,7 +32391,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_4a2fd304c4
+             BodySerDe'.body_of_t_758f437535
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -32579,7 +32579,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_1662f1c975
+             BodySerDe'.body_of_t_bcec995787
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -32656,7 +32656,7 @@ struct
     let _op = "/v1/accounts/{account}/people" in
     let _k _path ?ending_before ?expand ?limit ?relationship ?starting_after
         _req :
-          ([`CH_OK of (t_124c07594c * [`Http_header of string * string] list)
+          ([`CH_OK of (t_fde3b546b3 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -32696,7 +32696,7 @@ struct
       let _uri =
         match relationship with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_b886c9886d ~p:"relationship" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_8dfdeac1ad ~p:"relationship" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -32740,7 +32740,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_124c07594c j) with
+              begin match (Json_encoding.destruct Encoders'.t_fde3b546b3 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -32795,7 +32795,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_0649e1659d
+             BodySerDe'.body_of_t_0ff6a5a72c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -32989,7 +32989,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_995faed4ba
+             BodySerDe'.body_of_t_6672714713
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -33178,7 +33178,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_6fe3f98c90
+           BodySerDe'.body_of_t_9c2b26fa6b
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -33293,7 +33293,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b0227442ba
+             BodySerDe'.body_of_t_d3f7d69ce7
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -33385,7 +33385,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_0c1fc2d27c
+             BodySerDe'.body_of_t_9eb8fe0469
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -33766,7 +33766,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_f460d0db0d
+             BodySerDe'.body_of_t_9c06359ad3
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -33954,7 +33954,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_505449c1c1
+             BodySerDe'.body_of_t_3bb839257d
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34047,7 +34047,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_85bd60c74b
+             BodySerDe'.body_of_t_e235b824c0
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34339,7 +34339,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_67de26f40f
+           BodySerDe'.body_of_t_c381952697
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34432,7 +34432,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e1e2f3202f
+             BodySerDe'.body_of_t_bac8413461
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34525,7 +34525,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_52af184891
+             BodySerDe'.body_of_t_82f4439e13
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34727,7 +34727,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_4a6ca66503
+             BodySerDe'.body_of_t_6fb1415a2f
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34819,7 +34819,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_0e5ac31461
+             BodySerDe'.body_of_t_7e671e2ddc
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34915,7 +34915,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_6a29a128b6
+             BodySerDe'.body_of_t_e880d6c9c8
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -34993,7 +34993,7 @@ struct
     let _op = "/v1/transfers/{id}/reversals" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_0333d2e25e * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2e23061d84 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -35070,7 +35070,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_0333d2e25e j) with
+              begin match (Json_encoding.destruct Encoders'.t_2e23061d84 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -35218,7 +35218,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_3147bdcb0f
+           BodySerDe'.body_of_t_7802e54b91
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -35311,7 +35311,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_52f26f98a0
+             BodySerDe'.body_of_t_05e3124cdb
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -35403,7 +35403,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_a987b56548
+           BodySerDe'.body_of_t_bac46e226d
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -35480,7 +35480,7 @@ struct
     let _op = "/v1/invoices/{invoice}/lines" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_8d710898dd * [`Http_header of string * string] list)
+          ([`CH_OK of (t_40aa9228af * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -35557,7 +35557,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8d710898dd j) with
+              begin match (Json_encoding.destruct Encoders'.t_40aa9228af j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -35711,7 +35711,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_ee27bd615e
+             BodySerDe'.body_of_t_4113a1f78c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -35807,7 +35807,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_4c281d3f89
+             BodySerDe'.body_of_t_8eb20ab6f4
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -35992,7 +35992,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_9657124a3d
+             BodySerDe'.body_of_t_8dfd49ec14
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -36069,7 +36069,7 @@ struct
     let _op = "/v1/accounts/{account}/persons" in
     let _k _path ?ending_before ?expand ?limit ?relationship ?starting_after
         _req :
-          ([`CH_OK of (t_8662708ebe * [`Http_header of string * string] list)
+          ([`CH_OK of (t_adf6bacbbd * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -36109,7 +36109,7 @@ struct
       let _uri =
         match relationship with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_df97d4c864 ~p:"relationship" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_52a890434c ~p:"relationship" ~op:_op ~loc:`Query ~style:`DeepObject ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -36153,7 +36153,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8662708ebe j) with
+              begin match (Json_encoding.destruct Encoders'.t_adf6bacbbd j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -36208,7 +36208,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_7e5b080223
+             BodySerDe'.body_of_t_4b0daf9ed9
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -36300,7 +36300,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_d3af3d8376
+             BodySerDe'.body_of_t_bd0ab56125
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -36490,7 +36490,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_691d19b9b9
+             BodySerDe'.body_of_t_8b8321d428
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -36682,7 +36682,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_48a951389d
+           BodySerDe'.body_of_t_957eb39b31
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -36776,7 +36776,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_ecc3072831
+             BodySerDe'.body_of_t_50eac85280
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -36869,7 +36869,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_42e0ededca
+             BodySerDe'.body_of_t_e0e7761ff7
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -36963,7 +36963,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e5cadca279
+             BodySerDe'.body_of_t_9853c54b9d
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -37060,7 +37060,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_ed0a563493
+           BodySerDe'.body_of_t_19ad43629e
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -37257,7 +37257,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_a6e453345c
+             BodySerDe'.body_of_t_71e47b1b4e
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -37351,7 +37351,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_7551937833
+             BodySerDe'.body_of_t_0ca647b86f
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -37632,7 +37632,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_541238ad18
+             BodySerDe'.body_of_t_fbe77ceb11
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -37724,7 +37724,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_9d4fdffba0
+             BodySerDe'.body_of_t_51d6e29ed8
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -37922,7 +37922,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_04a865718b
+             BodySerDe'.body_of_t_03bcd47aa2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -38001,7 +38001,7 @@ struct
     let _op = "/v1/customers/{customer}/cards" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_a163e44515 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_935be5d592 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -38078,7 +38078,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_a163e44515 j) with
+              begin match (Json_encoding.destruct Encoders'.t_935be5d592 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -38224,7 +38224,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_917ec75f12
+             BodySerDe'.body_of_t_209218c363
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -38412,7 +38412,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_54a7a3b78b
+             BodySerDe'.body_of_t_7cbe5b26ac
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -38508,7 +38508,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_8580d60ccb
+             BodySerDe'.body_of_t_05b947f5ee
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -38691,7 +38691,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_642079a393
+             BodySerDe'.body_of_t_87e7e7fa42
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -38879,7 +38879,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_358ebf3f8d
+             BodySerDe'.body_of_t_1e3fe8c357
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -39067,7 +39067,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_3ad6222234
+           BodySerDe'.body_of_t_8d65e25082
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -39177,7 +39177,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_208179bd07
+             BodySerDe'.body_of_t_247ea586be
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -39273,7 +39273,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e8527333be
+             BodySerDe'.body_of_t_000c001e81
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -39446,7 +39446,7 @@ struct
     let _op = "/v1/checkout/sessions/{session}/line_items" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_85582b85a3 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b5bae8d183 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -39523,7 +39523,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_85582b85a3 j) with
+              begin match (Json_encoding.destruct Encoders'.t_b5bae8d183 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -39578,7 +39578,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e7d7b8539a
+             BodySerDe'.body_of_t_2057b87ef0
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -39672,7 +39672,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_41158558d6
+             BodySerDe'.body_of_t_9438e1e97d
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -39750,7 +39750,7 @@ struct
     let _op = "/v1/credit_notes/{credit_note}/lines" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_471d2ccfee * [`Http_header of string * string] list)
+          ([`CH_OK of (t_17654892a5 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -39827,7 +39827,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_471d2ccfee j) with
+              begin match (Json_encoding.destruct Encoders'.t_17654892a5 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -39882,7 +39882,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c188522c32
+             BodySerDe'.body_of_t_189e25f024
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -40169,7 +40169,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_6242113b06
+             BodySerDe'.body_of_t_190bfbf094
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -40263,7 +40263,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e4b40dec33
+             BodySerDe'.body_of_t_8f07f499ed
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -40453,7 +40453,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_f99463f06f
+             BodySerDe'.body_of_t_f0785efe33
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -40643,7 +40643,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_42ec27db9e
+             BodySerDe'.body_of_t_e4fa4d38ff
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -40739,7 +40739,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_4400756710
+             BodySerDe'.body_of_t_87beadc647
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -41116,7 +41116,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_99d11e1b03
+             BodySerDe'.body_of_t_4636c13369
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -41304,7 +41304,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b30867f24c
+             BodySerDe'.body_of_t_c1768f47d2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -41494,7 +41494,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_4926ae3bf6
+           BodySerDe'.body_of_t_8aa8f331cd
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -41586,7 +41586,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_df07df1e31
+             BodySerDe'.body_of_t_4c666f30a4
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -41678,7 +41678,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e105d89725
+             BodySerDe'.body_of_t_02eb6abcb0
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -41755,7 +41755,7 @@ struct
     let _op = "/v1/customers/{customer}/subscriptions" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_c009a80ac2 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_725e7e390f * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -41832,7 +41832,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_c009a80ac2 j) with
+              begin match (Json_encoding.destruct Encoders'.t_725e7e390f j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -41887,7 +41887,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_8377bf5b33
+             BodySerDe'.body_of_t_004e372a90
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -41980,7 +41980,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c9afc8c3c7
+             BodySerDe'.body_of_t_d3fb355477
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -42073,7 +42073,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c85fd9638d
+             BodySerDe'.body_of_t_2fd5762094
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -42452,7 +42452,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_1b35351ad0
+             BodySerDe'.body_of_t_9bd5268fc2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -42640,7 +42640,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c1edcd7596
+             BodySerDe'.body_of_t_e813eb08ba
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -42932,7 +42932,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_4ac062b052
+             BodySerDe'.body_of_t_9c3ca26028
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -43120,7 +43120,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2e99c002e9
+             BodySerDe'.body_of_t_ad795eca9c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -43311,7 +43311,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_aed880c229
+             BodySerDe'.body_of_t_5485d2e44c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -43488,7 +43488,7 @@ struct
     let _op = "/v1/quotes/{quote}/computed_upfront_line_items" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_56835c907c * [`Http_header of string * string] list)
+          ([`CH_OK of (t_61b163891b * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -43565,7 +43565,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_56835c907c j) with
+              begin match (Json_encoding.destruct Encoders'.t_61b163891b j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -43913,7 +43913,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_9e15a33c0b
+             BodySerDe'.body_of_t_25713982da
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -43990,7 +43990,7 @@ struct
     let _op = "/v1/customers/{customer}/sources" in
     let _k _path ?ending_before ?expand ?limit ?object_ ?starting_after
         _req :
-          ([`CH_OK of (t_9adfa7b451 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_08def66363 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -44074,7 +44074,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9adfa7b451 j) with
+              begin match (Json_encoding.destruct Encoders'.t_08def66363 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -44126,7 +44126,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_d85b111edd
+           BodySerDe'.body_of_t_bcad42072c
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -44219,7 +44219,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b7800a5208
+             BodySerDe'.body_of_t_5e31eb0dbe
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -44315,7 +44315,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_3d4ff3bb74
+             BodySerDe'.body_of_t_5afb636173
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -44598,7 +44598,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_b6b7a35388
+           BodySerDe'.body_of_t_a8fa6f704e
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -44675,7 +44675,7 @@ struct
     let _op = "/v1/products/{product}/features" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_9929dcf0ad * [`Http_header of string * string] list)
+          ([`CH_OK of (t_7db760c7aa * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -44752,7 +44752,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9929dcf0ad j) with
+              begin match (Json_encoding.destruct Encoders'.t_7db760c7aa j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -44807,7 +44807,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_8018435bce
+             BodySerDe'.body_of_t_e40a5805ad
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -44914,7 +44914,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_89d7e83914
+             BodySerDe'.body_of_t_3fb2b8754f
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -45006,7 +45006,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_137796d954
+             BodySerDe'.body_of_t_e54ad7b1b1
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -45196,7 +45196,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2a7f4d2fcb
+             BodySerDe'.body_of_t_ea602f43e3
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -45285,7 +45285,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_22dd2782c4
+           BodySerDe'.body_of_t_a2a369a5f3
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -45477,7 +45477,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_77098b9e70
+             BodySerDe'.body_of_t_c2338af3d2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -45569,7 +45569,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_95a0b28341
+             BodySerDe'.body_of_t_ca6b3dc196
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -45757,7 +45757,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c4ce31ae53
+             BodySerDe'.body_of_t_3eca492c14
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -45935,7 +45935,7 @@ struct
     let _op = "/v1/accounts/{account}/capabilities" in
     let _k _path ?expand
         _req :
-          ([`CH_OK of (t_cf208cb1f5 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_05eeb89580 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -45991,7 +45991,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_cf208cb1f5 j) with
+              begin match (Json_encoding.destruct Encoders'.t_05eeb89580 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -46031,7 +46031,7 @@ struct
     let _op = "/v1/financial_connections/accounts/{account}/owners" in
     let _k _path ?ending_before ?expand ?limit ~ownership ?starting_after
         _req :
-          ([`CH_OK of (t_5df9df2a3e * [`Http_header of string * string] list)
+          ([`CH_OK of (t_cb70d0eeef * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -46112,7 +46112,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_5df9df2a3e j) with
+              begin match (Json_encoding.destruct Encoders'.t_cb70d0eeef j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -46172,7 +46172,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_65f459585c
+             BodySerDe'.body_of_t_0221580d23
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -46365,7 +46365,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_bc456e2dec
+             BodySerDe'.body_of_t_fe2456625b
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -46645,7 +46645,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_485bd1f95e
+             BodySerDe'.body_of_t_335ed61920
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -46837,7 +46837,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_4f642e7623
+             BodySerDe'.body_of_t_fdc5092fe1
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -46930,7 +46930,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_bed3869825
+             BodySerDe'.body_of_t_891f2f5132
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -47198,7 +47198,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_5dfae2165a * [`Http_header of string * string] list)
+                       (t_5cf0bd6b40 * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -47212,7 +47212,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_3f7d65cb4e
+             BodySerDe'.body_of_t_9854b54c89
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -47249,7 +47249,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_5dfae2165a j) with
+              begin match (Json_encoding.destruct Encoders'.t_5cf0bd6b40 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -47289,7 +47289,7 @@ struct
     let _op = "/v1/terminal/locations/{location}" in
     let _k _path ?expand
         _req :
-          ([`CH_OK of (t_0b316dcf2f * [`Http_header of string * string] list)
+          ([`CH_OK of (t_9ea5160203 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -47345,7 +47345,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_0b316dcf2f j) with
+              begin match (Json_encoding.destruct Encoders'.t_9ea5160203 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -47400,7 +47400,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_00b417a660
+             BodySerDe'.body_of_t_bbe8140a62
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -47492,7 +47492,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_124e0f7625
+             BodySerDe'.body_of_t_77d060fc3e
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -47584,7 +47584,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_1d2414e106
+             BodySerDe'.body_of_t_9c715047af
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -47780,7 +47780,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_272ee8a03c
+             BodySerDe'.body_of_t_25582b7d89
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -48055,7 +48055,7 @@ struct
     let _op = "/v1/linked_accounts/{account}/owners" in
     let _k _path ?ending_before ?expand ?limit ~ownership ?starting_after
         _req :
-          ([`CH_OK of (t_5e517e0d36 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_606c2d05a7 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -48136,7 +48136,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_5e517e0d36 j) with
+              begin match (Json_encoding.destruct Encoders'.t_606c2d05a7 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -48199,7 +48199,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_a9fb82352a
+             BodySerDe'.body_of_t_7cb28563a7
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -48276,7 +48276,7 @@ struct
     let _op = "/v1/application_fees/{id}/refunds" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_71eee3cb1f * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b9e0aa198c * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -48353,7 +48353,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_71eee3cb1f j) with
+              begin match (Json_encoding.destruct Encoders'.t_b9e0aa198c j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -48408,7 +48408,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2c11f5c04d
+             BodySerDe'.body_of_t_a72563115a
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -48501,7 +48501,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_aa177c434b
+             BodySerDe'.body_of_t_a7fbbe89bf
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -48693,7 +48693,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_f82bce2264
+             BodySerDe'.body_of_t_c5d1d32dfc
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -48770,7 +48770,7 @@ struct
     let _op = "/v1/customers/{customer}/bank_accounts" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_00a181dcde * [`Http_header of string * string] list)
+          ([`CH_OK of (t_f21a0fa679 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -48847,7 +48847,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_00a181dcde j) with
+              begin match (Json_encoding.destruct Encoders'.t_f21a0fa679 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -48902,7 +48902,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_5906ed3d1a
+             BodySerDe'.body_of_t_a6714eec9b
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -48994,7 +48994,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_36825c96f9
+             BodySerDe'.body_of_t_6dc541f3f4
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -49285,7 +49285,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_54350e65da
+             BodySerDe'.body_of_t_1b0e22ccbc
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -49477,7 +49477,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b85f8d8c81
+             BodySerDe'.body_of_t_664ed968a8
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -49573,7 +49573,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_fc1e4fa3c5
+             BodySerDe'.body_of_t_762524c8dc
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -49685,7 +49685,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_702854dd00
+             BodySerDe'.body_of_t_90d08b81d8
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -49873,7 +49873,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2cb3f4c5b8
+             BodySerDe'.body_of_t_cdbc0083b6
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -49951,7 +49951,7 @@ struct
     let _op = "/v1/accounts/{account}/external_accounts" in
     let _k _path ?ending_before ?expand ?limit ?object_ ?starting_after
         _req :
-          ([`CH_OK of (t_aa72961198 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_ed7910ccf0 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -49991,7 +49991,7 @@ struct
       let _uri =
         match object_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_830aa13cdc ~p:"object" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_4e604540e7 ~p:"object" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -50035,7 +50035,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_aa72961198 j) with
+              begin match (Json_encoding.destruct Encoders'.t_ed7910ccf0 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -50090,7 +50090,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_13bfb93f22
+             BodySerDe'.body_of_t_e0e1caabf4
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -50281,7 +50281,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_97b90aeba7
+           BodySerDe'.body_of_t_5e3733c22b
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -50395,7 +50395,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_b076abc8e8
+           BodySerDe'.body_of_t_49208ce375
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -50491,7 +50491,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_12ad0cb13f
+             BodySerDe'.body_of_t_443b3fa246
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -50583,7 +50583,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_816a7290b6
+             BodySerDe'.body_of_t_97d6bcf429
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -50676,7 +50676,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_86a22f3d9a
+             BodySerDe'.body_of_t_7904238c21
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -50754,7 +50754,7 @@ struct
     let _k _path ?allow_redisplay ?ending_before ?expand ?limit
         ?starting_after ?type_
         _req :
-          ([`CH_OK of (t_49d4a3dfa6 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_ad4081eaea * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -50773,7 +50773,7 @@ struct
       let _uri =
         match allow_redisplay with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_53e3e26f8d ~p:"allow_redisplay" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_4f49500d45 ~p:"allow_redisplay" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -50808,7 +50808,7 @@ struct
       let _uri =
         match type_ with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_4ec070121c ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_e03d9a444b ~p:"type" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -50845,7 +50845,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_49d4a3dfa6 j) with
+              begin match (Json_encoding.destruct Encoders'.t_ad4081eaea j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -50901,7 +50901,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_639da83cc7
+             BodySerDe'.body_of_t_9c4b9da4b4
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -51173,7 +51173,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_7d57ec649a * [`Http_header of string * string] list)
+                       (t_d2ba7ca387 * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -51187,7 +51187,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b61c36c8b7
+             BodySerDe'.body_of_t_d395ce2720
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -51224,7 +51224,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_7d57ec649a j) with
+              begin match (Json_encoding.destruct Encoders'.t_d2ba7ca387 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -51264,7 +51264,7 @@ struct
     let _op = "/v1/terminal/readers/{reader}" in
     let _k _path ?expand
         _req :
-          ([`CH_OK of (t_416dfd2f6f * [`Http_header of string * string] list)
+          ([`CH_OK of (t_2ca1ba2569 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -51320,7 +51320,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_416dfd2f6f j) with
+              begin match (Json_encoding.destruct Encoders'.t_2ca1ba2569 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -51372,7 +51372,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_3fd2347cc8
+           BodySerDe'.body_of_t_3f758fb90a
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -51449,7 +51449,7 @@ struct
     let _op = "/v1/customers/{customer}/tax_ids" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_9b68001b8f * [`Http_header of string * string] list)
+          ([`CH_OK of (t_38c8f764f1 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -51526,7 +51526,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_9b68001b8f j) with
+              begin match (Json_encoding.destruct Encoders'.t_38c8f764f1 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -51581,7 +51581,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_a78c740cbb
+             BodySerDe'.body_of_t_36bf1a8752
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -51675,7 +51675,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_5744fbdd2a
+             BodySerDe'.body_of_t_966b79b159
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -51855,7 +51855,7 @@ struct
     let _op = "/v1/subscription_items/{subscription_item}/usage_record_summaries" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_4858739eed * [`Http_header of string * string] list)
+          ([`CH_OK of (t_691092e518 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -51932,7 +51932,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_4858739eed j) with
+              begin match (Json_encoding.destruct Encoders'.t_691092e518 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -51988,7 +51988,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_0ac571850f
+             BodySerDe'.body_of_t_33b35c33e3
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -52083,7 +52083,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_8045f191c5
+             BodySerDe'.body_of_t_b6a545cdf2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -52367,7 +52367,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_d4524fbbca
+             BodySerDe'.body_of_t_5a52a204c1
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -52460,7 +52460,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_f64c15d966
+             BodySerDe'.body_of_t_cf96a999b4
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -52669,7 +52669,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_d2b6d7f2eb
+             BodySerDe'.body_of_t_79e7f8c8c2
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -52746,7 +52746,7 @@ struct
     let _op = "/v1/charges/{charge}/refunds" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_31a3ff3653 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_0fc9eda318 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -52823,7 +52823,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_31a3ff3653 j) with
+              begin match (Json_encoding.destruct Encoders'.t_0fc9eda318 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -52878,7 +52878,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_759a19fa41
+             BodySerDe'.body_of_t_94fbd9b0fa
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53066,7 +53066,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e7b5357404
+             BodySerDe'.body_of_t_bc1efb62b6
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53257,7 +53257,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_ce5b122d77
+             BodySerDe'.body_of_t_2a30856b32
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53354,7 +53354,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2ddc9f381c
+             BodySerDe'.body_of_t_0a23dd73f1
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53446,7 +53446,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_caa1beef8b
+             BodySerDe'.body_of_t_cd767fc4a9
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53540,7 +53540,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_b13d04ec54
+             BodySerDe'.body_of_t_11a645720c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53618,7 +53618,7 @@ struct
     let _op = "/v1/customers/{customer}/cash_balance_transactions" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_40604aef1b * [`Http_header of string * string] list)
+          ([`CH_OK of (t_34ac9bd06d * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -53695,7 +53695,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_40604aef1b j) with
+              begin match (Json_encoding.destruct Encoders'.t_34ac9bd06d j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -53753,7 +53753,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_a5ef94f13d
+             BodySerDe'.body_of_t_f804a131e1
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53847,7 +53847,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_a4e56c6142
+             BodySerDe'.body_of_t_c5198a426a
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -53939,7 +53939,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c3aea2d0af
+             BodySerDe'.body_of_t_fc73a4ef65
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -54241,7 +54241,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_6de8aa236a
+           BodySerDe'.body_of_t_a2cd932c31
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -54434,7 +54434,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_14ce04311e
+             BodySerDe'.body_of_t_63ae974194
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -54513,7 +54513,7 @@ struct
     let _op = "/v1/quotes/{quote}/line_items" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_c94b8245b3 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_b05b9010db * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -54590,7 +54590,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_c94b8245b3 j) with
+              begin match (Json_encoding.destruct Encoders'.t_b05b9010db j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -54726,7 +54726,7 @@ struct
     let _op = "/v1/payment_links/{payment_link}/line_items" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_466263f459 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_1a3b6929f1 * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -54803,7 +54803,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_466263f459 j) with
+              begin match (Json_encoding.destruct Encoders'.t_1a3b6929f1 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -54858,7 +54858,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_0e3e3a503e
+             BodySerDe'.body_of_t_7ee7f99a15
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -54952,7 +54952,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2b406438a3
+             BodySerDe'.body_of_t_af6348f16b
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -55126,7 +55126,7 @@ struct
     let _k _path ~customer ~end_time ?ending_before ?expand ?limit
         ~start_time ?starting_after ?value_grouping_window
         _req :
-          ([`CH_OK of (t_6c656bbfa3 * [`Http_header of string * string] list)
+          ([`CH_OK of (t_d9b8cfd01d * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -55185,7 +55185,7 @@ struct
       let _uri =
         match value_grouping_window with
         | Some v ->
-          let _nv = ParamSerDe'.namevalues_of_t_8c6e63aa54 ~p:"value_grouping_window" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
+          let _nv = ParamSerDe'.namevalues_of_t_2ef034b1cb ~p:"value_grouping_window" ~op:_op ~loc:`Query ~style:`Form ~explode:true v in
           List.fold_left (fun acc_uri (n,v) -> Uri.add_query_param' acc_uri (n,v)) _uri _nv
         | None -> _uri
       in
@@ -55222,7 +55222,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_6c656bbfa3 j) with
+              begin match (Json_encoding.destruct Encoders'.t_d9b8cfd01d j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -55277,7 +55277,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_38d38d0ed4
+             BodySerDe'.body_of_t_4336fe6b25
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -55462,7 +55462,7 @@ struct
       let _attrs =
         `RequestBody
           ("application/x-www-form-urlencoded",
-           BodySerDe'.body_of_t_530fb4b186
+           BodySerDe'.body_of_t_3cf7957d1b
            ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -55540,7 +55540,7 @@ struct
     let _op = "/v1/customers/{customer}/balance_transactions" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_718e215e3a * [`Http_header of string * string] list)
+          ([`CH_OK of (t_0ff9c6b16b * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -55617,7 +55617,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_718e215e3a j) with
+              begin match (Json_encoding.destruct Encoders'.t_0ff9c6b16b j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -55657,7 +55657,7 @@ struct
     let _op = "/v1/tax/calculations/{calculation}/line_items" in
     let _k _path ?ending_before ?expand ?limit ?starting_after
         _req :
-          ([`CH_OK of (t_a6060faf9c * [`Http_header of string * string] list)
+          ([`CH_OK of (t_8db77c995a * [`Http_header of string * string] list)
            | `CH_Default of (error * [`Http_header of string * string] list)],
            [`Invalid_agent_attribute of string
             | `Nonconforming_response of string * string option
@@ -55734,7 +55734,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_a6060faf9c j) with
+              begin match (Json_encoding.destruct Encoders'.t_8db77c995a j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -55887,7 +55887,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2fbc0cc586
+             BodySerDe'.body_of_t_71368f28f0
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -56079,7 +56079,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_63cfa38997
+             BodySerDe'.body_of_t_b43e6c27b9
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -56258,7 +56258,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_8cc004ef79 * [`Http_header of string * string] list)
+                       (t_856459704a * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -56272,7 +56272,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_67fb237393
+             BodySerDe'.body_of_t_86637173ac
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -56309,7 +56309,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_8cc004ef79 j) with
+              begin match (Json_encoding.destruct Encoders'.t_856459704a j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -56351,7 +56351,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_01021b42ae * [`Http_header of string * string] list)
+                       (t_7f9b4fe25c * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -56365,7 +56365,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_56fff3fa92
+             BodySerDe'.body_of_t_8d2f372785
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -56402,7 +56402,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_01021b42ae j) with
+              begin match (Json_encoding.destruct Encoders'.t_7f9b4fe25c j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -56559,7 +56559,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_3d8fdeff43
+             BodySerDe'.body_of_t_4c8a52d117
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -57131,7 +57131,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2b0bd800cc
+             BodySerDe'.body_of_t_710cc66740
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -57307,7 +57307,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_d78b35a4fb * [`Http_header of string * string] list)
+                       (t_f45fcafdae * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -57321,7 +57321,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_410ecadf3f
+             BodySerDe'.body_of_t_a53acb8ec8
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -57358,7 +57358,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_d78b35a4fb j) with
+              begin match (Json_encoding.destruct Encoders'.t_f45fcafdae j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -57400,7 +57400,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_e76b7c1d1e * [`Http_header of string * string] list)
+                       (t_2bc92fc692 * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -57414,7 +57414,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_e114c81e22
+             BodySerDe'.body_of_t_e2011092a6
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -57451,7 +57451,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_e76b7c1d1e j) with
+              begin match (Json_encoding.destruct Encoders'.t_2bc92fc692 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -57993,7 +57993,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_6d73642c75
+             BodySerDe'.body_of_t_6bfc2fe3c9
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -58189,7 +58189,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_6cc9a417e8
+             BodySerDe'.body_of_t_77c2de13de
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -58383,7 +58383,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_159ef19a67
+             BodySerDe'.body_of_t_4688cef40c
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -58673,7 +58673,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2792c18cba
+             BodySerDe'.body_of_t_adc038ebfb
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -58968,7 +58968,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_340d484029
+             BodySerDe'.body_of_t_ab61fbafe1
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -59251,7 +59251,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_03e4e68959 * [`Http_header of string * string] list)
+                       (t_d58cff0cff * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -59265,7 +59265,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c8c38f8382
+             BodySerDe'.body_of_t_73e3595823
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -59302,7 +59302,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_03e4e68959 j) with
+              begin match (Json_encoding.destruct Encoders'.t_d58cff0cff j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -59344,7 +59344,7 @@ struct
     let _k _path _req :
                    ([
                      `CH_OK of
-                       (t_afff33146f * [`Http_header of string * string] list)
+                       (t_8bf295c604 * [`Http_header of string * string] list)
                     | `CH_Default of
                         (error * [`Http_header of string * string] list)],
                     [`Invalid_agent_attribute of string
@@ -59358,7 +59358,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_91f2d6c84a
+             BodySerDe'.body_of_t_0d61aaaa53
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -59395,7 +59395,7 @@ struct
             begin match Ezjsonm.value_from_string_result body' with
             | Error e -> Error (Paths'._lift_read_error e)
             | Ok j ->
-              begin match (Json_encoding.destruct Encoders'.t_afff33146f j) with
+              begin match (Json_encoding.destruct Encoders'.t_8bf295c604 j) with
               | o -> Ok (`CH_OK (o, !outheaders))
               | exception Json_encoding.Cannot_destruct e ->
                 Error (Paths'._lift_cannot_destruct e)
@@ -59552,7 +59552,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_d5207640e5
+             BodySerDe'.body_of_t_d83a6d8f1b
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -59646,7 +59646,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_fca42b91d3
+             BodySerDe'.body_of_t_6a54c2e4bd
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -59930,7 +59930,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_fdd67c7407
+             BodySerDe'.body_of_t_fcf9823b71
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -60123,7 +60123,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_5ff765fb6a
+             BodySerDe'.body_of_t_05b4eca2cd
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -60216,7 +60216,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_c2d5628823
+             BodySerDe'.body_of_t_62de8cc6bb
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -60401,7 +60401,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_97e3db8100
+             BodySerDe'.body_of_t_f8ce442641
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in
@@ -60591,7 +60591,7 @@ struct
         | Some _req ->
           `RequestBody
             ("application/x-www-form-urlencoded",
-             BodySerDe'.body_of_t_2cec9492a3
+             BodySerDe'.body_of_t_60553c2dee
              ~op:_op ~ctype:`FormUrlEncoded _req) :: _attrs
       in
       let _uri = (Uri.make ~path:_path ()) in

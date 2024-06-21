@@ -9,9 +9,9 @@ module ParamSerDe' = struct
   let _jfield_to_s kind ~n = match kind with
     | `ObjectN okinds -> begin
       match List.assoc_opt n okinds with
-      | Some [okind] -> EncBase'.json_to_string okind
+      | Some okind -> EncBase'.json_to_string okind
       | _ -> EncBase'.json_to_string (match List.assoc_opt "" okinds with
-        | Some [okind] -> okind
+        | Some okind -> okind
         | _ -> `Null)
       end
     | _ -> EncBase'.json_to_string `Null
@@ -20,8 +20,9 @@ module ParamSerDe' = struct
     | `Array [`List ikind] -> EncBase'.json_to_string ikind v
     | `Array akind ->
       let vs = Ezjsonm.get_list Fun.id v in
-      let kinds = EncBase'.singletons_of_array ~len:(min idx (List.length vs)) akind |> Array.of_list in
-      EncBase'.json_to_string (kinds.(idx)) v
+      let kinds = EncBase'.singletons_of_array ~len:(min idx (List.length vs)) akind in
+      let kindarr = Array.of_list kinds in
+      EncBase'.json_to_string (kindarr.(idx)) v
     | _ -> EncBase'.json_to_string `Null v
   
   let _string_of ~kind ~ctr =
@@ -123,47 +124,55 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct (Json_encoding.list Json_encoding.string))
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_fd1c57d9a7 ~p ~op ~loc ~style ~explode
-    (_x : t_fd1c57d9a7) =
+  let string_of_t_ab8d71cc96 ~p ~op ~loc ~style ~explode
+    (_x : t_ab8d71cc96) =
     _string_of ~kind:(
-      match _x with
-      | T_d1f4aaecc2 _x ->
+      begin match _x with
+      | T_6aa55531fa _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_fd1c57d9a7)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ab8d71cc96)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fd1c57d9a7 ~loc ~style ~explode (_x : string) =
+  let string_to_t_ab8d71cc96 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_d1f4aaecc2) in
-        Option.map (fun _y : t_fd1c57d9a7 -> T_d1f4aaecc2 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6aa55531fa) in
+        Option.map (fun _y : t_ab8d71cc96 -> T_6aa55531fa _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_fd1c57d9a7 -> Int _y)
+        Option.map (fun _y : t_ab8d71cc96 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_fd1c57d9a7 ~p ~op ~loc ~style ~explode
-    (_x : t_fd1c57d9a7) =
+  let namevalues_of_t_ab8d71cc96 ~p ~op ~loc ~style ~explode
+    (_x : t_ab8d71cc96) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_d1f4aaecc2 _x ->
+      begin match _x with
+      | T_6aa55531fa _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_fd1c57d9a7)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ab8d71cc96)
       ~p ~op ~loc ~style ~explode _x
   
   let string_of_p_String_ ~p ~op ~loc ~style ~explode (_x : string) =
@@ -194,297 +203,325 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Json_encoding.int)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_830aa13cdc ~p ~op ~loc ~style ~explode
-    (_x : t_830aa13cdc) =
+  let string_of_t_4e604540e7 ~p ~op ~loc ~style ~explode
+    (_x : t_4e604540e7) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_830aa13cdc)
+      ~ctr:(Json_encoding.construct Encoders'.t_4e604540e7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_830aa13cdc ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_830aa13cdc) in _string_to
+  let string_to_t_4e604540e7 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4e604540e7) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_830aa13cdc ~p ~op ~loc ~style ~explode
-    (_x : t_830aa13cdc) =
+  let namevalues_of_t_4e604540e7 ~p ~op ~loc ~style ~explode
+    (_x : t_4e604540e7) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_830aa13cdc)
+      ~ctr:(Json_encoding.construct Encoders'.t_4e604540e7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_b886c9886d ~p ~op ~loc ~style ~explode
-    (_x : t_b886c9886d) =
+  let string_of_t_8dfdeac1ad ~p ~op ~loc ~style ~explode
+    (_x : t_8dfdeac1ad) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("director", match _x.director with | None -> []
-          | Some _x -> [`Boolean]);
-         ("executive", match _x.executive with | None -> []
-          | Some _x -> [`Boolean]);
-         ("legal_guardian", match _x.legal_guardian with | None -> []
-          | Some _x -> [`Boolean]);
-         ("owner", match _x.owner with | None -> [] | Some _x -> [`Boolean]);
-         ("representative", match _x.representative with | None -> []
-          | Some _x -> [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_b886c9886d)
+        [("", `Any);
+         ("director", begin match _x.director with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("executive", begin match _x.executive with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("legal_guardian", begin match _x.legal_guardian with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("owner", begin match _x.owner with | None -> `Null | Some _x ->
+          `Boolean end);
+         ("representative", begin match _x.representative with
+          | None -> `Null | Some _x -> `Boolean end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_8dfdeac1ad)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b886c9886d ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b886c9886d) in _string_to
+  let string_to_t_8dfdeac1ad ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_8dfdeac1ad) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("director", [`Boolean]);
-                ("executive", [`Boolean]); ("legal_guardian", [`Boolean]);
-                ("owner", [`Boolean]); ("representative", [`Boolean])])
-      ~dtr ~loc ~style ~explode _x
+               [("", `Any); ("director", `Boolean); ("executive", `Boolean);
+                ("legal_guardian", `Boolean); ("owner", `Boolean);
+                ("representative", `Boolean)]) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_b886c9886d ~p ~op ~loc ~style ~explode
-    (_x : t_b886c9886d) =
+  let namevalues_of_t_8dfdeac1ad ~p ~op ~loc ~style ~explode
+    (_x : t_8dfdeac1ad) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("director", match _x.director with | None -> []
-          | Some _x -> [`Boolean]);
-         ("executive", match _x.executive with | None -> []
-          | Some _x -> [`Boolean]);
-         ("legal_guardian", match _x.legal_guardian with | None -> []
-          | Some _x -> [`Boolean]);
-         ("owner", match _x.owner with | None -> [] | Some _x -> [`Boolean]);
-         ("representative", match _x.representative with | None -> []
-          | Some _x -> [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_b886c9886d)
+        [("", `Any);
+         ("director", begin match _x.director with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("executive", begin match _x.executive with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("legal_guardian", begin match _x.legal_guardian with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("owner", begin match _x.owner with | None -> `Null | Some _x ->
+          `Boolean end);
+         ("representative", begin match _x.representative with
+          | None -> `Null | Some _x -> `Boolean end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_8dfdeac1ad)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_df97d4c864 ~p ~op ~loc ~style ~explode
-    (_x : t_df97d4c864) =
+  let string_of_t_52a890434c ~p ~op ~loc ~style ~explode
+    (_x : t_52a890434c) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("director", match _x.director with | None -> []
-          | Some _x -> [`Boolean]);
-         ("executive", match _x.executive with | None -> []
-          | Some _x -> [`Boolean]);
-         ("legal_guardian", match _x.legal_guardian with | None -> []
-          | Some _x -> [`Boolean]);
-         ("owner", match _x.owner with | None -> [] | Some _x -> [`Boolean]);
-         ("representative", match _x.representative with | None -> []
-          | Some _x -> [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_df97d4c864)
+        [("", `Any);
+         ("director", begin match _x.director with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("executive", begin match _x.executive with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("legal_guardian", begin match _x.legal_guardian with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("owner", begin match _x.owner with | None -> `Null | Some _x ->
+          `Boolean end);
+         ("representative", begin match _x.representative with
+          | None -> `Null | Some _x -> `Boolean end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_52a890434c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_df97d4c864 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_df97d4c864) in _string_to
+  let string_to_t_52a890434c ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_52a890434c) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("director", [`Boolean]);
-                ("executive", [`Boolean]); ("legal_guardian", [`Boolean]);
-                ("owner", [`Boolean]); ("representative", [`Boolean])])
-      ~dtr ~loc ~style ~explode _x
+               [("", `Any); ("director", `Boolean); ("executive", `Boolean);
+                ("legal_guardian", `Boolean); ("owner", `Boolean);
+                ("representative", `Boolean)]) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_df97d4c864 ~p ~op ~loc ~style ~explode
-    (_x : t_df97d4c864) =
+  let namevalues_of_t_52a890434c ~p ~op ~loc ~style ~explode
+    (_x : t_52a890434c) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("director", match _x.director with | None -> []
-          | Some _x -> [`Boolean]);
-         ("executive", match _x.executive with | None -> []
-          | Some _x -> [`Boolean]);
-         ("legal_guardian", match _x.legal_guardian with | None -> []
-          | Some _x -> [`Boolean]);
-         ("owner", match _x.owner with | None -> [] | Some _x -> [`Boolean]);
-         ("representative", match _x.representative with | None -> []
-          | Some _x -> [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_df97d4c864)
+        [("", `Any);
+         ("director", begin match _x.director with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("executive", begin match _x.executive with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("legal_guardian", begin match _x.legal_guardian with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("owner", begin match _x.owner with | None -> `Null | Some _x ->
+          `Boolean end);
+         ("representative", begin match _x.representative with
+          | None -> `Null | Some _x -> `Boolean end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_52a890434c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e12c761965 ~p ~op ~loc ~style ~explode
-    (_x : t_e12c761965) =
+  let string_of_t_9d68bdd713 ~p ~op ~loc ~style ~explode
+    (_x : t_9d68bdd713) =
     _string_of ~kind:(
-      match _x with
-      | T_ee07665ba6 _x ->
+      begin match _x with
+      | T_6705dd5948 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_e12c761965)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9d68bdd713)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e12c761965 ~loc ~style ~explode (_x : string) =
+  let string_to_t_9d68bdd713 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_ee07665ba6) in
-        Option.map (fun _y : t_e12c761965 -> T_ee07665ba6 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6705dd5948) in
+        Option.map (fun _y : t_9d68bdd713 -> T_6705dd5948 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_e12c761965 -> Int _y)
+        Option.map (fun _y : t_9d68bdd713 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_e12c761965 ~p ~op ~loc ~style ~explode
-    (_x : t_e12c761965) =
+  let namevalues_of_t_9d68bdd713 ~p ~op ~loc ~style ~explode
+    (_x : t_9d68bdd713) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_ee07665ba6 _x ->
+      begin match _x with
+      | T_6705dd5948 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_e12c761965)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9d68bdd713)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e9c8494c48 ~p ~op ~loc ~style ~explode
-    (_x : t_e9c8494c48) =
+  let string_of_t_4a4b8daa1f ~p ~op ~loc ~style ~explode
+    (_x : t_4a4b8daa1f) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("type", let _x = _x.type_ in [`String]);
-         ("user", match _x.user with | None -> [] | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_e9c8494c48)
+        [("", `Any); ("type", let _x = _x.type_ in `String);
+         ("user", begin match _x.user with | None -> `Null | Some _x ->
+          `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_4a4b8daa1f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e9c8494c48 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e9c8494c48) in _string_to
-      ~kind:(`ObjectN
-               [("", [`Any]); ("type", [`String]); ("user", [`String])])
+  let string_to_t_4a4b8daa1f ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4a4b8daa1f) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("type", `String); ("user", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_e9c8494c48 ~p ~op ~loc ~style ~explode
-    (_x : t_e9c8494c48) =
+  let namevalues_of_t_4a4b8daa1f ~p ~op ~loc ~style ~explode
+    (_x : t_4a4b8daa1f) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("type", let _x = _x.type_ in [`String]);
-         ("user", match _x.user with | None -> [] | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_e9c8494c48)
+        [("", `Any); ("type", let _x = _x.type_ in `String);
+         ("user", begin match _x.user with | None -> `Null | Some _x ->
+          `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_4a4b8daa1f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_890cf6dfd5 ~p ~op ~loc ~style ~explode
-    (_x : t_890cf6dfd5) =
+  let string_of_t_4ce91395e3 ~p ~op ~loc ~style ~explode
+    (_x : t_4ce91395e3) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("type", let _x = _x.type_ in [`String]);
-         ("user", match _x.user with | None -> [] | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_890cf6dfd5)
+        [("", `Any); ("type", let _x = _x.type_ in `String);
+         ("user", begin match _x.user with | None -> `Null | Some _x ->
+          `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_4ce91395e3)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_890cf6dfd5 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_890cf6dfd5) in _string_to
-      ~kind:(`ObjectN
-               [("", [`Any]); ("type", [`String]); ("user", [`String])])
+  let string_to_t_4ce91395e3 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4ce91395e3) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("type", `String); ("user", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_890cf6dfd5 ~p ~op ~loc ~style ~explode
-    (_x : t_890cf6dfd5) =
+  let namevalues_of_t_4ce91395e3 ~p ~op ~loc ~style ~explode
+    (_x : t_4ce91395e3) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("type", let _x = _x.type_ in [`String]);
-         ("user", match _x.user with | None -> [] | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_890cf6dfd5)
+        [("", `Any); ("type", let _x = _x.type_ in `String);
+         ("user", begin match _x.user with | None -> `Null | Some _x ->
+          `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_4ce91395e3)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_d867b2e5ee ~p ~op ~loc ~style ~explode
-    (_x : t_d867b2e5ee) =
+  let string_of_t_01b97bcd1e ~p ~op ~loc ~style ~explode
+    (_x : t_01b97bcd1e) =
     _string_of ~kind:(
-      match _x with
-      | T_9976a2991b _x ->
+      begin match _x with
+      | T_51dd3dd546 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d867b2e5ee)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_01b97bcd1e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d867b2e5ee ~loc ~style ~explode (_x : string) =
+  let string_to_t_01b97bcd1e ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_9976a2991b) in
-        Option.map (fun _y : t_d867b2e5ee -> T_9976a2991b _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_51dd3dd546) in
+        Option.map (fun _y : t_01b97bcd1e -> T_51dd3dd546 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_d867b2e5ee -> Int _y)
+        Option.map (fun _y : t_01b97bcd1e -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_d867b2e5ee ~p ~op ~loc ~style ~explode
-    (_x : t_d867b2e5ee) =
+  let namevalues_of_t_01b97bcd1e ~p ~op ~loc ~style ~explode
+    (_x : t_01b97bcd1e) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_9976a2991b _x ->
+      begin match _x with
+      | T_51dd3dd546 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d867b2e5ee)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_01b97bcd1e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_04deb19963 ~p ~op ~loc ~style ~explode
-    (_x : t_04deb19963) =
+  let string_of_t_e84cc44f8f ~p ~op ~loc ~style ~explode
+    (_x : t_e84cc44f8f) =
     _string_of ~kind:(
-      match _x with
-      | T_24f63781c8 _x ->
+      begin match _x with
+      | T_b5ed09371b _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_04deb19963)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_e84cc44f8f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_04deb19963 ~loc ~style ~explode (_x : string) =
+  let string_to_t_e84cc44f8f ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_24f63781c8) in
-        Option.map (fun _y : t_04deb19963 -> T_24f63781c8 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_b5ed09371b) in
+        Option.map (fun _y : t_e84cc44f8f -> T_b5ed09371b _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_04deb19963 -> Int _y)
+        Option.map (fun _y : t_e84cc44f8f -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_04deb19963 ~p ~op ~loc ~style ~explode
-    (_x : t_04deb19963) =
+  let namevalues_of_t_e84cc44f8f ~p ~op ~loc ~style ~explode
+    (_x : t_e84cc44f8f) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_24f63781c8 _x ->
+      begin match _x with
+      | T_b5ed09371b _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_04deb19963)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_e84cc44f8f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_c9c8b6e8e4 ~p ~op ~loc ~style ~explode
-    (_x : t_c9c8b6e8e4) =
+  let string_of_t_b478178155 ~p ~op ~loc ~style ~explode
+    (_x : t_b478178155) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_c9c8b6e8e4)
+      ~ctr:(Json_encoding.construct Encoders'.t_b478178155)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c9c8b6e8e4 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_c9c8b6e8e4) in _string_to
+  let string_to_t_b478178155 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b478178155) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_c9c8b6e8e4 ~p ~op ~loc ~style ~explode
-    (_x : t_c9c8b6e8e4) =
+  let namevalues_of_t_b478178155 ~p ~op ~loc ~style ~explode
+    (_x : t_b478178155) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_c9c8b6e8e4)
+      ~ctr:(Json_encoding.construct Encoders'.t_b478178155)
       ~p ~op ~loc ~style ~explode _x
   
   let string_of_p_Ptime_t ~p ~op ~loc ~style ~explode (_x : Ptime.t) =
@@ -501,20 +538,20 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct EncBase'.vendor_unix_time)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_8c6e63aa54 ~p ~op ~loc ~style ~explode
-    (_x : t_8c6e63aa54) =
+  let string_of_t_2ef034b1cb ~p ~op ~loc ~style ~explode
+    (_x : t_2ef034b1cb) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8c6e63aa54)
+      ~ctr:(Json_encoding.construct Encoders'.t_2ef034b1cb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8c6e63aa54 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_8c6e63aa54) in _string_to
+  let string_to_t_2ef034b1cb ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2ef034b1cb) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_8c6e63aa54 ~p ~op ~loc ~style ~explode
-    (_x : t_8c6e63aa54) =
+  let namevalues_of_t_2ef034b1cb ~p ~op ~loc ~style ~explode
+    (_x : t_2ef034b1cb) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8c6e63aa54)
+      ~ctr:(Json_encoding.construct Encoders'.t_2ef034b1cb)
       ~p ~op ~loc ~style ~explode _x
   
   let string_of_p_Bool ~p ~op ~loc ~style ~explode (_x : bool) =
@@ -531,6385 +568,6903 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Json_encoding.bool)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_97be7ade17 ~p ~op ~loc ~style ~explode
-    (_x : t_97be7ade17) =
+  let string_of_t_9b9d8d63ef ~p ~op ~loc ~style ~explode
+    (_x : t_9b9d8d63ef) =
     _string_of ~kind:(
-      match _x with
-      | T_9c9e30bd0a _x ->
+      begin match _x with
+      | T_143678df45 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_97be7ade17)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9b9d8d63ef)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_97be7ade17 ~loc ~style ~explode (_x : string) =
+  let string_to_t_9b9d8d63ef ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_9c9e30bd0a) in
-        Option.map (fun _y : t_97be7ade17 -> T_9c9e30bd0a _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_143678df45) in
+        Option.map (fun _y : t_9b9d8d63ef -> T_143678df45 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_97be7ade17 -> Int _y)
+        Option.map (fun _y : t_9b9d8d63ef -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_97be7ade17 ~p ~op ~loc ~style ~explode
-    (_x : t_97be7ade17) =
+  let namevalues_of_t_9b9d8d63ef ~p ~op ~loc ~style ~explode
+    (_x : t_9b9d8d63ef) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_9c9e30bd0a _x ->
+      begin match _x with
+      | T_143678df45 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_97be7ade17)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9b9d8d63ef)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_aa139a393a ~p ~op ~loc ~style ~explode
-    (_x : t_aa139a393a) =
+  let string_of_t_0b0b7bdb7e ~p ~op ~loc ~style ~explode
+    (_x : t_0b0b7bdb7e) =
     _string_of ~kind:(
-      match _x with
-      | T_b54379d2c7 _x ->
+      begin match _x with
+      | T_7da3863d89 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_aa139a393a)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_0b0b7bdb7e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_aa139a393a ~loc ~style ~explode (_x : string) =
+  let string_to_t_0b0b7bdb7e ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_b54379d2c7) in
-        Option.map (fun _y : t_aa139a393a -> T_b54379d2c7 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_7da3863d89) in
+        Option.map (fun _y : t_0b0b7bdb7e -> T_7da3863d89 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_aa139a393a -> Int _y)
+        Option.map (fun _y : t_0b0b7bdb7e -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_aa139a393a ~p ~op ~loc ~style ~explode
-    (_x : t_aa139a393a) =
+  let namevalues_of_t_0b0b7bdb7e ~p ~op ~loc ~style ~explode
+    (_x : t_0b0b7bdb7e) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_b54379d2c7 _x ->
+      begin match _x with
+      | T_7da3863d89 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_aa139a393a)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_0b0b7bdb7e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_26c973347b ~p ~op ~loc ~style ~explode
-    (_x : t_26c973347b) =
+  let string_of_t_12bf81c281 ~p ~op ~loc ~style ~explode
+    (_x : t_12bf81c281) =
     _string_of ~kind:(
-      `ObjectN [("", [`Any]); ("email", let _x = _x.email in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_26c973347b)
+      `ObjectN [("", `Any); ("email", let _x = _x.email in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_12bf81c281)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_26c973347b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_26c973347b) in _string_to
-      ~kind:(`ObjectN [("", [`Any]); ("email", [`String])])
+  let string_to_t_12bf81c281 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_12bf81c281) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("email", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_26c973347b ~p ~op ~loc ~style ~explode
-    (_x : t_26c973347b) =
+  let namevalues_of_t_12bf81c281 ~p ~op ~loc ~style ~explode
+    (_x : t_12bf81c281) =
     _namevalues_of ~kind:(
-      `ObjectN [("", [`Any]); ("email", let _x = _x.email in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_26c973347b)
+      `ObjectN [("", `Any); ("email", let _x = _x.email in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_12bf81c281)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_b373919511 ~p ~op ~loc ~style ~explode
-    (_x : t_b373919511) =
+  let string_of_t_976c399de7 ~p ~op ~loc ~style ~explode
+    (_x : t_976c399de7) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b373919511)
+      ~ctr:(Json_encoding.construct Encoders'.t_976c399de7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b373919511 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b373919511) in _string_to
+  let string_to_t_976c399de7 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_976c399de7) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_b373919511 ~p ~op ~loc ~style ~explode
-    (_x : t_b373919511) =
+  let namevalues_of_t_976c399de7 ~p ~op ~loc ~style ~explode
+    (_x : t_976c399de7) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b373919511)
+      ~ctr:(Json_encoding.construct Encoders'.t_976c399de7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_f9a2efc89d ~p ~op ~loc ~style ~explode
-    (_x : t_f9a2efc89d) =
+  let string_of_t_8efa015a15 ~p ~op ~loc ~style ~explode
+    (_x : t_8efa015a15) =
     _string_of ~kind:(
-      match _x with
-      | T_62f503fcab _x ->
+      begin match _x with
+      | T_13e89791f1 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_f9a2efc89d)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8efa015a15)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f9a2efc89d ~loc ~style ~explode (_x : string) =
+  let string_to_t_8efa015a15 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_62f503fcab) in
-        Option.map (fun _y : t_f9a2efc89d -> T_62f503fcab _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_13e89791f1) in
+        Option.map (fun _y : t_8efa015a15 -> T_13e89791f1 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_f9a2efc89d -> Int _y)
+        Option.map (fun _y : t_8efa015a15 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_f9a2efc89d ~p ~op ~loc ~style ~explode
-    (_x : t_f9a2efc89d) =
+  let namevalues_of_t_8efa015a15 ~p ~op ~loc ~style ~explode
+    (_x : t_8efa015a15) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_62f503fcab _x ->
+      begin match _x with
+      | T_13e89791f1 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_f9a2efc89d)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8efa015a15)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_d09edd25a8 ~p ~op ~loc ~style ~explode
-    (_x : t_d09edd25a8) =
+  let string_of_t_d1452a2e6d ~p ~op ~loc ~style ~explode
+    (_x : t_d1452a2e6d) =
     _string_of ~kind:(
-      match _x with
-      | T_e86a6266e7 _x ->
+      begin match _x with
+      | T_753b9f6893 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d09edd25a8)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_d1452a2e6d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d09edd25a8 ~loc ~style ~explode (_x : string) =
+  let string_to_t_d1452a2e6d ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_e86a6266e7) in
-        Option.map (fun _y : t_d09edd25a8 -> T_e86a6266e7 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_753b9f6893) in
+        Option.map (fun _y : t_d1452a2e6d -> T_753b9f6893 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_d09edd25a8 -> Int _y)
+        Option.map (fun _y : t_d1452a2e6d -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_d09edd25a8 ~p ~op ~loc ~style ~explode
-    (_x : t_d09edd25a8) =
+  let namevalues_of_t_d1452a2e6d ~p ~op ~loc ~style ~explode
+    (_x : t_d1452a2e6d) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_e86a6266e7 _x ->
+      begin match _x with
+      | T_753b9f6893 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d09edd25a8)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_d1452a2e6d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_537f0b2797 ~p ~op ~loc ~style ~explode
-    (_x : t_537f0b2797) =
+  let string_of_t_c4284eadfd ~p ~op ~loc ~style ~explode
+    (_x : t_c4284eadfd) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("shipping_rate", match _x.shipping_rate with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_537f0b2797)
+        [("", `Any);
+         ("shipping_rate", begin match _x.shipping_rate with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_c4284eadfd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_537f0b2797 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_537f0b2797) in _string_to
-      ~kind:(`ObjectN [("", [`Any]); ("shipping_rate", [`String])])
+  let string_to_t_c4284eadfd ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c4284eadfd) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_537f0b2797 ~p ~op ~loc ~style ~explode
-    (_x : t_537f0b2797) =
+  let namevalues_of_t_c4284eadfd ~p ~op ~loc ~style ~explode
+    (_x : t_c4284eadfd) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("shipping_rate", match _x.shipping_rate with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_537f0b2797)
+        [("", `Any);
+         ("shipping_rate", begin match _x.shipping_rate with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_c4284eadfd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_ea63e9747c ~p ~op ~loc ~style ~explode
-    (_x : t_ea63e9747c) =
+  let string_of_t_c086813c51 ~p ~op ~loc ~style ~explode
+    (_x : t_c086813c51) =
     _string_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_af89a87b4b) ->
+        ((List.map (fun (_x : t_cbe4f5acc3) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("invoice_line_item", match _x.invoice_line_item with
-                   | None -> [] | Some _x -> [`String]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_amounts", match _x.tax_amounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_bf627e1b51 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_0ef46b8218) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_467cde7fc9 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_ab1fb2277d _x -> `String]);
-                  ("type", let _x = _x.type_ in [`String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_ea63e9747c)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("invoice_line_item", begin match _x.invoice_line_item with
+                   | None -> `Null | Some _x -> `String end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_amounts", begin match _x.tax_amounts with
+                   | None -> `Null | Some _x ->
+                   begin match _x with
+                   | T_4eafa82af0 _x ->
+                     `Array
+                       ((List.map (fun (_x : t_ec0691360c) ->
+                           `Singleton (`Null)) _x))
+                   | T_603594d6a9 _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_3075582534 _x -> `String
+                   end end);
+                  ("type", let _x = _x.type_ in `String);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_c086813c51)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ea63e9747c ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_ea63e9747c) in _string_to
+  let string_to_t_c086813c51 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c086813c51) in _string_to
       ~kind:(`Array
                [(`List
                    (`ObjectN
-                      [("", [`Any]); ("amount", [`Integer]);
-                       ("description", [`String]);
-                       ("invoice_line_item", [`String]);
-                       ("quantity", [`Integer]);
-                       ("tax_amounts", [`Array [(`List (`Null))];
-                                        `String]);
-                       ("tax_rates", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("type", [`String]); ("unit_amount", [`Integer]);
-                       ("unit_amount_decimal", [`String])]))])
+                      [("", `Any); ("amount", `Integer);
+                       ("description", `String);
+                       ("invoice_line_item", `String);
+                       ("quantity", `Integer);
+                       ("tax_amounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("type", `String); ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_ea63e9747c ~p ~op ~loc ~style ~explode
-    (_x : t_ea63e9747c) =
+  let namevalues_of_t_c086813c51 ~p ~op ~loc ~style ~explode
+    (_x : t_c086813c51) =
     _namevalues_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_af89a87b4b) ->
+        ((List.map (fun (_x : t_cbe4f5acc3) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("invoice_line_item", match _x.invoice_line_item with
-                   | None -> [] | Some _x -> [`String]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_amounts", match _x.tax_amounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_bf627e1b51 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_0ef46b8218) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_467cde7fc9 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_ab1fb2277d _x -> `String]);
-                  ("type", let _x = _x.type_ in [`String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_ea63e9747c)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("invoice_line_item", begin match _x.invoice_line_item with
+                   | None -> `Null | Some _x -> `String end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_amounts", begin match _x.tax_amounts with
+                   | None -> `Null | Some _x ->
+                   begin match _x with
+                   | T_4eafa82af0 _x ->
+                     `Array
+                       ((List.map (fun (_x : t_ec0691360c) ->
+                           `Singleton (`Null)) _x))
+                   | T_603594d6a9 _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_3075582534 _x -> `String
+                   end end);
+                  ("type", let _x = _x.type_ in `String);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_c086813c51)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_1449eb52f2 ~p ~op ~loc ~style ~explode
-    (_x : t_1449eb52f2) =
-    _string_of ~kind:( `ObjectN [("", [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_1449eb52f2)
+  let string_of_t_fa0c590277 ~p ~op ~loc ~style ~explode
+    (_x : t_fa0c590277) =
+    _string_of ~kind:( `ObjectN [("", `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_fa0c590277)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1449eb52f2 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_1449eb52f2) in _string_to
-      ~kind:(`ObjectN [("", [`String])]) ~dtr ~loc ~style ~explode _x
+  let string_to_t_fa0c590277 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_fa0c590277) in _string_to
+      ~kind:(`ObjectN [("", `String)]) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_1449eb52f2 ~p ~op ~loc ~style ~explode
-    (_x : t_1449eb52f2) =
-    _namevalues_of ~kind:( `ObjectN [("", [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_1449eb52f2)
+  let namevalues_of_t_fa0c590277 ~p ~op ~loc ~style ~explode
+    (_x : t_fa0c590277) =
+    _namevalues_of ~kind:( `ObjectN [("", `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_fa0c590277)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_b994932726 ~p ~op ~loc ~style ~explode
-    (_x : t_b994932726) =
+  let string_of_t_935a453a3f ~p ~op ~loc ~style ~explode
+    (_x : t_935a453a3f) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b994932726)
+      ~ctr:(Json_encoding.construct Encoders'.t_935a453a3f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b994932726 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b994932726) in _string_to
+  let string_to_t_935a453a3f ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_935a453a3f) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_b994932726 ~p ~op ~loc ~style ~explode
-    (_x : t_b994932726) =
+  let namevalues_of_t_935a453a3f ~p ~op ~loc ~style ~explode
+    (_x : t_935a453a3f) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b994932726)
+      ~ctr:(Json_encoding.construct Encoders'.t_935a453a3f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_defa071e89 ~p ~op ~loc ~style ~explode
-    (_x : t_defa071e89) =
+  let string_of_t_5780adc875 ~p ~op ~loc ~style ~explode
+    (_x : t_5780adc875) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_defa071e89)
+      ~ctr:(Json_encoding.construct Encoders'.t_5780adc875)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_defa071e89 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_defa071e89) in _string_to
+  let string_to_t_5780adc875 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_5780adc875) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_defa071e89 ~p ~op ~loc ~style ~explode
-    (_x : t_defa071e89) =
+  let namevalues_of_t_5780adc875 ~p ~op ~loc ~style ~explode
+    (_x : t_5780adc875) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_defa071e89)
+      ~ctr:(Json_encoding.construct Encoders'.t_5780adc875)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_5116f50be5 ~p ~op ~loc ~style ~explode
-    (_x : t_5116f50be5) =
+  let string_of_t_7d4b84944c ~p ~op ~loc ~style ~explode
+    (_x : t_7d4b84944c) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("shipping_rate", match _x.shipping_rate with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_5116f50be5)
+        [("", `Any);
+         ("shipping_rate", begin match _x.shipping_rate with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_7d4b84944c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_5116f50be5 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_5116f50be5) in _string_to
-      ~kind:(`ObjectN [("", [`Any]); ("shipping_rate", [`String])])
+  let string_to_t_7d4b84944c ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7d4b84944c) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_5116f50be5 ~p ~op ~loc ~style ~explode
-    (_x : t_5116f50be5) =
+  let namevalues_of_t_7d4b84944c ~p ~op ~loc ~style ~explode
+    (_x : t_7d4b84944c) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("shipping_rate", match _x.shipping_rate with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_5116f50be5)
+        [("", `Any);
+         ("shipping_rate", begin match _x.shipping_rate with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_7d4b84944c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_302b4fc4e4 ~p ~op ~loc ~style ~explode
-    (_x : t_302b4fc4e4) =
+  let string_of_t_3acf43dc3b ~p ~op ~loc ~style ~explode
+    (_x : t_3acf43dc3b) =
     _string_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_7b0c385004) ->
+        ((List.map (fun (_x : t_595b5537ad) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("invoice_line_item", match _x.invoice_line_item with
-                   | None -> [] | Some _x -> [`String]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_amounts", match _x.tax_amounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_d7a16a0dc4 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_6c6845026a) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_78866db489 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_6034f184ea _x -> `String]);
-                  ("type", let _x = _x.type_ in [`String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_302b4fc4e4)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("invoice_line_item", begin match _x.invoice_line_item with
+                   | None -> `Null | Some _x -> `String end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_amounts", begin match _x.tax_amounts with
+                   | None -> `Null | Some _x ->
+                   begin match _x with
+                   | T_2c60c8fbae _x ->
+                     `Array
+                       ((List.map (fun (_x : t_1b02f7c5eb) ->
+                           `Singleton (`Null)) _x))
+                   | T_aa81a712ee _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_1514a7e869 _x -> `String
+                   end end);
+                  ("type", let _x = _x.type_ in `String);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_3acf43dc3b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_302b4fc4e4 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_302b4fc4e4) in _string_to
+  let string_to_t_3acf43dc3b ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3acf43dc3b) in _string_to
       ~kind:(`Array
                [(`List
                    (`ObjectN
-                      [("", [`Any]); ("amount", [`Integer]);
-                       ("description", [`String]);
-                       ("invoice_line_item", [`String]);
-                       ("quantity", [`Integer]);
-                       ("tax_amounts", [`Array [(`List (`Null))];
-                                        `String]);
-                       ("tax_rates", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("type", [`String]); ("unit_amount", [`Integer]);
-                       ("unit_amount_decimal", [`String])]))])
+                      [("", `Any); ("amount", `Integer);
+                       ("description", `String);
+                       ("invoice_line_item", `String);
+                       ("quantity", `Integer);
+                       ("tax_amounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("type", `String); ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_302b4fc4e4 ~p ~op ~loc ~style ~explode
-    (_x : t_302b4fc4e4) =
+  let namevalues_of_t_3acf43dc3b ~p ~op ~loc ~style ~explode
+    (_x : t_3acf43dc3b) =
     _namevalues_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_7b0c385004) ->
+        ((List.map (fun (_x : t_595b5537ad) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("invoice_line_item", match _x.invoice_line_item with
-                   | None -> [] | Some _x -> [`String]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_amounts", match _x.tax_amounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_d7a16a0dc4 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_6c6845026a) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_78866db489 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_6034f184ea _x -> `String]);
-                  ("type", let _x = _x.type_ in [`String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_302b4fc4e4)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("invoice_line_item", begin match _x.invoice_line_item with
+                   | None -> `Null | Some _x -> `String end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_amounts", begin match _x.tax_amounts with
+                   | None -> `Null | Some _x ->
+                   begin match _x with
+                   | T_2c60c8fbae _x ->
+                     `Array
+                       ((List.map (fun (_x : t_1b02f7c5eb) ->
+                           `Singleton (`Null)) _x))
+                   | T_aa81a712ee _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_1514a7e869 _x -> `String
+                   end end);
+                  ("type", let _x = _x.type_ in `String);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_3acf43dc3b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_0821868d84 ~p ~op ~loc ~style ~explode
-    (_x : t_0821868d84) =
-    _string_of ~kind:( `ObjectN [("", [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_0821868d84)
+  let string_of_t_2551b208c1 ~p ~op ~loc ~style ~explode
+    (_x : t_2551b208c1) =
+    _string_of ~kind:( `ObjectN [("", `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_2551b208c1)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0821868d84 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_0821868d84) in _string_to
-      ~kind:(`ObjectN [("", [`String])]) ~dtr ~loc ~style ~explode _x
+  let string_to_t_2551b208c1 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2551b208c1) in _string_to
+      ~kind:(`ObjectN [("", `String)]) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_0821868d84 ~p ~op ~loc ~style ~explode
-    (_x : t_0821868d84) =
-    _namevalues_of ~kind:( `ObjectN [("", [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_0821868d84)
+  let namevalues_of_t_2551b208c1 ~p ~op ~loc ~style ~explode
+    (_x : t_2551b208c1) =
+    _namevalues_of ~kind:( `ObjectN [("", `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_2551b208c1)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_3d8261ebd7 ~p ~op ~loc ~style ~explode
-    (_x : t_3d8261ebd7) =
+  let string_of_t_8cd3871a8a ~p ~op ~loc ~style ~explode
+    (_x : t_8cd3871a8a) =
     _string_of ~kind:(
-      match _x with
-      | T_21225e884d _x ->
+      begin match _x with
+      | T_29c5820fae _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_3d8261ebd7)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8cd3871a8a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_3d8261ebd7 ~loc ~style ~explode (_x : string) =
+  let string_to_t_8cd3871a8a ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_21225e884d) in
-        Option.map (fun _y : t_3d8261ebd7 -> T_21225e884d _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_29c5820fae) in
+        Option.map (fun _y : t_8cd3871a8a -> T_29c5820fae _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_3d8261ebd7 -> Int _y)
+        Option.map (fun _y : t_8cd3871a8a -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_3d8261ebd7 ~p ~op ~loc ~style ~explode
-    (_x : t_3d8261ebd7) =
+  let namevalues_of_t_8cd3871a8a ~p ~op ~loc ~style ~explode
+    (_x : t_8cd3871a8a) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_21225e884d _x ->
+      begin match _x with
+      | T_29c5820fae _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_3d8261ebd7)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8cd3871a8a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_53e3e26f8d ~p ~op ~loc ~style ~explode
-    (_x : t_53e3e26f8d) =
+  let string_of_t_4f49500d45 ~p ~op ~loc ~style ~explode
+    (_x : t_4f49500d45) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_53e3e26f8d)
+      ~ctr:(Json_encoding.construct Encoders'.t_4f49500d45)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_53e3e26f8d ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_53e3e26f8d) in _string_to
+  let string_to_t_4f49500d45 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4f49500d45) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_53e3e26f8d ~p ~op ~loc ~style ~explode
-    (_x : t_53e3e26f8d) =
+  let namevalues_of_t_4f49500d45 ~p ~op ~loc ~style ~explode
+    (_x : t_4f49500d45) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_53e3e26f8d)
+      ~ctr:(Json_encoding.construct Encoders'.t_4f49500d45)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_4ec070121c ~p ~op ~loc ~style ~explode
-    (_x : t_4ec070121c) =
+  let string_of_t_e03d9a444b ~p ~op ~loc ~style ~explode
+    (_x : t_e03d9a444b) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_4ec070121c)
+      ~ctr:(Json_encoding.construct Encoders'.t_e03d9a444b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4ec070121c ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4ec070121c) in _string_to
+  let string_to_t_e03d9a444b ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e03d9a444b) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_4ec070121c ~p ~op ~loc ~style ~explode
-    (_x : t_4ec070121c) =
+  let namevalues_of_t_e03d9a444b ~p ~op ~loc ~style ~explode
+    (_x : t_e03d9a444b) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_4ec070121c)
+      ~ctr:(Json_encoding.construct Encoders'.t_e03d9a444b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_9387af353f ~p ~op ~loc ~style ~explode
-    (_x : t_9387af353f) =
+  let string_of_t_d8f80ab533 ~p ~op ~loc ~style ~explode
+    (_x : t_d8f80ab533) =
     _string_of ~kind:(
-      match _x with
-      | T_c3b68b80c4 _x ->
+      begin match _x with
+      | T_05166771dc _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9387af353f)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_d8f80ab533)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9387af353f ~loc ~style ~explode (_x : string) =
+  let string_to_t_d8f80ab533 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_c3b68b80c4) in
-        Option.map (fun _y : t_9387af353f -> T_c3b68b80c4 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_05166771dc) in
+        Option.map (fun _y : t_d8f80ab533 -> T_05166771dc _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_9387af353f -> Int _y)
+        Option.map (fun _y : t_d8f80ab533 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_9387af353f ~p ~op ~loc ~style ~explode
-    (_x : t_9387af353f) =
+  let namevalues_of_t_d8f80ab533 ~p ~op ~loc ~style ~explode
+    (_x : t_d8f80ab533) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_c3b68b80c4 _x ->
+      begin match _x with
+      | T_05166771dc _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9387af353f)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_d8f80ab533)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_8159efcced ~p ~op ~loc ~style ~explode
-    (_x : t_8159efcced) =
+  let string_of_t_194d7f2624 ~p ~op ~loc ~style ~explode
+    (_x : t_194d7f2624) =
     _string_of ~kind:(
-      match _x with
-      | T_b49c7c27ac _x ->
+      begin match _x with
+      | T_4a62a84b9e _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_8159efcced)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_194d7f2624)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8159efcced ~loc ~style ~explode (_x : string) =
+  let string_to_t_194d7f2624 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_b49c7c27ac) in
-        Option.map (fun _y : t_8159efcced -> T_b49c7c27ac _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_4a62a84b9e) in
+        Option.map (fun _y : t_194d7f2624 -> T_4a62a84b9e _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_8159efcced -> Int _y)
+        Option.map (fun _y : t_194d7f2624 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_8159efcced ~p ~op ~loc ~style ~explode
-    (_x : t_8159efcced) =
+  let namevalues_of_t_194d7f2624 ~p ~op ~loc ~style ~explode
+    (_x : t_194d7f2624) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_b49c7c27ac _x ->
+      begin match _x with
+      | T_4a62a84b9e _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_8159efcced)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_194d7f2624)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_f4a5e75dbf ~p ~op ~loc ~style ~explode
-    (_x : t_f4a5e75dbf) =
+  let string_of_t_76bf2704bf ~p ~op ~loc ~style ~explode
+    (_x : t_76bf2704bf) =
     _string_of ~kind:(
-      match _x with
-      | T_6158529f95 _x ->
+      begin match _x with
+      | T_019e891337 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_f4a5e75dbf)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_76bf2704bf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f4a5e75dbf ~loc ~style ~explode (_x : string) =
+  let string_to_t_76bf2704bf ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_6158529f95) in
-        Option.map (fun _y : t_f4a5e75dbf -> T_6158529f95 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_019e891337) in
+        Option.map (fun _y : t_76bf2704bf -> T_019e891337 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_f4a5e75dbf -> Int _y)
+        Option.map (fun _y : t_76bf2704bf -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_f4a5e75dbf ~p ~op ~loc ~style ~explode
-    (_x : t_f4a5e75dbf) =
+  let namevalues_of_t_76bf2704bf ~p ~op ~loc ~style ~explode
+    (_x : t_76bf2704bf) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_6158529f95 _x ->
+      begin match _x with
+      | T_019e891337 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_f4a5e75dbf)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_76bf2704bf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_60f6463eff ~p ~op ~loc ~style ~explode
-    (_x : t_60f6463eff) =
+  let string_of_t_2657bcad54 ~p ~op ~loc ~style ~explode
+    (_x : t_2657bcad54) =
     _string_of ~kind:(
-      match _x with
-      | T_94eb4d749d _x ->
+      begin match _x with
+      | T_872f5780fe _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_60f6463eff)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_2657bcad54)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_60f6463eff ~loc ~style ~explode (_x : string) =
+  let string_to_t_2657bcad54 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_94eb4d749d) in
-        Option.map (fun _y : t_60f6463eff -> T_94eb4d749d _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_872f5780fe) in
+        Option.map (fun _y : t_2657bcad54 -> T_872f5780fe _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_60f6463eff -> Int _y)
+        Option.map (fun _y : t_2657bcad54 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_60f6463eff ~p ~op ~loc ~style ~explode
-    (_x : t_60f6463eff) =
+  let namevalues_of_t_2657bcad54 ~p ~op ~loc ~style ~explode
+    (_x : t_2657bcad54) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_94eb4d749d _x ->
+      begin match _x with
+      | T_872f5780fe _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_60f6463eff)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_2657bcad54)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_9b3a32e051 ~p ~op ~loc ~style ~explode
-    (_x : t_9b3a32e051) =
+  let string_of_t_512e4129fd ~p ~op ~loc ~style ~explode
+    (_x : t_512e4129fd) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_9b3a32e051)
+      ~ctr:(Json_encoding.construct Encoders'.t_512e4129fd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9b3a32e051 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_9b3a32e051) in _string_to
+  let string_to_t_512e4129fd ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_512e4129fd) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_9b3a32e051 ~p ~op ~loc ~style ~explode
-    (_x : t_9b3a32e051) =
+  let namevalues_of_t_512e4129fd ~p ~op ~loc ~style ~explode
+    (_x : t_512e4129fd) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_9b3a32e051)
+      ~ctr:(Json_encoding.construct Encoders'.t_512e4129fd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_f7bfa4b4d1 ~p ~op ~loc ~style ~explode
-    (_x : t_f7bfa4b4d1) =
+  let string_of_t_32de9e954f ~p ~op ~loc ~style ~explode
+    (_x : t_32de9e954f) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("customer", match _x.customer with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f7bfa4b4d1)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("customer", begin match _x.customer with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_32de9e954f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f7bfa4b4d1 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f7bfa4b4d1) in _string_to
+  let string_to_t_32de9e954f ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_32de9e954f) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("account", [`String]);
-                ("customer", [`String])]) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_f7bfa4b4d1 ~p ~op ~loc ~style ~explode
-    (_x : t_f7bfa4b4d1) =
-    _namevalues_of ~kind:(
-      `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("customer", match _x.customer with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f7bfa4b4d1)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_057e427287 ~p ~op ~loc ~style ~explode
-    (_x : t_057e427287) =
-    _string_of ~kind:(
-      match _x with
-      | T_c46138b060 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_057e427287)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_057e427287 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_c46138b060) in
-        Option.map (fun _y : t_057e427287 -> T_c46138b060 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_057e427287 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_057e427287 ~p ~op ~loc ~style ~explode
-    (_x : t_057e427287) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_c46138b060 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_057e427287)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_c07bfc89dd ~p ~op ~loc ~style ~explode
-    (_x : t_c07bfc89dd) =
-    _string_of ~kind:(
-      `ObjectN [("", [`Any]); ("after", let _x = _x.after in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_c07bfc89dd)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_c07bfc89dd ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_c07bfc89dd) in _string_to
-      ~kind:(`ObjectN [("", [`Any]); ("after", [`String])])
+               [("", `Any); ("account", `String); ("customer", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_c07bfc89dd ~p ~op ~loc ~style ~explode
-    (_x : t_c07bfc89dd) =
+  let namevalues_of_t_32de9e954f ~p ~op ~loc ~style ~explode
+    (_x : t_32de9e954f) =
     _namevalues_of ~kind:(
-      `ObjectN [("", [`Any]); ("after", let _x = _x.after in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_c07bfc89dd)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_7806695d68 ~p ~op ~loc ~style ~explode
-    (_x : t_7806695d68) =
-    _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-         ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-         ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-         ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_7806695d68)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("customer", begin match _x.customer with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_32de9e954f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_7806695d68 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_7806695d68) in _string_to
-      ~kind:(`ObjectN
-               [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                ("lt", [`Integer]); ("lte", [`Integer])])
+  let string_of_t_656d49aac0 ~p ~op ~loc ~style ~explode
+    (_x : t_656d49aac0) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_3a94416575 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_656d49aac0)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_656d49aac0 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_3a94416575) in
+        Option.map (fun _y : t_656d49aac0 -> T_3a94416575 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_656d49aac0 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_656d49aac0 ~p ~op ~loc ~style ~explode
+    (_x : t_656d49aac0) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_3a94416575 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_656d49aac0)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_83d5590180 ~p ~op ~loc ~style ~explode
+    (_x : t_83d5590180) =
+    _string_of ~kind:(
+      `ObjectN [("", `Any); ("after", let _x = _x.after in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_83d5590180)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_83d5590180 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_83d5590180) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("after", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_7806695d68 ~p ~op ~loc ~style ~explode
-    (_x : t_7806695d68) =
+  let namevalues_of_t_83d5590180 ~p ~op ~loc ~style ~explode
+    (_x : t_83d5590180) =
     _namevalues_of ~kind:(
-      `ObjectN
-        [("", [`Any]);
-         ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-         ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-         ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-         ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_7806695d68)
+      `ObjectN [("", `Any); ("after", let _x = _x.after in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_83d5590180)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_d8bdb49bf5 ~p ~op ~loc ~style ~explode
-    (_x : t_d8bdb49bf5) =
-    _string_of ~kind:(
-      match _x with
-      | T_29f8ba5efa _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d8bdb49bf5)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_d8bdb49bf5 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_29f8ba5efa) in
-        Option.map (fun _y : t_d8bdb49bf5 -> T_29f8ba5efa _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_d8bdb49bf5 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_d8bdb49bf5 ~p ~op ~loc ~style ~explode
-    (_x : t_d8bdb49bf5) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_29f8ba5efa _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d8bdb49bf5)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_f9a8042762 ~p ~op ~loc ~style ~explode
-    (_x : t_f9a8042762) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_f9a8042762)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_f9a8042762 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f9a8042762) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_f9a8042762 ~p ~op ~loc ~style ~explode
-    (_x : t_f9a8042762) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_f9a8042762)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_cd28c8e916 ~p ~op ~loc ~style ~explode
-    (_x : t_cd28c8e916) =
-    _string_of ~kind:(
-      match _x with
-      | T_4131fdfdbc _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_cd28c8e916)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_cd28c8e916 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_4131fdfdbc) in
-        Option.map (fun _y : t_cd28c8e916 -> T_4131fdfdbc _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_cd28c8e916 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_cd28c8e916 ~p ~op ~loc ~style ~explode
-    (_x : t_cd28c8e916) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_4131fdfdbc _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_cd28c8e916)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_80086f9abe ~p ~op ~loc ~style ~explode
-    (_x : t_80086f9abe) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_80086f9abe)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_80086f9abe ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_80086f9abe) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_80086f9abe ~p ~op ~loc ~style ~explode
-    (_x : t_80086f9abe) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_80086f9abe)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_f1cfc81a85 ~p ~op ~loc ~style ~explode
-    (_x : t_f1cfc81a85) =
-    _string_of ~kind:(
-      match _x with
-      | T_7b3ad81e3e _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_f1cfc81a85)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_f1cfc81a85 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_7b3ad81e3e) in
-        Option.map (fun _y : t_f1cfc81a85 -> T_7b3ad81e3e _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_f1cfc81a85 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_f1cfc81a85 ~p ~op ~loc ~style ~explode
-    (_x : t_f1cfc81a85) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_7b3ad81e3e _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_f1cfc81a85)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_279dfd61af ~p ~op ~loc ~style ~explode
-    (_x : t_279dfd61af) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_279dfd61af)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_279dfd61af ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_279dfd61af) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_279dfd61af ~p ~op ~loc ~style ~explode
-    (_x : t_279dfd61af) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_279dfd61af)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_aa3d2b4be3 ~p ~op ~loc ~style ~explode
-    (_x : t_aa3d2b4be3) =
-    _string_of ~kind:(
-      match _x with
-      | T_89ef3bf07e _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_aa3d2b4be3)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_aa3d2b4be3 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_89ef3bf07e) in
-        Option.map (fun _y : t_aa3d2b4be3 -> T_89ef3bf07e _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_aa3d2b4be3 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_aa3d2b4be3 ~p ~op ~loc ~style ~explode
-    (_x : t_aa3d2b4be3) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_89ef3bf07e _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_aa3d2b4be3)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_66ac0a8f50 ~p ~op ~loc ~style ~explode
-    (_x : t_66ac0a8f50) =
-    _string_of ~kind:(
-      match _x with
-      | T_574b8da69a _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_66ac0a8f50)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_66ac0a8f50 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_574b8da69a) in
-        Option.map (fun _y : t_66ac0a8f50 -> T_574b8da69a _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_66ac0a8f50 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_66ac0a8f50 ~p ~op ~loc ~style ~explode
-    (_x : t_66ac0a8f50) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_574b8da69a _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_66ac0a8f50)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_1247e44e67 ~p ~op ~loc ~style ~explode
-    (_x : t_1247e44e67) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_1247e44e67)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_1247e44e67 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_1247e44e67) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_1247e44e67 ~p ~op ~loc ~style ~explode
-    (_x : t_1247e44e67) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_1247e44e67)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_8a5fd2de38 ~p ~op ~loc ~style ~explode
-    (_x : t_8a5fd2de38) =
+  let string_of_t_a63e6bd7de ~p ~op ~loc ~style ~explode
+    (_x : t_a63e6bd7de) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("enabled", let _x = _x.enabled in [`Boolean]);
-         ("liability", match _x.liability with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("account", match _x.account with | None -> []
-                            | Some _x -> [`String]);
-                           ("type", let _x = _x.type_ in [`String])]])])
-      ~ctr:(Json_encoding.construct Encoders'.t_8a5fd2de38)
+        [("", `Any);
+         ("gt", begin match _x.gt with | None -> `Null | Some _x -> `Integer
+          end);
+         ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+          `Integer end);
+         ("lt", begin match _x.lt with | None -> `Null | Some _x -> `Integer
+          end);
+         ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+          `Integer end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_a63e6bd7de)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8a5fd2de38 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_8a5fd2de38) in _string_to
+  let string_to_t_a63e6bd7de ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a63e6bd7de) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("enabled", [`Boolean]);
+               [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                ("lt", `Integer); ("lte", `Integer)])
+      ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_a63e6bd7de ~p ~op ~loc ~style ~explode
+    (_x : t_a63e6bd7de) =
+    _namevalues_of ~kind:(
+      `ObjectN
+        [("", `Any);
+         ("gt", begin match _x.gt with | None -> `Null | Some _x -> `Integer
+          end);
+         ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+          `Integer end);
+         ("lt", begin match _x.lt with | None -> `Null | Some _x -> `Integer
+          end);
+         ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+          `Integer end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_a63e6bd7de)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_b566f1b6bc ~p ~op ~loc ~style ~explode
+    (_x : t_b566f1b6bc) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_862da605ac _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b566f1b6bc)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_b566f1b6bc ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_862da605ac) in
+        Option.map (fun _y : t_b566f1b6bc -> T_862da605ac _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_b566f1b6bc -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_b566f1b6bc ~p ~op ~loc ~style ~explode
+    (_x : t_b566f1b6bc) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_862da605ac _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b566f1b6bc)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_53be0c51ff ~p ~op ~loc ~style ~explode
+    (_x : t_53be0c51ff) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_53be0c51ff)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_53be0c51ff ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_53be0c51ff) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_53be0c51ff ~p ~op ~loc ~style ~explode
+    (_x : t_53be0c51ff) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_53be0c51ff)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_8333ac0d50 ~p ~op ~loc ~style ~explode
+    (_x : t_8333ac0d50) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_da2453d199 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8333ac0d50)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_8333ac0d50 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_da2453d199) in
+        Option.map (fun _y : t_8333ac0d50 -> T_da2453d199 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_8333ac0d50 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_8333ac0d50 ~p ~op ~loc ~style ~explode
+    (_x : t_8333ac0d50) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_da2453d199 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8333ac0d50)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_060ea1562f ~p ~op ~loc ~style ~explode
+    (_x : t_060ea1562f) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_060ea1562f)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_060ea1562f ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_060ea1562f) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_060ea1562f ~p ~op ~loc ~style ~explode
+    (_x : t_060ea1562f) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_060ea1562f)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_7181394bbb ~p ~op ~loc ~style ~explode
+    (_x : t_7181394bbb) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_6c4276e1a4 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_7181394bbb)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_7181394bbb ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6c4276e1a4) in
+        Option.map (fun _y : t_7181394bbb -> T_6c4276e1a4 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_7181394bbb -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_7181394bbb ~p ~op ~loc ~style ~explode
+    (_x : t_7181394bbb) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_6c4276e1a4 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_7181394bbb)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_3d308e0087 ~p ~op ~loc ~style ~explode
+    (_x : t_3d308e0087) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_3d308e0087)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_3d308e0087 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3d308e0087) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_3d308e0087 ~p ~op ~loc ~style ~explode
+    (_x : t_3d308e0087) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_3d308e0087)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_5fae893ff7 ~p ~op ~loc ~style ~explode
+    (_x : t_5fae893ff7) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_eb52c2c010 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_5fae893ff7)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_5fae893ff7 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_eb52c2c010) in
+        Option.map (fun _y : t_5fae893ff7 -> T_eb52c2c010 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_5fae893ff7 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_5fae893ff7 ~p ~op ~loc ~style ~explode
+    (_x : t_5fae893ff7) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_eb52c2c010 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_5fae893ff7)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_e8ff8d2aa0 ~p ~op ~loc ~style ~explode
+    (_x : t_e8ff8d2aa0) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_4c63ae17d6 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_e8ff8d2aa0)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_e8ff8d2aa0 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_4c63ae17d6) in
+        Option.map (fun _y : t_e8ff8d2aa0 -> T_4c63ae17d6 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_e8ff8d2aa0 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_e8ff8d2aa0 ~p ~op ~loc ~style ~explode
+    (_x : t_e8ff8d2aa0) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_4c63ae17d6 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_e8ff8d2aa0)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_2e0259263b ~p ~op ~loc ~style ~explode
+    (_x : t_2e0259263b) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_2e0259263b)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_2e0259263b ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2e0259263b) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_2e0259263b ~p ~op ~loc ~style ~explode
+    (_x : t_2e0259263b) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_2e0259263b)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_a51466ec35 ~p ~op ~loc ~style ~explode
+    (_x : t_a51466ec35) =
+    _string_of ~kind:(
+      `ObjectN
+        [("", `Any); ("enabled", let _x = _x.enabled in `Boolean);
+         ("liability", begin match _x.liability with | None -> `Null
+          | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("account", begin match _x.account with | None -> `Null
+              | Some _x -> `String end);
+             ("type", let _x = _x.type_ in `String)]
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_a51466ec35)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_a51466ec35 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a51466ec35) in _string_to
+      ~kind:(`ObjectN
+               [("", `Any); ("enabled", `Boolean);
                 ("liability",
-                 [`ObjectN
-                    [("", [`Any]); ("account", [`String]);
-                     ("type", [`String])]])]) ~dtr ~loc ~style ~explode _x
+                 `ObjectN
+                   [("", `Any); ("account", `String); ("type", `String)])])
+      ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_8a5fd2de38 ~p ~op ~loc ~style ~explode
-    (_x : t_8a5fd2de38) =
+  let namevalues_of_t_a51466ec35 ~p ~op ~loc ~style ~explode
+    (_x : t_a51466ec35) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("enabled", let _x = _x.enabled in [`Boolean]);
-         ("liability", match _x.liability with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("account", match _x.account with | None -> []
-                            | Some _x -> [`String]);
-                           ("type", let _x = _x.type_ in [`String])]])])
-      ~ctr:(Json_encoding.construct Encoders'.t_8a5fd2de38)
+        [("", `Any); ("enabled", let _x = _x.enabled in `Boolean);
+         ("liability", begin match _x.liability with | None -> `Null
+          | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("account", begin match _x.account with | None -> `Null
+              | Some _x -> `String end);
+             ("type", let _x = _x.type_ in `String)]
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_a51466ec35)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_ec4c522682 ~p ~op ~loc ~style ~explode
-    (_x : t_ec4c522682) =
+  let string_of_t_50aa3198c9 ~p ~op ~loc ~style ~explode
+    (_x : t_50aa3198c9) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_ec4c522682)
+      ~ctr:(Json_encoding.construct Encoders'.t_50aa3198c9)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ec4c522682 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_ec4c522682) in _string_to
+  let string_to_t_50aa3198c9 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_50aa3198c9) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_ec4c522682 ~p ~op ~loc ~style ~explode
-    (_x : t_ec4c522682) =
+  let namevalues_of_t_50aa3198c9 ~p ~op ~loc ~style ~explode
+    (_x : t_50aa3198c9) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_ec4c522682)
+      ~ctr:(Json_encoding.construct Encoders'.t_50aa3198c9)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e00ab899ed ~p ~op ~loc ~style ~explode
-    (_x : t_e00ab899ed) =
+  let string_of_t_c4767cb749 ~p ~op ~loc ~style ~explode
+    (_x : t_c4767cb749) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("end_behavior", match _x.end_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("phases", match _x.phases with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_8527d4f3ba) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("add_invoice_items",
-                                     match _x.add_invoice_items with
-                                     | None -> []
-                                     | Some _x -> [`Array
-                                                     ((List.map (fun (_x : t_4bc3539de0) ->
-                                                         `Singleton (`Null))
-                                                         _x))]);
-                                    ("application_fee_percent",
-                                     match _x.application_fee_percent with
-                                     | None -> [] | Some _x -> [`Number]);
-                                    ("automatic_tax",
-                                     match _x.automatic_tax with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("enabled",
-                                                       let _x = _x.enabled in
-                                                       [`Null]);
-                                                      ("liability",
-                                                       match _x.liability with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("billing_cycle_anchor",
-                                     match _x.billing_cycle_anchor with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_fcf3f3cc4f _x -> `Null
-                                                   | T_e2c0378d25 _x -> `Null]);
-                                    ("collection_method",
-                                     match _x.collection_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("coupon", match _x.coupon with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_payment_method",
-                                     match _x.default_payment_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_tax_rates",
-                                     match _x.default_tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_30f5bb2100 _x -> `Null]);
-                                    ("description", match _x.description with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | String_ _x -> `Null
-                                                   | T_9b7bcd629e _x -> `Null]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_9f51d1fd63 _x -> `Null
-                                                   | T_111a9f2365 _x -> `Null]);
-                                    ("end_date", match _x.end_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_f939c879ff _x -> `Null]);
-                                    ("invoice_settings",
-                                     match _x.invoice_settings with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("account_tax_ids",
-                                                       match _x.account_tax_ids with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("days_until_due",
-                                                       match _x.days_until_due with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("issuer",
-                                                       match _x.issuer with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("items", let _x = _x.items in
-                                     [`Array
-                                        ((List.map (fun (_x : t_1ccaef01fc) ->
-                                            `Singleton (`Null)) _x))]);
-                                    ("iterations", match _x.iterations with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN [("", [`Null])]]);
-                                    ("on_behalf_of",
-                                     match _x.on_behalf_of with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("proration_behavior",
-                                     match _x.proration_behavior with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("start_date", match _x.start_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_78925a3533 _x -> `Null]);
-                                    ("transfer_data",
-                                     match _x.transfer_data with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("amount_percent",
-                                                       match _x.amount_percent with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("destination",
-                                                       let _x = _x.destination in
-                                                       [`Null])]]);
-                                    ("trial", match _x.trial with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("trial_end", match _x.trial_end with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_8bbff7aec4 _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_e00ab899ed)
+        [("", `Any);
+         ("end_behavior", begin match _x.end_behavior with | None -> `Null
+          | Some _x -> `String end);
+         ("phases", begin match _x.phases with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_94553cb579) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("add_invoice_items",
+                       begin match _x.add_invoice_items with | None -> `Null
+                       | Some _x ->
+                       `Array
+                         ((List.map (fun (_x : t_32fe86aa85) ->
+                             `Singleton (`Null)) _x))
+                       end);
+                      ("application_fee_percent",
+                       begin match _x.application_fee_percent with
+                       | None -> `Null | Some _x -> `Number end);
+                      ("automatic_tax", begin match _x.automatic_tax with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("enabled", let _x = _x.enabled in `Null);
+                          ("liability", begin match _x.liability with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("billing_cycle_anchor",
+                       begin match _x.billing_cycle_anchor with
+                       | None -> `Null | Some _x -> `String end);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_ea5c39759d _x -> `Null
+                       | T_0829cab37e _x -> `Null
+                       end end);
+                      ("collection_method",
+                       begin match _x.collection_method with | None -> `Null
+                       | Some _x -> `String end);
+                      ("coupon", begin match _x.coupon with | None -> `Null
+                       | Some _x -> `String end);
+                      ("default_payment_method",
+                       begin match _x.default_payment_method with
+                       | None -> `Null | Some _x -> `String end);
+                      ("default_tax_rates",
+                       begin match _x.default_tax_rates with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_cccdb8d4f1 _x -> `Null
+                       end end);
+                      ("description", begin match _x.description with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | String_ _x -> `Null
+                       | T_dae89e1d87 _x -> `Null
+                       end end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_f72277021f _x -> `Null
+                       | T_a1930a67fa _x -> `Null
+                       end end);
+                      ("end_date", begin match _x.end_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_2fa9ab7487 _x -> `Null
+                       end end);
+                      ("invoice_settings",
+                       begin match _x.invoice_settings with | None -> `Null
+                       | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("account_tax_ids",
+                           begin match _x.account_tax_ids with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("days_until_due",
+                           begin match _x.days_until_due with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("issuer", begin match _x.issuer with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("items", let _x = _x.items in
+                       `Array
+                         ((List.map (fun (_x : t_1f4b985808) ->
+                             `Singleton (`Null)) _x)));
+                      ("iterations", begin match _x.iterations with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x -> `ObjectN [("", `Null)]
+                       end);
+                      ("on_behalf_of", begin match _x.on_behalf_of with
+                       | None -> `Null | Some _x -> `String end);
+                      ("proration_behavior",
+                       begin match _x.proration_behavior with | None -> `Null
+                       | Some _x -> `String end);
+                      ("start_date", begin match _x.start_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_d0a68ee4b5 _x -> `Null
+                       end end);
+                      ("transfer_data", begin match _x.transfer_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("amount_percent",
+                           begin match _x.amount_percent with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("destination", let _x = _x.destination in `Null)]
+                       end);
+                      ("trial", begin match _x.trial with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("trial_end", begin match _x.trial_end with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_ea977ed81f _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_c4767cb749)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e00ab899ed ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e00ab899ed) in _string_to
+  let string_to_t_c4767cb749 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c4767cb749) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("end_behavior", [`String]);
+               [("", `Any); ("end_behavior", `String);
                 ("phases",
-                 [`Array
-                    [(`List
-                        (`ObjectN
-                           [("", [`Any]);
-                            ("add_invoice_items", [`Array [(`List (`Null))]]);
-                            ("application_fee_percent", [`Number]);
-                            ("automatic_tax",
-                             [`ObjectN
-                                [("", [`Null]); ("enabled", [`Null]);
-                                 ("liability", [`Null])]]);
-                            ("billing_cycle_anchor", [`String]);
-                            ("billing_thresholds", [`Null;
-                                                    `Null]);
-                            ("collection_method", [`String]);
-                            ("coupon", [`String]);
-                            ("default_payment_method", [`String]);
-                            ("default_tax_rates", [`Null;
-                                                   `Null]);
-                            ("description", [`Null;
-                                             `Null]);
-                            ("discounts", [`Null;
-                                           `Null]);
-                            ("end_date", [`Null;
-                                          `Null]);
-                            ("invoice_settings",
-                             [`ObjectN
-                                [("", [`Null]); ("account_tax_ids", [`Null]);
-                                 ("days_until_due", [`Null]);
-                                 ("issuer", [`Null])]]);
-                            ("items", [`Array [(`List (`Null))]]);
-                            ("iterations", [`Integer]);
-                            ("metadata", [`ObjectN [("", [`Null])]]);
-                            ("on_behalf_of", [`String]);
-                            ("proration_behavior", [`String]);
-                            ("start_date", [`Null;
-                                            `Null]);
-                            ("transfer_data",
-                             [`ObjectN
-                                [("", [`Null]); ("amount_percent", [`Null]);
-                                 ("destination", [`Null])]]);
-                            ("trial", [`Boolean]);
-                            ("trial_end", [`Null;
-                                           `Null])]))]]);
-                ("proration_behavior", [`String])]) ~dtr ~loc ~style ~explode
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("add_invoice_items", `Array [(`List (`Null))]);
+                           ("application_fee_percent", `Number);
+                           ("automatic_tax",
+                            `ObjectN
+                              [("", `Null); ("enabled", `Null);
+                               ("liability", `Null)]);
+                           ("billing_cycle_anchor", `String);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("collection_method", `String);
+                           ("coupon", `String);
+                           ("default_payment_method", `String);
+                           ("default_tax_rates", `Choice
+                                                 [`Null; `Null]);
+                           ("description", `Choice
+                                           [`Null; `Null]);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("end_date", `Choice
+                                        [`Null; `Null]);
+                           ("invoice_settings",
+                            `ObjectN
+                              [("", `Null); ("account_tax_ids", `Null);
+                               ("days_until_due", `Null); ("issuer", `Null)]);
+                           ("items", `Array [(`List (`Null))]);
+                           ("iterations", `Integer);
+                           ("metadata", `ObjectN [("", `Null)]);
+                           ("on_behalf_of", `String);
+                           ("proration_behavior", `String);
+                           ("start_date", `Choice
+                                          [`Null; `Null]);
+                           ("transfer_data",
+                            `ObjectN
+                              [("", `Null); ("amount_percent", `Null);
+                               ("destination", `Null)]);
+                           ("trial", `Boolean);
+                           ("trial_end", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String)]) ~dtr ~loc ~style ~explode
       _x
   
-  let namevalues_of_t_e00ab899ed ~p ~op ~loc ~style ~explode
-    (_x : t_e00ab899ed) =
+  let namevalues_of_t_c4767cb749 ~p ~op ~loc ~style ~explode
+    (_x : t_c4767cb749) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("end_behavior", match _x.end_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("phases", match _x.phases with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_8527d4f3ba) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("add_invoice_items",
-                                     match _x.add_invoice_items with
-                                     | None -> []
-                                     | Some _x -> [`Array
-                                                     ((List.map (fun (_x : t_4bc3539de0) ->
-                                                         `Singleton (`Null))
-                                                         _x))]);
-                                    ("application_fee_percent",
-                                     match _x.application_fee_percent with
-                                     | None -> [] | Some _x -> [`Number]);
-                                    ("automatic_tax",
-                                     match _x.automatic_tax with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("enabled",
-                                                       let _x = _x.enabled in
-                                                       [`Null]);
-                                                      ("liability",
-                                                       match _x.liability with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("billing_cycle_anchor",
-                                     match _x.billing_cycle_anchor with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_fcf3f3cc4f _x -> `Null
-                                                   | T_e2c0378d25 _x -> `Null]);
-                                    ("collection_method",
-                                     match _x.collection_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("coupon", match _x.coupon with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_payment_method",
-                                     match _x.default_payment_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_tax_rates",
-                                     match _x.default_tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_30f5bb2100 _x -> `Null]);
-                                    ("description", match _x.description with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | String_ _x -> `Null
-                                                   | T_9b7bcd629e _x -> `Null]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_9f51d1fd63 _x -> `Null
-                                                   | T_111a9f2365 _x -> `Null]);
-                                    ("end_date", match _x.end_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_f939c879ff _x -> `Null]);
-                                    ("invoice_settings",
-                                     match _x.invoice_settings with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("account_tax_ids",
-                                                       match _x.account_tax_ids with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("days_until_due",
-                                                       match _x.days_until_due with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("issuer",
-                                                       match _x.issuer with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("items", let _x = _x.items in
-                                     [`Array
-                                        ((List.map (fun (_x : t_1ccaef01fc) ->
-                                            `Singleton (`Null)) _x))]);
-                                    ("iterations", match _x.iterations with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN [("", [`Null])]]);
-                                    ("on_behalf_of",
-                                     match _x.on_behalf_of with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("proration_behavior",
-                                     match _x.proration_behavior with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("start_date", match _x.start_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_78925a3533 _x -> `Null]);
-                                    ("transfer_data",
-                                     match _x.transfer_data with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("amount_percent",
-                                                       match _x.amount_percent with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("destination",
-                                                       let _x = _x.destination in
-                                                       [`Null])]]);
-                                    ("trial", match _x.trial with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("trial_end", match _x.trial_end with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_8bbff7aec4 _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_e00ab899ed)
+        [("", `Any);
+         ("end_behavior", begin match _x.end_behavior with | None -> `Null
+          | Some _x -> `String end);
+         ("phases", begin match _x.phases with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_94553cb579) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("add_invoice_items",
+                       begin match _x.add_invoice_items with | None -> `Null
+                       | Some _x ->
+                       `Array
+                         ((List.map (fun (_x : t_32fe86aa85) ->
+                             `Singleton (`Null)) _x))
+                       end);
+                      ("application_fee_percent",
+                       begin match _x.application_fee_percent with
+                       | None -> `Null | Some _x -> `Number end);
+                      ("automatic_tax", begin match _x.automatic_tax with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("enabled", let _x = _x.enabled in `Null);
+                          ("liability", begin match _x.liability with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("billing_cycle_anchor",
+                       begin match _x.billing_cycle_anchor with
+                       | None -> `Null | Some _x -> `String end);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_ea5c39759d _x -> `Null
+                       | T_0829cab37e _x -> `Null
+                       end end);
+                      ("collection_method",
+                       begin match _x.collection_method with | None -> `Null
+                       | Some _x -> `String end);
+                      ("coupon", begin match _x.coupon with | None -> `Null
+                       | Some _x -> `String end);
+                      ("default_payment_method",
+                       begin match _x.default_payment_method with
+                       | None -> `Null | Some _x -> `String end);
+                      ("default_tax_rates",
+                       begin match _x.default_tax_rates with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_cccdb8d4f1 _x -> `Null
+                       end end);
+                      ("description", begin match _x.description with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | String_ _x -> `Null
+                       | T_dae89e1d87 _x -> `Null
+                       end end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_f72277021f _x -> `Null
+                       | T_a1930a67fa _x -> `Null
+                       end end);
+                      ("end_date", begin match _x.end_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_2fa9ab7487 _x -> `Null
+                       end end);
+                      ("invoice_settings",
+                       begin match _x.invoice_settings with | None -> `Null
+                       | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("account_tax_ids",
+                           begin match _x.account_tax_ids with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("days_until_due",
+                           begin match _x.days_until_due with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("issuer", begin match _x.issuer with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("items", let _x = _x.items in
+                       `Array
+                         ((List.map (fun (_x : t_1f4b985808) ->
+                             `Singleton (`Null)) _x)));
+                      ("iterations", begin match _x.iterations with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x -> `ObjectN [("", `Null)]
+                       end);
+                      ("on_behalf_of", begin match _x.on_behalf_of with
+                       | None -> `Null | Some _x -> `String end);
+                      ("proration_behavior",
+                       begin match _x.proration_behavior with | None -> `Null
+                       | Some _x -> `String end);
+                      ("start_date", begin match _x.start_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_d0a68ee4b5 _x -> `Null
+                       end end);
+                      ("transfer_data", begin match _x.transfer_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("amount_percent",
+                           begin match _x.amount_percent with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("destination", let _x = _x.destination in `Null)]
+                       end);
+                      ("trial", begin match _x.trial with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("trial_end", begin match _x.trial_end with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_ea977ed81f _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_c4767cb749)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_c97f96140a ~p ~op ~loc ~style ~explode
-    (_x : t_c97f96140a) =
+  let string_of_t_312ad6306f ~p ~op ~loc ~style ~explode
+    (_x : t_312ad6306f) =
     _string_of ~kind:(
-      match _x with
-      | T_9868ecd2e2 _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_c97f96140a)
+      begin match _x with
+      | T_13d6b80cc4 _x -> `String
+      | Ptime_t _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_312ad6306f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c97f96140a ~loc ~style ~explode (_x : string) =
+  let string_to_t_312ad6306f ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_9868ecd2e2) in
-        Option.map (fun _y : t_c97f96140a -> T_9868ecd2e2 _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_13d6b80cc4) in
+        Option.map (fun _y : t_312ad6306f -> T_13d6b80cc4 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
-        Option.map (fun _y : t_c97f96140a -> Ptime_t _y)
+        Option.map (fun _y : t_312ad6306f -> Ptime_t _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_c97f96140a ~p ~op ~loc ~style ~explode
-    (_x : t_c97f96140a) =
+  let namevalues_of_t_312ad6306f ~p ~op ~loc ~style ~explode
+    (_x : t_312ad6306f) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_9868ecd2e2 _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_c97f96140a)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_991e5f6179 ~p ~op ~loc ~style ~explode
-    (_x : t_991e5f6179) =
-    _string_of ~kind:(
-      match _x with
+      begin match _x with
+      | T_13d6b80cc4 _x -> `String
       | Ptime_t _x -> `Integer
-      | T_1b74fb906e _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_991e5f6179)
+      end) ~ctr:(Json_encoding.construct Encoders'.t_312ad6306f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_991e5f6179 ~loc ~style ~explode (_x : string) =
+  let string_of_t_b9ba448b2f ~p ~op ~loc ~style ~explode
+    (_x : t_b9ba448b2f) =
+    _string_of ~kind:(
+      begin match _x with
+      | Ptime_t _x -> `Integer
+      | T_97816224ba _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b9ba448b2f)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_b9ba448b2f ~loc ~style ~explode (_x : string) =
     [(let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
-        Option.map (fun _y : t_991e5f6179 -> Ptime_t _y)
+        Option.map (fun _y : t_b9ba448b2f -> Ptime_t _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_1b74fb906e) in
-        Option.map (fun _y : t_991e5f6179 -> T_1b74fb906e _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_97816224ba) in
+        Option.map (fun _y : t_b9ba448b2f -> T_97816224ba _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_991e5f6179 ~p ~op ~loc ~style ~explode
-    (_x : t_991e5f6179) =
+  let namevalues_of_t_b9ba448b2f ~p ~op ~loc ~style ~explode
+    (_x : t_b9ba448b2f) =
     _namevalues_of ~kind:(
-      match _x with
+      begin match _x with
       | Ptime_t _x -> `Integer
-      | T_1b74fb906e _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_991e5f6179)
+      | T_97816224ba _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b9ba448b2f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_0948902ade ~p ~op ~loc ~style ~explode
-    (_x : t_0948902ade) =
+  let string_of_t_0178e1face ~p ~op ~loc ~style ~explode
+    (_x : t_0178e1face) =
     _string_of ~kind:(
-      match _x with
+      begin match _x with
       | StringList _x ->
         `Array ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
-      | T_35bc81453e _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_0948902ade)
+      | T_177b598972 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_0178e1face)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0948902ade ~loc ~style ~explode (_x : string) =
+  let string_to_t_0178e1face ~loc ~style ~explode (_x : string) =
     [(let kind = `Array [(`List (`String))] in
         let dtr = (Json_encoding.destruct
                      (Json_encoding.list Json_encoding.string)) in
-        Option.map (fun _y : t_0948902ade -> StringList _y)
+        Option.map (fun _y : t_0178e1face -> StringList _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_35bc81453e) in
-        Option.map (fun _y : t_0948902ade -> T_35bc81453e _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_177b598972) in
+        Option.map (fun _y : t_0178e1face -> T_177b598972 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_0948902ade ~p ~op ~loc ~style ~explode
-    (_x : t_0948902ade) =
+  let namevalues_of_t_0178e1face ~p ~op ~loc ~style ~explode
+    (_x : t_0178e1face) =
     _namevalues_of ~kind:(
-      match _x with
+      begin match _x with
       | StringList _x ->
         `Array ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
-      | T_35bc81453e _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_0948902ade)
+      | T_177b598972 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_0178e1face)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_5bdcc41c2a ~p ~op ~loc ~style ~explode
-    (_x : t_5bdcc41c2a) =
+  let string_of_t_baccbfb036 ~p ~op ~loc ~style ~explode
+    (_x : t_baccbfb036) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("billing_cycle_anchor", match _x.billing_cycle_anchor with
-          | None -> []
-          | Some _x -> [match _x with
-                        | T_bea294789e _x -> `String
-                        | Ptime_t _x -> `Integer]);
-         ("cancel_at", match _x.cancel_at with | None -> []
-          | Some _x -> [match _x with
-                        | Ptime_t _x -> `Integer
-                        | T_b35fff3e2f _x -> `String]);
-         ("cancel_at_period_end", match _x.cancel_at_period_end with
-          | None -> [] | Some _x -> [`Boolean]);
-         ("cancel_now", match _x.cancel_now with | None -> []
-          | Some _x -> [`Boolean]);
-         ("default_tax_rates", match _x.default_tax_rates with | None -> []
-          | Some _x -> [match _x with
-                        | StringList _x ->
-                          `Array
-                            ((List.map (fun (_x : string) ->
-                                `Singleton (`String)) _x))
-                        | T_97b4206ea3 _x -> `String]);
-         ("items", match _x.items with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_5819877672) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_33225edb3a _x -> `Null
-                                                   | T_98f2f687bc _x -> `Null]);
-                                    ("clear_usage", match _x.clear_usage with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("deleted", match _x.deleted with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_2d42449240 _x -> `Null
-                                                   | T_759f36a333 _x -> `Null]);
-                                    ("id", match _x.id with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_03e2d7b3db _x -> `Null
-                                                   | T_acb33ab021 _x -> `Null]);
-                                    ("price", match _x.price with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("price_data", match _x.price_data with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("currency",
-                                                       let _x = _x.currency in
-                                                       [`Null]);
-                                                      ("product",
-                                                       let _x = _x.product in
-                                                       [`Null]);
-                                                      ("recurring",
-                                                       let _x = _x.recurring in
-                                                       [`Null]);
-                                                      ("tax_behavior",
-                                                       match _x.tax_behavior with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount",
-                                                       match _x.unit_amount with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount_decimal",
-                                                       match _x.unit_amount_decimal with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("quantity", match _x.quantity with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("tax_rates", match _x.tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_ce5fed8dc6 _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("proration_date", match _x.proration_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("resume_at", match _x.resume_at with | None -> []
-          | Some _x -> [`String]);
-         ("start_date", match _x.start_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("trial_end", match _x.trial_end with | None -> []
-          | Some _x -> [match _x with
-                        | T_0508bf77fd _x -> `String
-                        | Ptime_t _x -> `Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_5bdcc41c2a)
+        [("", `Any);
+         ("billing_cycle_anchor", begin match _x.billing_cycle_anchor with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | T_e7638b8884 _x -> `String
+          | Ptime_t _x -> `Integer
+          end end);
+         ("cancel_at", begin match _x.cancel_at with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | Ptime_t _x -> `Integer
+          | T_8914431bd5 _x -> `String
+          end end);
+         ("cancel_at_period_end", begin match _x.cancel_at_period_end with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("cancel_now", begin match _x.cancel_now with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("default_tax_rates", begin match _x.default_tax_rates with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | StringList _x ->
+            `Array
+              ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
+          | T_49afdb843d _x -> `String
+          end end);
+         ("items", begin match _x.items with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_47a4de758c) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_59dcf31c18 _x -> `Null
+                       | T_1a992df9bb _x -> `Null
+                       end end);
+                      ("clear_usage", begin match _x.clear_usage with
+                       | None -> `Null | Some _x -> `Boolean end);
+                      ("deleted", begin match _x.deleted with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_d7b1f5cd74 _x -> `Null
+                       | T_e9d9a84421 _x -> `Null
+                       end end);
+                      ("id", begin match _x.id with | None -> `Null
+                       | Some _x -> `String end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_7948b96036 _x -> `Null
+                       | T_bfa9c3016a _x -> `Null
+                       end end);
+                      ("price", begin match _x.price with | None -> `Null
+                       | Some _x -> `String end);
+                      ("price_data", begin match _x.price_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("currency", let _x = _x.currency in `Null);
+                          ("product", let _x = _x.product in `Null);
+                          ("recurring", let _x = _x.recurring in `Null);
+                          ("tax_behavior", begin match _x.tax_behavior with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount", begin match _x.unit_amount with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount_decimal",
+                           begin match _x.unit_amount_decimal with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("quantity", begin match _x.quantity with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("tax_rates", begin match _x.tax_rates with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_8c176ec44f _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end);
+         ("proration_date", begin match _x.proration_date with
+          | None -> `Null | Some _x -> `Integer end);
+         ("resume_at", begin match _x.resume_at with | None -> `Null
+          | Some _x -> `String end);
+         ("start_date", begin match _x.start_date with | None -> `Null
+          | Some _x -> `Integer end);
+         ("trial_end", begin match _x.trial_end with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_74d5102f8e _x -> `String
+          | Ptime_t _x -> `Integer
+          end end)]) ~ctr:(Json_encoding.construct Encoders'.t_baccbfb036)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_5bdcc41c2a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_5bdcc41c2a) in _string_to
+  let string_to_t_baccbfb036 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_baccbfb036) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("billing_cycle_anchor", [`String;
-                                                        `Integer]);
-                ("cancel_at", [`Integer;
-                               `String]);
-                ("cancel_at_period_end", [`Boolean]);
-                ("cancel_now", [`Boolean]);
-                ("default_tax_rates", [`Array [(`List (`String))];
-                                       `String]);
+               [("", `Any);
+                ("billing_cycle_anchor", `Choice
+                                         [`String; `Integer]);
+                ("cancel_at", `Choice
+                              [`Integer; `String]);
+                ("cancel_at_period_end", `Boolean); ("cancel_now", `Boolean);
+                ("default_tax_rates",
+                 `Choice
+                 [`Array [(`List (`String))]; `String]);
                 ("items",
-                 [`Array
-                    [(`List
-                        (`ObjectN
-                           [("", [`Any]);
-                            ("billing_thresholds", [`Null;
-                                                    `Null]);
-                            ("clear_usage", [`Boolean]);
-                            ("deleted", [`Boolean]);
-                            ("discounts", [`Null;
-                                           `Null]);
-                            ("id", [`String]); ("metadata", [`Null;
-                                                             `Null]);
-                            ("price", [`String]);
-                            ("price_data",
-                             [`ObjectN
-                                [("", [`Null]); ("currency", [`Null]);
-                                 ("product", [`Null]);
-                                 ("recurring", [`Null]);
-                                 ("tax_behavior", [`Null]);
-                                 ("unit_amount", [`Null]);
-                                 ("unit_amount_decimal", [`Null])]]);
-                            ("quantity", [`Integer]);
-                            ("tax_rates", [`Null;
-                                           `Null])]))]]);
-                ("proration_behavior", [`String]);
-                ("proration_date", [`Integer]); ("resume_at", [`String]);
-                ("start_date", [`Integer]);
-                ("trial_end", [`String;
-                               `Integer])]) ~dtr ~loc ~style ~explode _x
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("clear_usage", `Boolean); ("deleted", `Boolean);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("id", `String);
+                           ("metadata", `Choice
+                                        [`Null; `Null]);
+                           ("price", `String);
+                           ("price_data",
+                            `ObjectN
+                              [("", `Null); ("currency", `Null);
+                               ("product", `Null); ("recurring", `Null);
+                               ("tax_behavior", `Null);
+                               ("unit_amount", `Null);
+                               ("unit_amount_decimal", `Null)]);
+                           ("quantity", `Integer);
+                           ("tax_rates", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String);
+                ("proration_date", `Integer); ("resume_at", `String);
+                ("start_date", `Integer);
+                ("trial_end", `Choice
+                              [`String; `Integer])])
+      ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_5bdcc41c2a ~p ~op ~loc ~style ~explode
-    (_x : t_5bdcc41c2a) =
+  let namevalues_of_t_baccbfb036 ~p ~op ~loc ~style ~explode
+    (_x : t_baccbfb036) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("billing_cycle_anchor", match _x.billing_cycle_anchor with
-          | None -> []
-          | Some _x -> [match _x with
-                        | T_bea294789e _x -> `String
-                        | Ptime_t _x -> `Integer]);
-         ("cancel_at", match _x.cancel_at with | None -> []
-          | Some _x -> [match _x with
-                        | Ptime_t _x -> `Integer
-                        | T_b35fff3e2f _x -> `String]);
-         ("cancel_at_period_end", match _x.cancel_at_period_end with
-          | None -> [] | Some _x -> [`Boolean]);
-         ("cancel_now", match _x.cancel_now with | None -> []
-          | Some _x -> [`Boolean]);
-         ("default_tax_rates", match _x.default_tax_rates with | None -> []
-          | Some _x -> [match _x with
-                        | StringList _x ->
-                          `Array
-                            ((List.map (fun (_x : string) ->
-                                `Singleton (`String)) _x))
-                        | T_97b4206ea3 _x -> `String]);
-         ("items", match _x.items with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_5819877672) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_33225edb3a _x -> `Null
-                                                   | T_98f2f687bc _x -> `Null]);
-                                    ("clear_usage", match _x.clear_usage with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("deleted", match _x.deleted with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_2d42449240 _x -> `Null
-                                                   | T_759f36a333 _x -> `Null]);
-                                    ("id", match _x.id with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_03e2d7b3db _x -> `Null
-                                                   | T_acb33ab021 _x -> `Null]);
-                                    ("price", match _x.price with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("price_data", match _x.price_data with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("currency",
-                                                       let _x = _x.currency in
-                                                       [`Null]);
-                                                      ("product",
-                                                       let _x = _x.product in
-                                                       [`Null]);
-                                                      ("recurring",
-                                                       let _x = _x.recurring in
-                                                       [`Null]);
-                                                      ("tax_behavior",
-                                                       match _x.tax_behavior with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount",
-                                                       match _x.unit_amount with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount_decimal",
-                                                       match _x.unit_amount_decimal with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("quantity", match _x.quantity with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("tax_rates", match _x.tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_ce5fed8dc6 _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("proration_date", match _x.proration_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("resume_at", match _x.resume_at with | None -> []
-          | Some _x -> [`String]);
-         ("start_date", match _x.start_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("trial_end", match _x.trial_end with | None -> []
-          | Some _x -> [match _x with
-                        | T_0508bf77fd _x -> `String
-                        | Ptime_t _x -> `Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_5bdcc41c2a)
+        [("", `Any);
+         ("billing_cycle_anchor", begin match _x.billing_cycle_anchor with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | T_e7638b8884 _x -> `String
+          | Ptime_t _x -> `Integer
+          end end);
+         ("cancel_at", begin match _x.cancel_at with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | Ptime_t _x -> `Integer
+          | T_8914431bd5 _x -> `String
+          end end);
+         ("cancel_at_period_end", begin match _x.cancel_at_period_end with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("cancel_now", begin match _x.cancel_now with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("default_tax_rates", begin match _x.default_tax_rates with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | StringList _x ->
+            `Array
+              ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
+          | T_49afdb843d _x -> `String
+          end end);
+         ("items", begin match _x.items with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_47a4de758c) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_59dcf31c18 _x -> `Null
+                       | T_1a992df9bb _x -> `Null
+                       end end);
+                      ("clear_usage", begin match _x.clear_usage with
+                       | None -> `Null | Some _x -> `Boolean end);
+                      ("deleted", begin match _x.deleted with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_d7b1f5cd74 _x -> `Null
+                       | T_e9d9a84421 _x -> `Null
+                       end end);
+                      ("id", begin match _x.id with | None -> `Null
+                       | Some _x -> `String end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_7948b96036 _x -> `Null
+                       | T_bfa9c3016a _x -> `Null
+                       end end);
+                      ("price", begin match _x.price with | None -> `Null
+                       | Some _x -> `String end);
+                      ("price_data", begin match _x.price_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("currency", let _x = _x.currency in `Null);
+                          ("product", let _x = _x.product in `Null);
+                          ("recurring", let _x = _x.recurring in `Null);
+                          ("tax_behavior", begin match _x.tax_behavior with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount", begin match _x.unit_amount with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount_decimal",
+                           begin match _x.unit_amount_decimal with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("quantity", begin match _x.quantity with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("tax_rates", begin match _x.tax_rates with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_8c176ec44f _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end);
+         ("proration_date", begin match _x.proration_date with
+          | None -> `Null | Some _x -> `Integer end);
+         ("resume_at", begin match _x.resume_at with | None -> `Null
+          | Some _x -> `String end);
+         ("start_date", begin match _x.start_date with | None -> `Null
+          | Some _x -> `Integer end);
+         ("trial_end", begin match _x.trial_end with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_74d5102f8e _x -> `String
+          | Ptime_t _x -> `Integer
+          end end)]) ~ctr:(Json_encoding.construct Encoders'.t_baccbfb036)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_b0fda171f8 ~p ~op ~loc ~style ~explode
-    (_x : t_b0fda171f8) =
+  let string_of_t_671de99c34 ~p ~op ~loc ~style ~explode
+    (_x : t_671de99c34) =
     _string_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_aeb37a8a18) ->
+        ((List.map (fun (_x : t_5935fcbdc2) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("billing_thresholds", match _x.billing_thresholds with
-                   | None -> []
-                   | Some _x -> [match _x with
-                                 | T_43cfaf3452 _x ->
-                                   `ObjectN
-                                     [("", [`Null]);
-                                      ("usage_gte", let _x = _x.usage_gte in
-                                       [`Null])]
-                                 | T_1fc4a74891 _x -> `String]);
-                  ("clear_usage", match _x.clear_usage with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("deleted", match _x.deleted with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_d8df00cf5d _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_eeeccfccc0) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_456d9fa0b3 _x -> `String]);
-                  ("id", match _x.id with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_7bd6c963e5 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_79217cf88a _x -> `String]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("recurring", let _x = _x.recurring in
-                                     [`ObjectN
-                                        [("", [`Null]);
-                                         ("interval", let _x = _x.interval in
-                                          [`Null]);
-                                         ("interval_count",
-                                          match _x.interval_count with
-                                          | None -> [] | Some _x -> [`Null])]]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_46aae4974b _x -> `String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_b0fda171f8)
+                 [("", `Any);
+                  ("billing_thresholds",
+                   begin match _x.billing_thresholds with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_bb54fadb7d _x ->
+                     `ObjectN
+                       [("", `Null);
+                        ("usage_gte", let _x = _x.usage_gte in `Null)]
+                   | T_3728c21bc2 _x -> `String
+                   end end);
+                  ("clear_usage", begin match _x.clear_usage with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("deleted", begin match _x.deleted with | None -> `Null
+                   | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_adbf82df0f _x ->
+                     `Array
+                       ((List.map (fun (_x : t_75b0a73940) ->
+                           `Singleton (`Null)) _x))
+                   | T_12c9506282 _x -> `String
+                   end end);
+                  ("id", begin match _x.id with | None -> `Null | Some _x ->
+                   `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_87d859f618 _x -> `ObjectN [("", `Null)]
+                   | T_5e8ddbf64f _x -> `String
+                   end end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("recurring", let _x = _x.recurring in
+                       `ObjectN
+                         [("", `Null);
+                          ("interval", let _x = _x.interval in `Null);
+                          ("interval_count",
+                           begin match _x.interval_count with | None -> `Null
+                           | Some _x -> `Null end)]);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_6755408a65 _x -> `String
+                   end end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_671de99c34)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b0fda171f8 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b0fda171f8) in _string_to
+  let string_to_t_671de99c34 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_671de99c34) in _string_to
       ~kind:(`Array
                [(`List
                    (`ObjectN
-                      [("", [`Any]);
+                      [("", `Any);
                        ("billing_thresholds",
-                        [`ObjectN [("", [`Null]); ("usage_gte", [`Null])];
+                        `Choice
+                        [`ObjectN [("", `Null); ("usage_gte", `Null)];
                          `String]);
-                       ("clear_usage", [`Boolean]); ("deleted", [`Boolean]);
-                       ("discounts", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("id", [`String]);
-                       ("metadata", [`ObjectN [("", [`Null])];
-                                     `String]);
-                       ("price", [`String]);
+                       ("clear_usage", `Boolean); ("deleted", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("id", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
+                       ("price", `String);
                        ("price_data",
-                        [`ObjectN
-                           [("", [`Any]); ("currency", [`String]);
-                            ("product", [`String]);
-                            ("recurring",
-                             [`ObjectN
-                                [("", [`Null]); ("interval", [`Null]);
-                                 ("interval_count", [`Null])]]);
-                            ("tax_behavior", [`String]);
-                            ("unit_amount", [`Integer]);
-                            ("unit_amount_decimal", [`String])]]);
-                       ("quantity", [`Integer]);
-                       ("tax_rates", [`Array [(`List (`Null))];
-                                      `String])]))])
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String);
+                           ("recurring",
+                            `ObjectN
+                              [("", `Null); ("interval", `Null);
+                               ("interval_count", `Null)]);
+                           ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String])]))])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_b0fda171f8 ~p ~op ~loc ~style ~explode
-    (_x : t_b0fda171f8) =
+  let namevalues_of_t_671de99c34 ~p ~op ~loc ~style ~explode
+    (_x : t_671de99c34) =
     _namevalues_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_aeb37a8a18) ->
+        ((List.map (fun (_x : t_5935fcbdc2) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("billing_thresholds", match _x.billing_thresholds with
-                   | None -> []
-                   | Some _x -> [match _x with
-                                 | T_43cfaf3452 _x ->
-                                   `ObjectN
-                                     [("", [`Null]);
-                                      ("usage_gte", let _x = _x.usage_gte in
-                                       [`Null])]
-                                 | T_1fc4a74891 _x -> `String]);
-                  ("clear_usage", match _x.clear_usage with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("deleted", match _x.deleted with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_d8df00cf5d _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_eeeccfccc0) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_456d9fa0b3 _x -> `String]);
-                  ("id", match _x.id with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_7bd6c963e5 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_79217cf88a _x -> `String]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("recurring", let _x = _x.recurring in
-                                     [`ObjectN
-                                        [("", [`Null]);
-                                         ("interval", let _x = _x.interval in
-                                          [`Null]);
-                                         ("interval_count",
-                                          match _x.interval_count with
-                                          | None -> [] | Some _x -> [`Null])]]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_46aae4974b _x -> `String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_b0fda171f8)
+                 [("", `Any);
+                  ("billing_thresholds",
+                   begin match _x.billing_thresholds with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_bb54fadb7d _x ->
+                     `ObjectN
+                       [("", `Null);
+                        ("usage_gte", let _x = _x.usage_gte in `Null)]
+                   | T_3728c21bc2 _x -> `String
+                   end end);
+                  ("clear_usage", begin match _x.clear_usage with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("deleted", begin match _x.deleted with | None -> `Null
+                   | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_adbf82df0f _x ->
+                     `Array
+                       ((List.map (fun (_x : t_75b0a73940) ->
+                           `Singleton (`Null)) _x))
+                   | T_12c9506282 _x -> `String
+                   end end);
+                  ("id", begin match _x.id with | None -> `Null | Some _x ->
+                   `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_87d859f618 _x -> `ObjectN [("", `Null)]
+                   | T_5e8ddbf64f _x -> `String
+                   end end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("recurring", let _x = _x.recurring in
+                       `ObjectN
+                         [("", `Null);
+                          ("interval", let _x = _x.interval in `Null);
+                          ("interval_count",
+                           begin match _x.interval_count with | None -> `Null
+                           | Some _x -> `Null end)]);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_6755408a65 _x -> `String
+                   end end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_671de99c34)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_876fb1bc40 ~p ~op ~loc ~style ~explode
-    (_x : t_876fb1bc40) =
+  let string_of_t_6dff880c24 ~p ~op ~loc ~style ~explode
+    (_x : t_6dff880c24) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_876fb1bc40)
+      ~ctr:(Json_encoding.construct Encoders'.t_6dff880c24)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_876fb1bc40 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_876fb1bc40) in _string_to
+  let string_to_t_6dff880c24 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6dff880c24) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_876fb1bc40 ~p ~op ~loc ~style ~explode
-    (_x : t_876fb1bc40) =
+  let namevalues_of_t_6dff880c24 ~p ~op ~loc ~style ~explode
+    (_x : t_6dff880c24) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_876fb1bc40)
+      ~ctr:(Json_encoding.construct Encoders'.t_6dff880c24)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_9ad9bd5605 ~p ~op ~loc ~style ~explode
-    (_x : t_9ad9bd5605) =
+  let string_of_t_50e9f09abe ~p ~op ~loc ~style ~explode
+    (_x : t_50e9f09abe) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_9ad9bd5605)
+      ~ctr:(Json_encoding.construct Encoders'.t_50e9f09abe)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9ad9bd5605 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_9ad9bd5605) in _string_to
+  let string_to_t_50e9f09abe ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_50e9f09abe) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_9ad9bd5605 ~p ~op ~loc ~style ~explode
-    (_x : t_9ad9bd5605) =
+  let namevalues_of_t_50e9f09abe ~p ~op ~loc ~style ~explode
+    (_x : t_50e9f09abe) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_9ad9bd5605)
+      ~ctr:(Json_encoding.construct Encoders'.t_50e9f09abe)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_915f11076c ~p ~op ~loc ~style ~explode
-    (_x : t_915f11076c) =
+  let string_of_t_30748e2d12 ~p ~op ~loc ~style ~explode
+    (_x : t_30748e2d12) =
     _string_of ~kind:(
-      match _x with
-      | T_69db67d24d _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_915f11076c)
+      begin match _x with
+      | T_e18674598e _x -> `String
+      | Ptime_t _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_30748e2d12)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_915f11076c ~loc ~style ~explode (_x : string) =
+  let string_to_t_30748e2d12 ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_69db67d24d) in
-        Option.map (fun _y : t_915f11076c -> T_69db67d24d _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_e18674598e) in
+        Option.map (fun _y : t_30748e2d12 -> T_e18674598e _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
-        Option.map (fun _y : t_915f11076c -> Ptime_t _y)
+        Option.map (fun _y : t_30748e2d12 -> Ptime_t _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_915f11076c ~p ~op ~loc ~style ~explode
-    (_x : t_915f11076c) =
+  let namevalues_of_t_30748e2d12 ~p ~op ~loc ~style ~explode
+    (_x : t_30748e2d12) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_69db67d24d _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_915f11076c)
+      begin match _x with
+      | T_e18674598e _x -> `String
+      | Ptime_t _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_30748e2d12)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e3f1f34a06 ~p ~op ~loc ~style ~explode
-    (_x : t_e3f1f34a06) =
+  let string_of_t_c87881fc5c ~p ~op ~loc ~style ~explode
+    (_x : t_c87881fc5c) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("address", match _x.address with | None -> []
-          | Some _x -> [match _x with
-                        | T_0452c57eaf _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("city", match _x.city with | None -> []
-                              | Some _x -> [`String]);
-                             ("country", match _x.country with | None -> []
-                              | Some _x -> [`String]);
-                             ("line1", match _x.line1 with | None -> []
-                              | Some _x -> [`String]);
-                             ("line2", match _x.line2 with | None -> []
-                              | Some _x -> [`String]);
-                             ("postal_code", match _x.postal_code with
-                              | None -> [] | Some _x -> [`String]);
-                             ("state", match _x.state with | None -> []
-                              | Some _x -> [`String])]
-                        | T_0dafd7563b _x -> `String]);
-         ("shipping", match _x.shipping with | None -> []
-          | Some _x -> [match _x with
-                        | T_3c3062fd9a _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("address", let _x = _x.address in
-                              [`ObjectN
-                                 [("", [`Any]);
-                                  ("city", match _x.city with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("country", match _x.country with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("line1", match _x.line1 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("line2", match _x.line2 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("postal_code", match _x.postal_code with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("state", match _x.state with | None -> []
-                                   | Some _x -> [`String])]]);
-                             ("name", let _x = _x.name in [`String]);
-                             ("phone", match _x.phone with | None -> []
-                              | Some _x -> [`String])]
-                        | T_5b26f4839a _x -> `String]);
-         ("tax", match _x.tax with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("ip_address", match _x.ip_address with
-                            | None -> []
-                            | Some _x -> [match _x with
-                                          | String_ _x -> `String
-                                          | T_af1dd0111d _x -> `String])]]);
-         ("tax_exempt", match _x.tax_exempt with | None -> []
-          | Some _x -> [`String]);
-         ("tax_ids", match _x.tax_ids with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_1e501e7dc4) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("type", let _x = _x.type_ in [`String]);
-                                    ("value", let _x = _x.value in [`String])]))
-                              _x))])])
-      ~ctr:(Json_encoding.construct Encoders'.t_e3f1f34a06)
+        [("", `Any);
+         ("address", begin match _x.address with | None -> `Null | Some _x ->
+          begin match _x with
+          | T_d2b7d5933e _x ->
+            `ObjectN
+              [("", `Any);
+               ("city", begin match _x.city with | None -> `Null | Some _x ->
+                `String end);
+               ("country", begin match _x.country with | None -> `Null
+                | Some _x -> `String end);
+               ("line1", begin match _x.line1 with | None -> `Null
+                | Some _x -> `String end);
+               ("line2", begin match _x.line2 with | None -> `Null
+                | Some _x -> `String end);
+               ("postal_code", begin match _x.postal_code with
+                | None -> `Null | Some _x -> `String end);
+               ("state", begin match _x.state with | None -> `Null
+                | Some _x -> `String end)]
+          | T_24529d85b7 _x -> `String
+          end end);
+         ("shipping", begin match _x.shipping with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_d2075e2bfe _x ->
+            `ObjectN
+              [("", `Any);
+               ("address", let _x = _x.address in
+                `ObjectN
+                  [("", `Any);
+                   ("city", begin match _x.city with | None -> `Null
+                    | Some _x -> `String end);
+                   ("country", begin match _x.country with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line1", begin match _x.line1 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line2", begin match _x.line2 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("postal_code", begin match _x.postal_code with
+                    | None -> `Null | Some _x -> `String end);
+                   ("state", begin match _x.state with | None -> `Null
+                    | Some _x -> `String end)]);
+               ("name", let _x = _x.name in `String);
+               ("phone", begin match _x.phone with | None -> `Null
+                | Some _x -> `String end)]
+          | T_6a6f426354 _x -> `String
+          end end);
+         ("tax", begin match _x.tax with | None -> `Null | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("ip_address", begin match _x.ip_address with | None -> `Null
+              | Some _x ->
+              begin match _x with
+              | String_ _x -> `String
+              | T_ea916b88e8 _x -> `String
+              end end)]
+          end);
+         ("tax_exempt", begin match _x.tax_exempt with | None -> `Null
+          | Some _x -> `String end);
+         ("tax_ids", begin match _x.tax_ids with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_88c656de84) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any); ("type", let _x = _x.type_ in `String);
+                      ("value", let _x = _x.value in `String)])) _x))
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_c87881fc5c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e3f1f34a06 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e3f1f34a06) in _string_to
+  let string_to_t_c87881fc5c ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c87881fc5c) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]);
+               [("", `Any);
                 ("address",
+                 `Choice
                  [`ObjectN
-                    [("", [`Any]); ("city", [`String]);
-                     ("country", [`String]); ("line1", [`String]);
-                     ("line2", [`String]); ("postal_code", [`String]);
-                     ("state", [`String])];
+                    [("", `Any); ("city", `String); ("country", `String);
+                     ("line1", `String); ("line2", `String);
+                     ("postal_code", `String); ("state", `String)];
                   `String]);
                 ("shipping",
+                 `Choice
                  [`ObjectN
-                    [("", [`Any]);
+                    [("", `Any);
                      ("address",
-                      [`ObjectN
-                         [("", [`Any]); ("city", [`String]);
-                          ("country", [`String]); ("line1", [`String]);
-                          ("line2", [`String]); ("postal_code", [`String]);
-                          ("state", [`String])]]);
-                     ("name", [`String]); ("phone", [`String])];
+                      `ObjectN
+                        [("", `Any); ("city", `String); ("country", `String);
+                         ("line1", `String); ("line2", `String);
+                         ("postal_code", `String); ("state", `String)]);
+                     ("name", `String); ("phone", `String)];
                   `String]);
                 ("tax",
-                 [`ObjectN [("", [`Any]); ("ip_address", [`String;
-                                                          `String])]]);
-                ("tax_exempt", [`String]);
+                 `ObjectN
+                   [("", `Any); ("ip_address", `Choice
+                                               [`String; `String])]);
+                ("tax_exempt", `String);
                 ("tax_ids",
-                 [`Array
-                    [(`List
-                        (`ObjectN
-                           [("", [`Any]); ("type", [`String]);
-                            ("value", [`String])]))]])])
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any); ("type", `String); ("value", `String)]))])])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_e3f1f34a06 ~p ~op ~loc ~style ~explode
-    (_x : t_e3f1f34a06) =
+  let namevalues_of_t_c87881fc5c ~p ~op ~loc ~style ~explode
+    (_x : t_c87881fc5c) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("address", match _x.address with | None -> []
-          | Some _x -> [match _x with
-                        | T_0452c57eaf _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("city", match _x.city with | None -> []
-                              | Some _x -> [`String]);
-                             ("country", match _x.country with | None -> []
-                              | Some _x -> [`String]);
-                             ("line1", match _x.line1 with | None -> []
-                              | Some _x -> [`String]);
-                             ("line2", match _x.line2 with | None -> []
-                              | Some _x -> [`String]);
-                             ("postal_code", match _x.postal_code with
-                              | None -> [] | Some _x -> [`String]);
-                             ("state", match _x.state with | None -> []
-                              | Some _x -> [`String])]
-                        | T_0dafd7563b _x -> `String]);
-         ("shipping", match _x.shipping with | None -> []
-          | Some _x -> [match _x with
-                        | T_3c3062fd9a _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("address", let _x = _x.address in
-                              [`ObjectN
-                                 [("", [`Any]);
-                                  ("city", match _x.city with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("country", match _x.country with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("line1", match _x.line1 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("line2", match _x.line2 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("postal_code", match _x.postal_code with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("state", match _x.state with | None -> []
-                                   | Some _x -> [`String])]]);
-                             ("name", let _x = _x.name in [`String]);
-                             ("phone", match _x.phone with | None -> []
-                              | Some _x -> [`String])]
-                        | T_5b26f4839a _x -> `String]);
-         ("tax", match _x.tax with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("ip_address", match _x.ip_address with
-                            | None -> []
-                            | Some _x -> [match _x with
-                                          | String_ _x -> `String
-                                          | T_af1dd0111d _x -> `String])]]);
-         ("tax_exempt", match _x.tax_exempt with | None -> []
-          | Some _x -> [`String]);
-         ("tax_ids", match _x.tax_ids with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_1e501e7dc4) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("type", let _x = _x.type_ in [`String]);
-                                    ("value", let _x = _x.value in [`String])]))
-                              _x))])])
-      ~ctr:(Json_encoding.construct Encoders'.t_e3f1f34a06)
+        [("", `Any);
+         ("address", begin match _x.address with | None -> `Null | Some _x ->
+          begin match _x with
+          | T_d2b7d5933e _x ->
+            `ObjectN
+              [("", `Any);
+               ("city", begin match _x.city with | None -> `Null | Some _x ->
+                `String end);
+               ("country", begin match _x.country with | None -> `Null
+                | Some _x -> `String end);
+               ("line1", begin match _x.line1 with | None -> `Null
+                | Some _x -> `String end);
+               ("line2", begin match _x.line2 with | None -> `Null
+                | Some _x -> `String end);
+               ("postal_code", begin match _x.postal_code with
+                | None -> `Null | Some _x -> `String end);
+               ("state", begin match _x.state with | None -> `Null
+                | Some _x -> `String end)]
+          | T_24529d85b7 _x -> `String
+          end end);
+         ("shipping", begin match _x.shipping with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_d2075e2bfe _x ->
+            `ObjectN
+              [("", `Any);
+               ("address", let _x = _x.address in
+                `ObjectN
+                  [("", `Any);
+                   ("city", begin match _x.city with | None -> `Null
+                    | Some _x -> `String end);
+                   ("country", begin match _x.country with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line1", begin match _x.line1 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line2", begin match _x.line2 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("postal_code", begin match _x.postal_code with
+                    | None -> `Null | Some _x -> `String end);
+                   ("state", begin match _x.state with | None -> `Null
+                    | Some _x -> `String end)]);
+               ("name", let _x = _x.name in `String);
+               ("phone", begin match _x.phone with | None -> `Null
+                | Some _x -> `String end)]
+          | T_6a6f426354 _x -> `String
+          end end);
+         ("tax", begin match _x.tax with | None -> `Null | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("ip_address", begin match _x.ip_address with | None -> `Null
+              | Some _x ->
+              begin match _x with
+              | String_ _x -> `String
+              | T_ea916b88e8 _x -> `String
+              end end)]
+          end);
+         ("tax_exempt", begin match _x.tax_exempt with | None -> `Null
+          | Some _x -> `String end);
+         ("tax_ids", begin match _x.tax_ids with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_88c656de84) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any); ("type", let _x = _x.type_ in `String);
+                      ("value", let _x = _x.value in `String)])) _x))
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_c87881fc5c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_ec989090c2 ~p ~op ~loc ~style ~explode
-    (_x : t_ec989090c2) =
+  let string_of_t_873409613d ~p ~op ~loc ~style ~explode
+    (_x : t_873409613d) =
     _string_of ~kind:(
-      match _x with
-      | T_f66f2e78fb _x ->
+      begin match _x with
+      | T_31c19e5e08 _x ->
         `Array
-          ((List.map (fun (_x : t_8496089bd2) ->
+          ((List.map (fun (_x : t_97829cf2e1) ->
               `Singleton
                 (`ObjectN
-                   [("", [`Any]);
-                    ("coupon", match _x.coupon with | None -> []
-                     | Some _x -> [`String]);
-                    ("discount", match _x.discount with | None -> []
-                     | Some _x -> [`String]);
-                    ("promotion_code", match _x.promotion_code with
-                     | None -> [] | Some _x -> [`String])])) _x))
-      | T_171fdc29dc _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_ec989090c2)
+                   [("", `Any);
+                    ("coupon", begin match _x.coupon with | None -> `Null
+                     | Some _x -> `String end);
+                    ("discount", begin match _x.discount with | None -> `Null
+                     | Some _x -> `String end);
+                    ("promotion_code", begin match _x.promotion_code with
+                     | None -> `Null | Some _x -> `String end)])) _x))
+      | T_e023a69498 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_873409613d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ec989090c2 ~loc ~style ~explode (_x : string) =
+  let string_to_t_873409613d ~loc ~style ~explode (_x : string) =
     [(let kind = `Array
                    [(`List
                        (`ObjectN
-                          [("", [`Any]); ("coupon", [`String]);
-                           ("discount", [`String]);
-                           ("promotion_code", [`String])]))] in
-        let dtr = (Json_encoding.destruct Encoders'.t_f66f2e78fb) in
-        Option.map (fun _y : t_ec989090c2 -> T_f66f2e78fb _y)
+                          [("", `Any); ("coupon", `String);
+                           ("discount", `String);
+                           ("promotion_code", `String)]))] in
+        let dtr = (Json_encoding.destruct Encoders'.t_31c19e5e08) in
+        Option.map (fun _y : t_873409613d -> T_31c19e5e08 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_171fdc29dc) in
-        Option.map (fun _y : t_ec989090c2 -> T_171fdc29dc _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_e023a69498) in
+        Option.map (fun _y : t_873409613d -> T_e023a69498 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_ec989090c2 ~p ~op ~loc ~style ~explode
-    (_x : t_ec989090c2) =
+  let namevalues_of_t_873409613d ~p ~op ~loc ~style ~explode
+    (_x : t_873409613d) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_f66f2e78fb _x ->
+      begin match _x with
+      | T_31c19e5e08 _x ->
         `Array
-          ((List.map (fun (_x : t_8496089bd2) ->
+          ((List.map (fun (_x : t_97829cf2e1) ->
               `Singleton
                 (`ObjectN
-                   [("", [`Any]);
-                    ("coupon", match _x.coupon with | None -> []
-                     | Some _x -> [`String]);
-                    ("discount", match _x.discount with | None -> []
-                     | Some _x -> [`String]);
-                    ("promotion_code", match _x.promotion_code with
-                     | None -> [] | Some _x -> [`String])])) _x))
-      | T_171fdc29dc _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_ec989090c2)
+                   [("", `Any);
+                    ("coupon", begin match _x.coupon with | None -> `Null
+                     | Some _x -> `String end);
+                    ("discount", begin match _x.discount with | None -> `Null
+                     | Some _x -> `String end);
+                    ("promotion_code", begin match _x.promotion_code with
+                     | None -> `Null | Some _x -> `String end)])) _x))
+      | T_e023a69498 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_873409613d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_f80679d274 ~p ~op ~loc ~style ~explode
-    (_x : t_f80679d274) =
+  let string_of_t_96382fbbc2 ~p ~op ~loc ~style ~explode
+    (_x : t_96382fbbc2) =
     _string_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_aa55ae2178) ->
+        ((List.map (fun (_x : t_e9893b909b) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("currency", match _x.currency with | None -> []
-                   | Some _x -> [`String]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("discountable", match _x.discountable with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_baf0f88c14 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_6e64dcd9e0) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_4580487f41 _x -> `String]);
-                  ("invoiceitem", match _x.invoiceitem with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_6f4bafa2b8 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_3f2ec43e76 _x -> `String]);
-                  ("period", match _x.period with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("end", let _x = _x.end_ in [`Integer]);
-                                    ("start", let _x = _x.start in
-                                     [`Integer])]]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_behavior", match _x.tax_behavior with | None -> []
-                   | Some _x -> [`String]);
-                  ("tax_code", match _x.tax_code with | None -> []
-                   | Some _x -> [match _x with
-                                 | String_ _x -> `String
-                                 | T_ea76c4a152 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_ef61320518 _x -> `String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_f80679d274)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("currency", begin match _x.currency with | None -> `Null
+                   | Some _x -> `String end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("discountable", begin match _x.discountable with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_5d3f83cf9a _x ->
+                     `Array
+                       ((List.map (fun (_x : t_f4df748cbc) ->
+                           `Singleton (`Null)) _x))
+                   | T_a76752bf7d _x -> `String
+                   end end);
+                  ("invoiceitem", begin match _x.invoiceitem with
+                   | None -> `Null | Some _x -> `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_2914026972 _x -> `ObjectN [("", `Null)]
+                   | T_67827e70c9 _x -> `String
+                   end end);
+                  ("period", begin match _x.period with | None -> `Null
+                   | Some _x ->
+                   `ObjectN
+                     [("", `Any); ("end", let _x = _x.end_ in `Integer);
+                      ("start", let _x = _x.start in `Integer)]
+                   end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_behavior", begin match _x.tax_behavior with
+                   | None -> `Null | Some _x -> `String end);
+                  ("tax_code", begin match _x.tax_code with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | String_ _x -> `String
+                   | T_9f3605bc0e _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_1281decff3 _x -> `String
+                   end end);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_96382fbbc2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f80679d274 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f80679d274) in _string_to
+  let string_to_t_96382fbbc2 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_96382fbbc2) in _string_to
       ~kind:(`Array
                [(`List
                    (`ObjectN
-                      [("", [`Any]); ("amount", [`Integer]);
-                       ("currency", [`String]); ("description", [`String]);
-                       ("discountable", [`Boolean]);
-                       ("discounts", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("invoiceitem", [`String]);
-                       ("metadata", [`ObjectN [("", [`Null])];
-                                     `String]);
+                      [("", `Any); ("amount", `Integer);
+                       ("currency", `String); ("description", `String);
+                       ("discountable", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("invoiceitem", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
                        ("period",
-                        [`ObjectN
-                           [("", [`Any]); ("end", [`Integer]);
-                            ("start", [`Integer])]]);
-                       ("price", [`String]);
+                        `ObjectN
+                          [("", `Any); ("end", `Integer);
+                           ("start", `Integer)]);
+                       ("price", `String);
                        ("price_data",
-                        [`ObjectN
-                           [("", [`Any]); ("currency", [`String]);
-                            ("product", [`String]);
-                            ("tax_behavior", [`String]);
-                            ("unit_amount", [`Integer]);
-                            ("unit_amount_decimal", [`String])]]);
-                       ("quantity", [`Integer]); ("tax_behavior", [`String]);
-                       ("tax_code", [`String;
-                                     `String]);
-                       ("tax_rates", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("unit_amount", [`Integer]);
-                       ("unit_amount_decimal", [`String])]))])
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String); ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer); ("tax_behavior", `String);
+                       ("tax_code", `Choice
+                                    [`String; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_f80679d274 ~p ~op ~loc ~style ~explode
-    (_x : t_f80679d274) =
+  let namevalues_of_t_96382fbbc2 ~p ~op ~loc ~style ~explode
+    (_x : t_96382fbbc2) =
     _namevalues_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_aa55ae2178) ->
+        ((List.map (fun (_x : t_e9893b909b) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("currency", match _x.currency with | None -> []
-                   | Some _x -> [`String]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("discountable", match _x.discountable with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_baf0f88c14 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_6e64dcd9e0) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_4580487f41 _x -> `String]);
-                  ("invoiceitem", match _x.invoiceitem with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_6f4bafa2b8 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_3f2ec43e76 _x -> `String]);
-                  ("period", match _x.period with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("end", let _x = _x.end_ in [`Integer]);
-                                    ("start", let _x = _x.start in
-                                     [`Integer])]]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_behavior", match _x.tax_behavior with | None -> []
-                   | Some _x -> [`String]);
-                  ("tax_code", match _x.tax_code with | None -> []
-                   | Some _x -> [match _x with
-                                 | String_ _x -> `String
-                                 | T_ea76c4a152 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_ef61320518 _x -> `String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_f80679d274)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("currency", begin match _x.currency with | None -> `Null
+                   | Some _x -> `String end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("discountable", begin match _x.discountable with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_5d3f83cf9a _x ->
+                     `Array
+                       ((List.map (fun (_x : t_f4df748cbc) ->
+                           `Singleton (`Null)) _x))
+                   | T_a76752bf7d _x -> `String
+                   end end);
+                  ("invoiceitem", begin match _x.invoiceitem with
+                   | None -> `Null | Some _x -> `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_2914026972 _x -> `ObjectN [("", `Null)]
+                   | T_67827e70c9 _x -> `String
+                   end end);
+                  ("period", begin match _x.period with | None -> `Null
+                   | Some _x ->
+                   `ObjectN
+                     [("", `Any); ("end", let _x = _x.end_ in `Integer);
+                      ("start", let _x = _x.start in `Integer)]
+                   end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_behavior", begin match _x.tax_behavior with
+                   | None -> `Null | Some _x -> `String end);
+                  ("tax_code", begin match _x.tax_code with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | String_ _x -> `String
+                   | T_9f3605bc0e _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_1281decff3 _x -> `String
+                   end end);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_96382fbbc2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_32a68f7fa5 ~p ~op ~loc ~style ~explode
-    (_x : t_32a68f7fa5) =
+  let string_of_t_266682ce3a ~p ~op ~loc ~style ~explode
+    (_x : t_266682ce3a) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("type", let _x = _x.type_ in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_32a68f7fa5)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("type", let _x = _x.type_ in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_266682ce3a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_32a68f7fa5 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_32a68f7fa5) in _string_to
-      ~kind:(`ObjectN
-               [("", [`Any]); ("account", [`String]); ("type", [`String])])
+  let string_to_t_266682ce3a ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_266682ce3a) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("account", `String); ("type", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_32a68f7fa5 ~p ~op ~loc ~style ~explode
-    (_x : t_32a68f7fa5) =
+  let namevalues_of_t_266682ce3a ~p ~op ~loc ~style ~explode
+    (_x : t_266682ce3a) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("type", let _x = _x.type_ in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_32a68f7fa5)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("type", let _x = _x.type_ in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_266682ce3a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_a83913a4f2 ~p ~op ~loc ~style ~explode
-    (_x : t_a83913a4f2) =
+  let string_of_t_9aa5bd9e73 ~p ~op ~loc ~style ~explode
+    (_x : t_9aa5bd9e73) =
     _string_of ~kind:(
-      match _x with
+      begin match _x with
       | String_ _x -> `String
-      | T_e0b9016d7e _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_a83913a4f2)
+      | T_037795d400 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9aa5bd9e73)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a83913a4f2 ~loc ~style ~explode (_x : string) =
+  let string_to_t_9aa5bd9e73 ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Json_encoding.string) in
-        Option.map (fun _y : t_a83913a4f2 -> String_ _y)
+        Option.map (fun _y : t_9aa5bd9e73 -> String_ _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_e0b9016d7e) in
-        Option.map (fun _y : t_a83913a4f2 -> T_e0b9016d7e _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_037795d400) in
+        Option.map (fun _y : t_9aa5bd9e73 -> T_037795d400 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_a83913a4f2 ~p ~op ~loc ~style ~explode
-    (_x : t_a83913a4f2) =
+  let namevalues_of_t_9aa5bd9e73 ~p ~op ~loc ~style ~explode
+    (_x : t_9aa5bd9e73) =
     _namevalues_of ~kind:(
-      match _x with
+      begin match _x with
       | String_ _x -> `String
-      | T_e0b9016d7e _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_a83913a4f2)
+      | T_037795d400 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9aa5bd9e73)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_2fbe7f660e ~p ~op ~loc ~style ~explode
-    (_x : t_2fbe7f660e) =
+  let string_of_t_25cc6e6754 ~p ~op ~loc ~style ~explode
+    (_x : t_25cc6e6754) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("enabled", let _x = _x.enabled in [`Boolean]);
-         ("liability", match _x.liability with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("account", match _x.account with | None -> []
-                            | Some _x -> [`String]);
-                           ("type", let _x = _x.type_ in [`String])]])])
-      ~ctr:(Json_encoding.construct Encoders'.t_2fbe7f660e)
+        [("", `Any); ("enabled", let _x = _x.enabled in `Boolean);
+         ("liability", begin match _x.liability with | None -> `Null
+          | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("account", begin match _x.account with | None -> `Null
+              | Some _x -> `String end);
+             ("type", let _x = _x.type_ in `String)]
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_25cc6e6754)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2fbe7f660e ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_2fbe7f660e) in _string_to
+  let string_to_t_25cc6e6754 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_25cc6e6754) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("enabled", [`Boolean]);
+               [("", `Any); ("enabled", `Boolean);
                 ("liability",
-                 [`ObjectN
-                    [("", [`Any]); ("account", [`String]);
-                     ("type", [`String])]])]) ~dtr ~loc ~style ~explode _x
+                 `ObjectN
+                   [("", `Any); ("account", `String); ("type", `String)])])
+      ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_2fbe7f660e ~p ~op ~loc ~style ~explode
-    (_x : t_2fbe7f660e) =
+  let namevalues_of_t_25cc6e6754 ~p ~op ~loc ~style ~explode
+    (_x : t_25cc6e6754) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]); ("enabled", let _x = _x.enabled in [`Boolean]);
-         ("liability", match _x.liability with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("account", match _x.account with | None -> []
-                            | Some _x -> [`String]);
-                           ("type", let _x = _x.type_ in [`String])]])])
-      ~ctr:(Json_encoding.construct Encoders'.t_2fbe7f660e)
+        [("", `Any); ("enabled", let _x = _x.enabled in `Boolean);
+         ("liability", begin match _x.liability with | None -> `Null
+          | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("account", begin match _x.account with | None -> `Null
+              | Some _x -> `String end);
+             ("type", let _x = _x.type_ in `String)]
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_25cc6e6754)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_fa6f579b99 ~p ~op ~loc ~style ~explode
-    (_x : t_fa6f579b99) =
+  let string_of_t_d3294049d8 ~p ~op ~loc ~style ~explode
+    (_x : t_d3294049d8) =
     _string_of ~kind:(
-      match _x with
+      begin match _x with
       | String_ _x -> `String
-      | T_b7e53e8ff3 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_fa6f579b99)
+      | T_bf81051835 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_d3294049d8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fa6f579b99 ~loc ~style ~explode (_x : string) =
+  let string_to_t_d3294049d8 ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Json_encoding.string) in
-        Option.map (fun _y : t_fa6f579b99 -> String_ _y)
+        Option.map (fun _y : t_d3294049d8 -> String_ _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_b7e53e8ff3) in
-        Option.map (fun _y : t_fa6f579b99 -> T_b7e53e8ff3 _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_bf81051835) in
+        Option.map (fun _y : t_d3294049d8 -> T_bf81051835 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_fa6f579b99 ~p ~op ~loc ~style ~explode
-    (_x : t_fa6f579b99) =
+  let namevalues_of_t_d3294049d8 ~p ~op ~loc ~style ~explode
+    (_x : t_d3294049d8) =
     _namevalues_of ~kind:(
-      match _x with
+      begin match _x with
       | String_ _x -> `String
-      | T_b7e53e8ff3 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_fa6f579b99)
+      | T_bf81051835 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_d3294049d8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_3122be5d2a ~p ~op ~loc ~style ~explode
-    (_x : t_3122be5d2a) =
+  let string_of_t_f90350482b ~p ~op ~loc ~style ~explode
+    (_x : t_f90350482b) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_3122be5d2a)
+      ~ctr:(Json_encoding.construct Encoders'.t_f90350482b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_3122be5d2a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_3122be5d2a) in _string_to
+  let string_to_t_f90350482b ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f90350482b) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_3122be5d2a ~p ~op ~loc ~style ~explode
-    (_x : t_3122be5d2a) =
+  let namevalues_of_t_f90350482b ~p ~op ~loc ~style ~explode
+    (_x : t_f90350482b) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_3122be5d2a)
+      ~ctr:(Json_encoding.construct Encoders'.t_f90350482b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_fd8d01a560 ~p ~op ~loc ~style ~explode
-    (_x : t_fd8d01a560) =
+  let string_of_t_4592f6749b ~p ~op ~loc ~style ~explode
+    (_x : t_4592f6749b) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("end_behavior", match _x.end_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("phases", match _x.phases with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_e1b3852c81) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("add_invoice_items",
-                                     match _x.add_invoice_items with
-                                     | None -> []
-                                     | Some _x -> [`Array
-                                                     ((List.map (fun (_x : t_de0e385969) ->
-                                                         `Singleton (`Null))
-                                                         _x))]);
-                                    ("application_fee_percent",
-                                     match _x.application_fee_percent with
-                                     | None -> [] | Some _x -> [`Number]);
-                                    ("automatic_tax",
-                                     match _x.automatic_tax with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("enabled",
-                                                       let _x = _x.enabled in
-                                                       [`Null]);
-                                                      ("liability",
-                                                       match _x.liability with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("billing_cycle_anchor",
-                                     match _x.billing_cycle_anchor with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_1b4079495a _x -> `Null
-                                                   | T_4edf93db52 _x -> `Null]);
-                                    ("collection_method",
-                                     match _x.collection_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("coupon", match _x.coupon with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_payment_method",
-                                     match _x.default_payment_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_tax_rates",
-                                     match _x.default_tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_73136db6c1 _x -> `Null]);
-                                    ("description", match _x.description with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | String_ _x -> `Null
-                                                   | T_ededbab84a _x -> `Null]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_7e453c6eea _x -> `Null
-                                                   | T_216683d889 _x -> `Null]);
-                                    ("end_date", match _x.end_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_b77919689a _x -> `Null]);
-                                    ("invoice_settings",
-                                     match _x.invoice_settings with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("account_tax_ids",
-                                                       match _x.account_tax_ids with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("days_until_due",
-                                                       match _x.days_until_due with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("issuer",
-                                                       match _x.issuer with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("items", let _x = _x.items in
-                                     [`Array
-                                        ((List.map (fun (_x : t_dee69222eb) ->
-                                            `Singleton (`Null)) _x))]);
-                                    ("iterations", match _x.iterations with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN [("", [`Null])]]);
-                                    ("on_behalf_of",
-                                     match _x.on_behalf_of with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("proration_behavior",
-                                     match _x.proration_behavior with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("start_date", match _x.start_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_03bff8c62d _x -> `Null]);
-                                    ("transfer_data",
-                                     match _x.transfer_data with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("amount_percent",
-                                                       match _x.amount_percent with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("destination",
-                                                       let _x = _x.destination in
-                                                       [`Null])]]);
-                                    ("trial", match _x.trial with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("trial_end", match _x.trial_end with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_fb00d7ae56 _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_fd8d01a560)
+        [("", `Any);
+         ("end_behavior", begin match _x.end_behavior with | None -> `Null
+          | Some _x -> `String end);
+         ("phases", begin match _x.phases with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_e083edf3b7) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("add_invoice_items",
+                       begin match _x.add_invoice_items with | None -> `Null
+                       | Some _x ->
+                       `Array
+                         ((List.map (fun (_x : t_09ff00d63c) ->
+                             `Singleton (`Null)) _x))
+                       end);
+                      ("application_fee_percent",
+                       begin match _x.application_fee_percent with
+                       | None -> `Null | Some _x -> `Number end);
+                      ("automatic_tax", begin match _x.automatic_tax with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("enabled", let _x = _x.enabled in `Null);
+                          ("liability", begin match _x.liability with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("billing_cycle_anchor",
+                       begin match _x.billing_cycle_anchor with
+                       | None -> `Null | Some _x -> `String end);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_4a54b9013a _x -> `Null
+                       | T_0303c42b80 _x -> `Null
+                       end end);
+                      ("collection_method",
+                       begin match _x.collection_method with | None -> `Null
+                       | Some _x -> `String end);
+                      ("coupon", begin match _x.coupon with | None -> `Null
+                       | Some _x -> `String end);
+                      ("default_payment_method",
+                       begin match _x.default_payment_method with
+                       | None -> `Null | Some _x -> `String end);
+                      ("default_tax_rates",
+                       begin match _x.default_tax_rates with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_3bde3b5055 _x -> `Null
+                       end end);
+                      ("description", begin match _x.description with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | String_ _x -> `Null
+                       | T_1fc7f5fe2a _x -> `Null
+                       end end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_fcfd9a8504 _x -> `Null
+                       | T_ec6ad958e1 _x -> `Null
+                       end end);
+                      ("end_date", begin match _x.end_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_1741fe7401 _x -> `Null
+                       end end);
+                      ("invoice_settings",
+                       begin match _x.invoice_settings with | None -> `Null
+                       | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("account_tax_ids",
+                           begin match _x.account_tax_ids with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("days_until_due",
+                           begin match _x.days_until_due with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("issuer", begin match _x.issuer with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("items", let _x = _x.items in
+                       `Array
+                         ((List.map (fun (_x : t_5c2bdfb2a5) ->
+                             `Singleton (`Null)) _x)));
+                      ("iterations", begin match _x.iterations with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x -> `ObjectN [("", `Null)]
+                       end);
+                      ("on_behalf_of", begin match _x.on_behalf_of with
+                       | None -> `Null | Some _x -> `String end);
+                      ("proration_behavior",
+                       begin match _x.proration_behavior with | None -> `Null
+                       | Some _x -> `String end);
+                      ("start_date", begin match _x.start_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_fb19f83934 _x -> `Null
+                       end end);
+                      ("transfer_data", begin match _x.transfer_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("amount_percent",
+                           begin match _x.amount_percent with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("destination", let _x = _x.destination in `Null)]
+                       end);
+                      ("trial", begin match _x.trial with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("trial_end", begin match _x.trial_end with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_dec2d4e644 _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_4592f6749b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fd8d01a560 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_fd8d01a560) in _string_to
+  let string_to_t_4592f6749b ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4592f6749b) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("end_behavior", [`String]);
+               [("", `Any); ("end_behavior", `String);
                 ("phases",
-                 [`Array
-                    [(`List
-                        (`ObjectN
-                           [("", [`Any]);
-                            ("add_invoice_items", [`Array [(`List (`Null))]]);
-                            ("application_fee_percent", [`Number]);
-                            ("automatic_tax",
-                             [`ObjectN
-                                [("", [`Null]); ("enabled", [`Null]);
-                                 ("liability", [`Null])]]);
-                            ("billing_cycle_anchor", [`String]);
-                            ("billing_thresholds", [`Null;
-                                                    `Null]);
-                            ("collection_method", [`String]);
-                            ("coupon", [`String]);
-                            ("default_payment_method", [`String]);
-                            ("default_tax_rates", [`Null;
-                                                   `Null]);
-                            ("description", [`Null;
-                                             `Null]);
-                            ("discounts", [`Null;
-                                           `Null]);
-                            ("end_date", [`Null;
-                                          `Null]);
-                            ("invoice_settings",
-                             [`ObjectN
-                                [("", [`Null]); ("account_tax_ids", [`Null]);
-                                 ("days_until_due", [`Null]);
-                                 ("issuer", [`Null])]]);
-                            ("items", [`Array [(`List (`Null))]]);
-                            ("iterations", [`Integer]);
-                            ("metadata", [`ObjectN [("", [`Null])]]);
-                            ("on_behalf_of", [`String]);
-                            ("proration_behavior", [`String]);
-                            ("start_date", [`Null;
-                                            `Null]);
-                            ("transfer_data",
-                             [`ObjectN
-                                [("", [`Null]); ("amount_percent", [`Null]);
-                                 ("destination", [`Null])]]);
-                            ("trial", [`Boolean]);
-                            ("trial_end", [`Null;
-                                           `Null])]))]]);
-                ("proration_behavior", [`String])]) ~dtr ~loc ~style ~explode
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("add_invoice_items", `Array [(`List (`Null))]);
+                           ("application_fee_percent", `Number);
+                           ("automatic_tax",
+                            `ObjectN
+                              [("", `Null); ("enabled", `Null);
+                               ("liability", `Null)]);
+                           ("billing_cycle_anchor", `String);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("collection_method", `String);
+                           ("coupon", `String);
+                           ("default_payment_method", `String);
+                           ("default_tax_rates", `Choice
+                                                 [`Null; `Null]);
+                           ("description", `Choice
+                                           [`Null; `Null]);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("end_date", `Choice
+                                        [`Null; `Null]);
+                           ("invoice_settings",
+                            `ObjectN
+                              [("", `Null); ("account_tax_ids", `Null);
+                               ("days_until_due", `Null); ("issuer", `Null)]);
+                           ("items", `Array [(`List (`Null))]);
+                           ("iterations", `Integer);
+                           ("metadata", `ObjectN [("", `Null)]);
+                           ("on_behalf_of", `String);
+                           ("proration_behavior", `String);
+                           ("start_date", `Choice
+                                          [`Null; `Null]);
+                           ("transfer_data",
+                            `ObjectN
+                              [("", `Null); ("amount_percent", `Null);
+                               ("destination", `Null)]);
+                           ("trial", `Boolean);
+                           ("trial_end", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String)]) ~dtr ~loc ~style ~explode
       _x
   
-  let namevalues_of_t_fd8d01a560 ~p ~op ~loc ~style ~explode
-    (_x : t_fd8d01a560) =
+  let namevalues_of_t_4592f6749b ~p ~op ~loc ~style ~explode
+    (_x : t_4592f6749b) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("end_behavior", match _x.end_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("phases", match _x.phases with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_e1b3852c81) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("add_invoice_items",
-                                     match _x.add_invoice_items with
-                                     | None -> []
-                                     | Some _x -> [`Array
-                                                     ((List.map (fun (_x : t_de0e385969) ->
-                                                         `Singleton (`Null))
-                                                         _x))]);
-                                    ("application_fee_percent",
-                                     match _x.application_fee_percent with
-                                     | None -> [] | Some _x -> [`Number]);
-                                    ("automatic_tax",
-                                     match _x.automatic_tax with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("enabled",
-                                                       let _x = _x.enabled in
-                                                       [`Null]);
-                                                      ("liability",
-                                                       match _x.liability with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("billing_cycle_anchor",
-                                     match _x.billing_cycle_anchor with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_1b4079495a _x -> `Null
-                                                   | T_4edf93db52 _x -> `Null]);
-                                    ("collection_method",
-                                     match _x.collection_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("coupon", match _x.coupon with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_payment_method",
-                                     match _x.default_payment_method with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("default_tax_rates",
-                                     match _x.default_tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_73136db6c1 _x -> `Null]);
-                                    ("description", match _x.description with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | String_ _x -> `Null
-                                                   | T_ededbab84a _x -> `Null]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_7e453c6eea _x -> `Null
-                                                   | T_216683d889 _x -> `Null]);
-                                    ("end_date", match _x.end_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_b77919689a _x -> `Null]);
-                                    ("invoice_settings",
-                                     match _x.invoice_settings with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("account_tax_ids",
-                                                       match _x.account_tax_ids with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("days_until_due",
-                                                       match _x.days_until_due with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("issuer",
-                                                       match _x.issuer with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("items", let _x = _x.items in
-                                     [`Array
-                                        ((List.map (fun (_x : t_dee69222eb) ->
-                                            `Singleton (`Null)) _x))]);
-                                    ("iterations", match _x.iterations with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN [("", [`Null])]]);
-                                    ("on_behalf_of",
-                                     match _x.on_behalf_of with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("proration_behavior",
-                                     match _x.proration_behavior with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("start_date", match _x.start_date with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_03bff8c62d _x -> `Null]);
-                                    ("transfer_data",
-                                     match _x.transfer_data with | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("amount_percent",
-                                                       match _x.amount_percent with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("destination",
-                                                       let _x = _x.destination in
-                                                       [`Null])]]);
-                                    ("trial", match _x.trial with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("trial_end", match _x.trial_end with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | Ptime_t _x -> `Null
-                                                   | T_fb00d7ae56 _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_fd8d01a560)
+        [("", `Any);
+         ("end_behavior", begin match _x.end_behavior with | None -> `Null
+          | Some _x -> `String end);
+         ("phases", begin match _x.phases with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_e083edf3b7) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("add_invoice_items",
+                       begin match _x.add_invoice_items with | None -> `Null
+                       | Some _x ->
+                       `Array
+                         ((List.map (fun (_x : t_09ff00d63c) ->
+                             `Singleton (`Null)) _x))
+                       end);
+                      ("application_fee_percent",
+                       begin match _x.application_fee_percent with
+                       | None -> `Null | Some _x -> `Number end);
+                      ("automatic_tax", begin match _x.automatic_tax with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("enabled", let _x = _x.enabled in `Null);
+                          ("liability", begin match _x.liability with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("billing_cycle_anchor",
+                       begin match _x.billing_cycle_anchor with
+                       | None -> `Null | Some _x -> `String end);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_4a54b9013a _x -> `Null
+                       | T_0303c42b80 _x -> `Null
+                       end end);
+                      ("collection_method",
+                       begin match _x.collection_method with | None -> `Null
+                       | Some _x -> `String end);
+                      ("coupon", begin match _x.coupon with | None -> `Null
+                       | Some _x -> `String end);
+                      ("default_payment_method",
+                       begin match _x.default_payment_method with
+                       | None -> `Null | Some _x -> `String end);
+                      ("default_tax_rates",
+                       begin match _x.default_tax_rates with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_3bde3b5055 _x -> `Null
+                       end end);
+                      ("description", begin match _x.description with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | String_ _x -> `Null
+                       | T_1fc7f5fe2a _x -> `Null
+                       end end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_fcfd9a8504 _x -> `Null
+                       | T_ec6ad958e1 _x -> `Null
+                       end end);
+                      ("end_date", begin match _x.end_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_1741fe7401 _x -> `Null
+                       end end);
+                      ("invoice_settings",
+                       begin match _x.invoice_settings with | None -> `Null
+                       | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("account_tax_ids",
+                           begin match _x.account_tax_ids with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("days_until_due",
+                           begin match _x.days_until_due with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("issuer", begin match _x.issuer with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("items", let _x = _x.items in
+                       `Array
+                         ((List.map (fun (_x : t_5c2bdfb2a5) ->
+                             `Singleton (`Null)) _x)));
+                      ("iterations", begin match _x.iterations with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x -> `ObjectN [("", `Null)]
+                       end);
+                      ("on_behalf_of", begin match _x.on_behalf_of with
+                       | None -> `Null | Some _x -> `String end);
+                      ("proration_behavior",
+                       begin match _x.proration_behavior with | None -> `Null
+                       | Some _x -> `String end);
+                      ("start_date", begin match _x.start_date with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_fb19f83934 _x -> `Null
+                       end end);
+                      ("transfer_data", begin match _x.transfer_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("amount_percent",
+                           begin match _x.amount_percent with | None -> `Null
+                           | Some _x -> `Null end);
+                          ("destination", let _x = _x.destination in `Null)]
+                       end);
+                      ("trial", begin match _x.trial with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("trial_end", begin match _x.trial_end with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | Ptime_t _x -> `Null
+                       | T_dec2d4e644 _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_4592f6749b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_10fbc38ff9 ~p ~op ~loc ~style ~explode
-    (_x : t_10fbc38ff9) =
+  let string_of_t_ed69666899 ~p ~op ~loc ~style ~explode
+    (_x : t_ed69666899) =
     _string_of ~kind:(
-      match _x with
-      | T_c00ffe585f _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_10fbc38ff9)
+      begin match _x with
+      | T_055dff077f _x -> `String
+      | Ptime_t _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ed69666899)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_10fbc38ff9 ~loc ~style ~explode (_x : string) =
+  let string_to_t_ed69666899 ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_c00ffe585f) in
-        Option.map (fun _y : t_10fbc38ff9 -> T_c00ffe585f _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_055dff077f) in
+        Option.map (fun _y : t_ed69666899 -> T_055dff077f _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
-        Option.map (fun _y : t_10fbc38ff9 -> Ptime_t _y)
+        Option.map (fun _y : t_ed69666899 -> Ptime_t _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_10fbc38ff9 ~p ~op ~loc ~style ~explode
-    (_x : t_10fbc38ff9) =
+  let namevalues_of_t_ed69666899 ~p ~op ~loc ~style ~explode
+    (_x : t_ed69666899) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_c00ffe585f _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_10fbc38ff9)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_cfe86625c3 ~p ~op ~loc ~style ~explode
-    (_x : t_cfe86625c3) =
-    _string_of ~kind:(
-      match _x with
+      begin match _x with
+      | T_055dff077f _x -> `String
       | Ptime_t _x -> `Integer
-      | T_b55c6a85e5 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_cfe86625c3)
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ed69666899)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_cfe86625c3 ~loc ~style ~explode (_x : string) =
+  let string_of_t_1d44572454 ~p ~op ~loc ~style ~explode
+    (_x : t_1d44572454) =
+    _string_of ~kind:(
+      begin match _x with
+      | Ptime_t _x -> `Integer
+      | T_0c25334bd1 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_1d44572454)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_1d44572454 ~loc ~style ~explode (_x : string) =
     [(let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
-        Option.map (fun _y : t_cfe86625c3 -> Ptime_t _y)
+        Option.map (fun _y : t_1d44572454 -> Ptime_t _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_b55c6a85e5) in
-        Option.map (fun _y : t_cfe86625c3 -> T_b55c6a85e5 _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_0c25334bd1) in
+        Option.map (fun _y : t_1d44572454 -> T_0c25334bd1 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_cfe86625c3 ~p ~op ~loc ~style ~explode
-    (_x : t_cfe86625c3) =
+  let namevalues_of_t_1d44572454 ~p ~op ~loc ~style ~explode
+    (_x : t_1d44572454) =
     _namevalues_of ~kind:(
-      match _x with
+      begin match _x with
       | Ptime_t _x -> `Integer
-      | T_b55c6a85e5 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_cfe86625c3)
+      | T_0c25334bd1 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_1d44572454)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_0852729626 ~p ~op ~loc ~style ~explode
-    (_x : t_0852729626) =
+  let string_of_t_8f5fa696e4 ~p ~op ~loc ~style ~explode
+    (_x : t_8f5fa696e4) =
     _string_of ~kind:(
-      match _x with
+      begin match _x with
       | StringList _x ->
         `Array ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
-      | T_c15b34b7e3 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_0852729626)
+      | T_124a01eb97 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8f5fa696e4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0852729626 ~loc ~style ~explode (_x : string) =
+  let string_to_t_8f5fa696e4 ~loc ~style ~explode (_x : string) =
     [(let kind = `Array [(`List (`String))] in
         let dtr = (Json_encoding.destruct
                      (Json_encoding.list Json_encoding.string)) in
-        Option.map (fun _y : t_0852729626 -> StringList _y)
+        Option.map (fun _y : t_8f5fa696e4 -> StringList _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_c15b34b7e3) in
-        Option.map (fun _y : t_0852729626 -> T_c15b34b7e3 _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_124a01eb97) in
+        Option.map (fun _y : t_8f5fa696e4 -> T_124a01eb97 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_0852729626 ~p ~op ~loc ~style ~explode
-    (_x : t_0852729626) =
+  let namevalues_of_t_8f5fa696e4 ~p ~op ~loc ~style ~explode
+    (_x : t_8f5fa696e4) =
     _namevalues_of ~kind:(
-      match _x with
+      begin match _x with
       | StringList _x ->
         `Array ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
-      | T_c15b34b7e3 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_0852729626)
+      | T_124a01eb97 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8f5fa696e4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_79f4876735 ~p ~op ~loc ~style ~explode
-    (_x : t_79f4876735) =
+  let string_of_t_7cca4f7dbf ~p ~op ~loc ~style ~explode
+    (_x : t_7cca4f7dbf) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("billing_cycle_anchor", match _x.billing_cycle_anchor with
-          | None -> []
-          | Some _x -> [match _x with
-                        | T_7f55dab405 _x -> `String
-                        | Ptime_t _x -> `Integer]);
-         ("cancel_at", match _x.cancel_at with | None -> []
-          | Some _x -> [match _x with
-                        | Ptime_t _x -> `Integer
-                        | T_63bf374c06 _x -> `String]);
-         ("cancel_at_period_end", match _x.cancel_at_period_end with
-          | None -> [] | Some _x -> [`Boolean]);
-         ("cancel_now", match _x.cancel_now with | None -> []
-          | Some _x -> [`Boolean]);
-         ("default_tax_rates", match _x.default_tax_rates with | None -> []
-          | Some _x -> [match _x with
-                        | StringList _x ->
-                          `Array
-                            ((List.map (fun (_x : string) ->
-                                `Singleton (`String)) _x))
-                        | T_c61bf5df59 _x -> `String]);
-         ("items", match _x.items with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_6b40ba9af2) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_c2df5b02da _x -> `Null
-                                                   | T_e2db266f8b _x -> `Null]);
-                                    ("clear_usage", match _x.clear_usage with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("deleted", match _x.deleted with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_f586543d2a _x -> `Null
-                                                   | T_26d53ebad5 _x -> `Null]);
-                                    ("id", match _x.id with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_829e1aad74 _x -> `Null
-                                                   | T_e2a7ea97bf _x -> `Null]);
-                                    ("price", match _x.price with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("price_data", match _x.price_data with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("currency",
-                                                       let _x = _x.currency in
-                                                       [`Null]);
-                                                      ("product",
-                                                       let _x = _x.product in
-                                                       [`Null]);
-                                                      ("recurring",
-                                                       let _x = _x.recurring in
-                                                       [`Null]);
-                                                      ("tax_behavior",
-                                                       match _x.tax_behavior with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount",
-                                                       match _x.unit_amount with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount_decimal",
-                                                       match _x.unit_amount_decimal with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("quantity", match _x.quantity with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("tax_rates", match _x.tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_395c2ab50f _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("proration_date", match _x.proration_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("resume_at", match _x.resume_at with | None -> []
-          | Some _x -> [`String]);
-         ("start_date", match _x.start_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("trial_end", match _x.trial_end with | None -> []
-          | Some _x -> [match _x with
-                        | T_e8a5b013fe _x -> `String
-                        | Ptime_t _x -> `Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_79f4876735)
+        [("", `Any);
+         ("billing_cycle_anchor", begin match _x.billing_cycle_anchor with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | T_ac476c6fff _x -> `String
+          | Ptime_t _x -> `Integer
+          end end);
+         ("cancel_at", begin match _x.cancel_at with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | Ptime_t _x -> `Integer
+          | T_c16049800d _x -> `String
+          end end);
+         ("cancel_at_period_end", begin match _x.cancel_at_period_end with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("cancel_now", begin match _x.cancel_now with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("default_tax_rates", begin match _x.default_tax_rates with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | StringList _x ->
+            `Array
+              ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
+          | T_5a615d7a6b _x -> `String
+          end end);
+         ("items", begin match _x.items with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_3c6c982289) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_4eadbfd4e1 _x -> `Null
+                       | T_2571d9f0a2 _x -> `Null
+                       end end);
+                      ("clear_usage", begin match _x.clear_usage with
+                       | None -> `Null | Some _x -> `Boolean end);
+                      ("deleted", begin match _x.deleted with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_0f0fa94121 _x -> `Null
+                       | T_47922f83c1 _x -> `Null
+                       end end);
+                      ("id", begin match _x.id with | None -> `Null
+                       | Some _x -> `String end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_1b95510dbf _x -> `Null
+                       | T_8ea0737343 _x -> `Null
+                       end end);
+                      ("price", begin match _x.price with | None -> `Null
+                       | Some _x -> `String end);
+                      ("price_data", begin match _x.price_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("currency", let _x = _x.currency in `Null);
+                          ("product", let _x = _x.product in `Null);
+                          ("recurring", let _x = _x.recurring in `Null);
+                          ("tax_behavior", begin match _x.tax_behavior with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount", begin match _x.unit_amount with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount_decimal",
+                           begin match _x.unit_amount_decimal with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("quantity", begin match _x.quantity with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("tax_rates", begin match _x.tax_rates with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_0527cbbae2 _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end);
+         ("proration_date", begin match _x.proration_date with
+          | None -> `Null | Some _x -> `Integer end);
+         ("resume_at", begin match _x.resume_at with | None -> `Null
+          | Some _x -> `String end);
+         ("start_date", begin match _x.start_date with | None -> `Null
+          | Some _x -> `Integer end);
+         ("trial_end", begin match _x.trial_end with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_24f72174d8 _x -> `String
+          | Ptime_t _x -> `Integer
+          end end)]) ~ctr:(Json_encoding.construct Encoders'.t_7cca4f7dbf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_79f4876735 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_79f4876735) in _string_to
+  let string_to_t_7cca4f7dbf ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7cca4f7dbf) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("billing_cycle_anchor", [`String;
-                                                        `Integer]);
-                ("cancel_at", [`Integer;
-                               `String]);
-                ("cancel_at_period_end", [`Boolean]);
-                ("cancel_now", [`Boolean]);
-                ("default_tax_rates", [`Array [(`List (`String))];
-                                       `String]);
+               [("", `Any);
+                ("billing_cycle_anchor", `Choice
+                                         [`String; `Integer]);
+                ("cancel_at", `Choice
+                              [`Integer; `String]);
+                ("cancel_at_period_end", `Boolean); ("cancel_now", `Boolean);
+                ("default_tax_rates",
+                 `Choice
+                 [`Array [(`List (`String))]; `String]);
                 ("items",
-                 [`Array
-                    [(`List
-                        (`ObjectN
-                           [("", [`Any]);
-                            ("billing_thresholds", [`Null;
-                                                    `Null]);
-                            ("clear_usage", [`Boolean]);
-                            ("deleted", [`Boolean]);
-                            ("discounts", [`Null;
-                                           `Null]);
-                            ("id", [`String]); ("metadata", [`Null;
-                                                             `Null]);
-                            ("price", [`String]);
-                            ("price_data",
-                             [`ObjectN
-                                [("", [`Null]); ("currency", [`Null]);
-                                 ("product", [`Null]);
-                                 ("recurring", [`Null]);
-                                 ("tax_behavior", [`Null]);
-                                 ("unit_amount", [`Null]);
-                                 ("unit_amount_decimal", [`Null])]]);
-                            ("quantity", [`Integer]);
-                            ("tax_rates", [`Null;
-                                           `Null])]))]]);
-                ("proration_behavior", [`String]);
-                ("proration_date", [`Integer]); ("resume_at", [`String]);
-                ("start_date", [`Integer]);
-                ("trial_end", [`String;
-                               `Integer])]) ~dtr ~loc ~style ~explode _x
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("clear_usage", `Boolean); ("deleted", `Boolean);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("id", `String);
+                           ("metadata", `Choice
+                                        [`Null; `Null]);
+                           ("price", `String);
+                           ("price_data",
+                            `ObjectN
+                              [("", `Null); ("currency", `Null);
+                               ("product", `Null); ("recurring", `Null);
+                               ("tax_behavior", `Null);
+                               ("unit_amount", `Null);
+                               ("unit_amount_decimal", `Null)]);
+                           ("quantity", `Integer);
+                           ("tax_rates", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String);
+                ("proration_date", `Integer); ("resume_at", `String);
+                ("start_date", `Integer);
+                ("trial_end", `Choice
+                              [`String; `Integer])])
+      ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_79f4876735 ~p ~op ~loc ~style ~explode
-    (_x : t_79f4876735) =
+  let namevalues_of_t_7cca4f7dbf ~p ~op ~loc ~style ~explode
+    (_x : t_7cca4f7dbf) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("billing_cycle_anchor", match _x.billing_cycle_anchor with
-          | None -> []
-          | Some _x -> [match _x with
-                        | T_7f55dab405 _x -> `String
-                        | Ptime_t _x -> `Integer]);
-         ("cancel_at", match _x.cancel_at with | None -> []
-          | Some _x -> [match _x with
-                        | Ptime_t _x -> `Integer
-                        | T_63bf374c06 _x -> `String]);
-         ("cancel_at_period_end", match _x.cancel_at_period_end with
-          | None -> [] | Some _x -> [`Boolean]);
-         ("cancel_now", match _x.cancel_now with | None -> []
-          | Some _x -> [`Boolean]);
-         ("default_tax_rates", match _x.default_tax_rates with | None -> []
-          | Some _x -> [match _x with
-                        | StringList _x ->
-                          `Array
-                            ((List.map (fun (_x : string) ->
-                                `Singleton (`String)) _x))
-                        | T_c61bf5df59 _x -> `String]);
-         ("items", match _x.items with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_6b40ba9af2) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("billing_thresholds",
-                                     match _x.billing_thresholds with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_c2df5b02da _x -> `Null
-                                                   | T_e2db266f8b _x -> `Null]);
-                                    ("clear_usage", match _x.clear_usage with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("deleted", match _x.deleted with
-                                     | None -> [] | Some _x -> [`Boolean]);
-                                    ("discounts", match _x.discounts with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_f586543d2a _x -> `Null
-                                                   | T_26d53ebad5 _x -> `Null]);
-                                    ("id", match _x.id with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("metadata", match _x.metadata with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | T_829e1aad74 _x -> `Null
-                                                   | T_e2a7ea97bf _x -> `Null]);
-                                    ("price", match _x.price with
-                                     | None -> [] | Some _x -> [`String]);
-                                    ("price_data", match _x.price_data with
-                                     | None -> []
-                                     | Some _x -> [`ObjectN
-                                                     [("", [`Null]);
-                                                      ("currency",
-                                                       let _x = _x.currency in
-                                                       [`Null]);
-                                                      ("product",
-                                                       let _x = _x.product in
-                                                       [`Null]);
-                                                      ("recurring",
-                                                       let _x = _x.recurring in
-                                                       [`Null]);
-                                                      ("tax_behavior",
-                                                       match _x.tax_behavior with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount",
-                                                       match _x.unit_amount with
-                                                       | None -> []
-                                                       | Some _x -> [`Null]);
-                                                      ("unit_amount_decimal",
-                                                       match _x.unit_amount_decimal with
-                                                       | None -> []
-                                                       | Some _x -> [`Null])]]);
-                                    ("quantity", match _x.quantity with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("tax_rates", match _x.tax_rates with
-                                     | None -> []
-                                     | Some _x -> [match _x with
-                                                   | StringList _x -> `Null
-                                                   | T_395c2ab50f _x -> `Null])]))
-                              _x))]);
-         ("proration_behavior", match _x.proration_behavior with | None -> []
-          | Some _x -> [`String]);
-         ("proration_date", match _x.proration_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("resume_at", match _x.resume_at with | None -> []
-          | Some _x -> [`String]);
-         ("start_date", match _x.start_date with | None -> []
-          | Some _x -> [`Integer]);
-         ("trial_end", match _x.trial_end with | None -> []
-          | Some _x -> [match _x with
-                        | T_e8a5b013fe _x -> `String
-                        | Ptime_t _x -> `Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_79f4876735)
+        [("", `Any);
+         ("billing_cycle_anchor", begin match _x.billing_cycle_anchor with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | T_ac476c6fff _x -> `String
+          | Ptime_t _x -> `Integer
+          end end);
+         ("cancel_at", begin match _x.cancel_at with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | Ptime_t _x -> `Integer
+          | T_c16049800d _x -> `String
+          end end);
+         ("cancel_at_period_end", begin match _x.cancel_at_period_end with
+          | None -> `Null | Some _x -> `Boolean end);
+         ("cancel_now", begin match _x.cancel_now with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("default_tax_rates", begin match _x.default_tax_rates with
+          | None -> `Null | Some _x ->
+          begin match _x with
+          | StringList _x ->
+            `Array
+              ((List.map (fun (_x : string) -> `Singleton (`String)) _x))
+          | T_5a615d7a6b _x -> `String
+          end end);
+         ("items", begin match _x.items with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_3c6c982289) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any);
+                      ("billing_thresholds",
+                       begin match _x.billing_thresholds with | None -> `Null
+                       | Some _x ->
+                       begin match _x with
+                       | T_4eadbfd4e1 _x -> `Null
+                       | T_2571d9f0a2 _x -> `Null
+                       end end);
+                      ("clear_usage", begin match _x.clear_usage with
+                       | None -> `Null | Some _x -> `Boolean end);
+                      ("deleted", begin match _x.deleted with | None -> `Null
+                       | Some _x -> `Boolean end);
+                      ("discounts", begin match _x.discounts with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_0f0fa94121 _x -> `Null
+                       | T_47922f83c1 _x -> `Null
+                       end end);
+                      ("id", begin match _x.id with | None -> `Null
+                       | Some _x -> `String end);
+                      ("metadata", begin match _x.metadata with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | T_1b95510dbf _x -> `Null
+                       | T_8ea0737343 _x -> `Null
+                       end end);
+                      ("price", begin match _x.price with | None -> `Null
+                       | Some _x -> `String end);
+                      ("price_data", begin match _x.price_data with
+                       | None -> `Null | Some _x ->
+                       `ObjectN
+                         [("", `Null);
+                          ("currency", let _x = _x.currency in `Null);
+                          ("product", let _x = _x.product in `Null);
+                          ("recurring", let _x = _x.recurring in `Null);
+                          ("tax_behavior", begin match _x.tax_behavior with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount", begin match _x.unit_amount with
+                           | None -> `Null | Some _x -> `Null end);
+                          ("unit_amount_decimal",
+                           begin match _x.unit_amount_decimal with
+                           | None -> `Null | Some _x -> `Null end)]
+                       end);
+                      ("quantity", begin match _x.quantity with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("tax_rates", begin match _x.tax_rates with
+                       | None -> `Null | Some _x ->
+                       begin match _x with
+                       | StringList _x -> `Null
+                       | T_0527cbbae2 _x -> `Null
+                       end end)])) _x))
+          end);
+         ("proration_behavior", begin match _x.proration_behavior with
+          | None -> `Null | Some _x -> `String end);
+         ("proration_date", begin match _x.proration_date with
+          | None -> `Null | Some _x -> `Integer end);
+         ("resume_at", begin match _x.resume_at with | None -> `Null
+          | Some _x -> `String end);
+         ("start_date", begin match _x.start_date with | None -> `Null
+          | Some _x -> `Integer end);
+         ("trial_end", begin match _x.trial_end with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_24f72174d8 _x -> `String
+          | Ptime_t _x -> `Integer
+          end end)]) ~ctr:(Json_encoding.construct Encoders'.t_7cca4f7dbf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e14347739f ~p ~op ~loc ~style ~explode
-    (_x : t_e14347739f) =
+  let string_of_t_1d8dcb799a ~p ~op ~loc ~style ~explode
+    (_x : t_1d8dcb799a) =
     _string_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_7d1d634a95) ->
+        ((List.map (fun (_x : t_1374dad90f) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("billing_thresholds", match _x.billing_thresholds with
-                   | None -> []
-                   | Some _x -> [match _x with
-                                 | T_1b8cabdd62 _x ->
-                                   `ObjectN
-                                     [("", [`Null]);
-                                      ("usage_gte", let _x = _x.usage_gte in
-                                       [`Null])]
-                                 | T_1713b7185f _x -> `String]);
-                  ("clear_usage", match _x.clear_usage with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("deleted", match _x.deleted with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_f85dc498b3 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_f69ed98de2) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_6763bb7bbe _x -> `String]);
-                  ("id", match _x.id with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_9d750c61e7 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_3c592eb40f _x -> `String]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("recurring", let _x = _x.recurring in
-                                     [`ObjectN
-                                        [("", [`Null]);
-                                         ("interval", let _x = _x.interval in
-                                          [`Null]);
-                                         ("interval_count",
-                                          match _x.interval_count with
-                                          | None -> [] | Some _x -> [`Null])]]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_875656e4a1 _x -> `String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_e14347739f)
+                 [("", `Any);
+                  ("billing_thresholds",
+                   begin match _x.billing_thresholds with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_ddb7e86f56 _x ->
+                     `ObjectN
+                       [("", `Null);
+                        ("usage_gte", let _x = _x.usage_gte in `Null)]
+                   | T_8d4566be9e _x -> `String
+                   end end);
+                  ("clear_usage", begin match _x.clear_usage with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("deleted", begin match _x.deleted with | None -> `Null
+                   | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_578889ed69 _x ->
+                     `Array
+                       ((List.map (fun (_x : t_09f523f9f5) ->
+                           `Singleton (`Null)) _x))
+                   | T_849ac8a715 _x -> `String
+                   end end);
+                  ("id", begin match _x.id with | None -> `Null | Some _x ->
+                   `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_d340f0bf3a _x -> `ObjectN [("", `Null)]
+                   | T_fea0a35e16 _x -> `String
+                   end end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("recurring", let _x = _x.recurring in
+                       `ObjectN
+                         [("", `Null);
+                          ("interval", let _x = _x.interval in `Null);
+                          ("interval_count",
+                           begin match _x.interval_count with | None -> `Null
+                           | Some _x -> `Null end)]);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_7582a29c79 _x -> `String
+                   end end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_1d8dcb799a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e14347739f ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e14347739f) in _string_to
+  let string_to_t_1d8dcb799a ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_1d8dcb799a) in _string_to
       ~kind:(`Array
                [(`List
                    (`ObjectN
-                      [("", [`Any]);
+                      [("", `Any);
                        ("billing_thresholds",
-                        [`ObjectN [("", [`Null]); ("usage_gte", [`Null])];
+                        `Choice
+                        [`ObjectN [("", `Null); ("usage_gte", `Null)];
                          `String]);
-                       ("clear_usage", [`Boolean]); ("deleted", [`Boolean]);
-                       ("discounts", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("id", [`String]);
-                       ("metadata", [`ObjectN [("", [`Null])];
-                                     `String]);
-                       ("price", [`String]);
+                       ("clear_usage", `Boolean); ("deleted", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("id", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
+                       ("price", `String);
                        ("price_data",
-                        [`ObjectN
-                           [("", [`Any]); ("currency", [`String]);
-                            ("product", [`String]);
-                            ("recurring",
-                             [`ObjectN
-                                [("", [`Null]); ("interval", [`Null]);
-                                 ("interval_count", [`Null])]]);
-                            ("tax_behavior", [`String]);
-                            ("unit_amount", [`Integer]);
-                            ("unit_amount_decimal", [`String])]]);
-                       ("quantity", [`Integer]);
-                       ("tax_rates", [`Array [(`List (`Null))];
-                                      `String])]))])
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String);
+                           ("recurring",
+                            `ObjectN
+                              [("", `Null); ("interval", `Null);
+                               ("interval_count", `Null)]);
+                           ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String])]))])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_e14347739f ~p ~op ~loc ~style ~explode
-    (_x : t_e14347739f) =
+  let namevalues_of_t_1d8dcb799a ~p ~op ~loc ~style ~explode
+    (_x : t_1d8dcb799a) =
     _namevalues_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_7d1d634a95) ->
+        ((List.map (fun (_x : t_1374dad90f) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("billing_thresholds", match _x.billing_thresholds with
-                   | None -> []
-                   | Some _x -> [match _x with
-                                 | T_1b8cabdd62 _x ->
-                                   `ObjectN
-                                     [("", [`Null]);
-                                      ("usage_gte", let _x = _x.usage_gte in
-                                       [`Null])]
-                                 | T_1713b7185f _x -> `String]);
-                  ("clear_usage", match _x.clear_usage with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("deleted", match _x.deleted with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_f85dc498b3 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_f69ed98de2) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_6763bb7bbe _x -> `String]);
-                  ("id", match _x.id with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_9d750c61e7 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_3c592eb40f _x -> `String]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("recurring", let _x = _x.recurring in
-                                     [`ObjectN
-                                        [("", [`Null]);
-                                         ("interval", let _x = _x.interval in
-                                          [`Null]);
-                                         ("interval_count",
-                                          match _x.interval_count with
-                                          | None -> [] | Some _x -> [`Null])]]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_875656e4a1 _x -> `String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_e14347739f)
+                 [("", `Any);
+                  ("billing_thresholds",
+                   begin match _x.billing_thresholds with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_ddb7e86f56 _x ->
+                     `ObjectN
+                       [("", `Null);
+                        ("usage_gte", let _x = _x.usage_gte in `Null)]
+                   | T_8d4566be9e _x -> `String
+                   end end);
+                  ("clear_usage", begin match _x.clear_usage with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("deleted", begin match _x.deleted with | None -> `Null
+                   | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_578889ed69 _x ->
+                     `Array
+                       ((List.map (fun (_x : t_09f523f9f5) ->
+                           `Singleton (`Null)) _x))
+                   | T_849ac8a715 _x -> `String
+                   end end);
+                  ("id", begin match _x.id with | None -> `Null | Some _x ->
+                   `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_d340f0bf3a _x -> `ObjectN [("", `Null)]
+                   | T_fea0a35e16 _x -> `String
+                   end end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("recurring", let _x = _x.recurring in
+                       `ObjectN
+                         [("", `Null);
+                          ("interval", let _x = _x.interval in `Null);
+                          ("interval_count",
+                           begin match _x.interval_count with | None -> `Null
+                           | Some _x -> `Null end)]);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_7582a29c79 _x -> `String
+                   end end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_1d8dcb799a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_c3d0e8c5c0 ~p ~op ~loc ~style ~explode
-    (_x : t_c3d0e8c5c0) =
+  let string_of_t_b3cdff625a ~p ~op ~loc ~style ~explode
+    (_x : t_b3cdff625a) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_c3d0e8c5c0)
+      ~ctr:(Json_encoding.construct Encoders'.t_b3cdff625a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c3d0e8c5c0 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_c3d0e8c5c0) in _string_to
+  let string_to_t_b3cdff625a ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b3cdff625a) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_c3d0e8c5c0 ~p ~op ~loc ~style ~explode
-    (_x : t_c3d0e8c5c0) =
+  let namevalues_of_t_b3cdff625a ~p ~op ~loc ~style ~explode
+    (_x : t_b3cdff625a) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_c3d0e8c5c0)
+      ~ctr:(Json_encoding.construct Encoders'.t_b3cdff625a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_04983d6adf ~p ~op ~loc ~style ~explode
-    (_x : t_04983d6adf) =
+  let string_of_t_f0d6f3faa7 ~p ~op ~loc ~style ~explode
+    (_x : t_f0d6f3faa7) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_04983d6adf)
+      ~ctr:(Json_encoding.construct Encoders'.t_f0d6f3faa7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_04983d6adf ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_04983d6adf) in _string_to
+  let string_to_t_f0d6f3faa7 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f0d6f3faa7) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_04983d6adf ~p ~op ~loc ~style ~explode
-    (_x : t_04983d6adf) =
+  let namevalues_of_t_f0d6f3faa7 ~p ~op ~loc ~style ~explode
+    (_x : t_f0d6f3faa7) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_04983d6adf)
+      ~ctr:(Json_encoding.construct Encoders'.t_f0d6f3faa7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_2952cd25d0 ~p ~op ~loc ~style ~explode
-    (_x : t_2952cd25d0) =
+  let string_of_t_8a9e68982d ~p ~op ~loc ~style ~explode
+    (_x : t_8a9e68982d) =
     _string_of ~kind:(
-      match _x with
-      | T_f8c5c86816 _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_2952cd25d0)
+      begin match _x with
+      | T_b12bfcf7b3 _x -> `String
+      | Ptime_t _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8a9e68982d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2952cd25d0 ~loc ~style ~explode (_x : string) =
+  let string_to_t_8a9e68982d ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_f8c5c86816) in
-        Option.map (fun _y : t_2952cd25d0 -> T_f8c5c86816 _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_b12bfcf7b3) in
+        Option.map (fun _y : t_8a9e68982d -> T_b12bfcf7b3 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
-        Option.map (fun _y : t_2952cd25d0 -> Ptime_t _y)
+        Option.map (fun _y : t_8a9e68982d -> Ptime_t _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_2952cd25d0 ~p ~op ~loc ~style ~explode
-    (_x : t_2952cd25d0) =
+  let namevalues_of_t_8a9e68982d ~p ~op ~loc ~style ~explode
+    (_x : t_8a9e68982d) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_f8c5c86816 _x -> `String
-      | Ptime_t _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_2952cd25d0)
+      begin match _x with
+      | T_b12bfcf7b3 _x -> `String
+      | Ptime_t _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8a9e68982d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_f6eb04d2e3 ~p ~op ~loc ~style ~explode
-    (_x : t_f6eb04d2e3) =
+  let string_of_t_428991b112 ~p ~op ~loc ~style ~explode
+    (_x : t_428991b112) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("address", match _x.address with | None -> []
-          | Some _x -> [match _x with
-                        | T_4e08799e12 _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("city", match _x.city with | None -> []
-                              | Some _x -> [`String]);
-                             ("country", match _x.country with | None -> []
-                              | Some _x -> [`String]);
-                             ("line1", match _x.line1 with | None -> []
-                              | Some _x -> [`String]);
-                             ("line2", match _x.line2 with | None -> []
-                              | Some _x -> [`String]);
-                             ("postal_code", match _x.postal_code with
-                              | None -> [] | Some _x -> [`String]);
-                             ("state", match _x.state with | None -> []
-                              | Some _x -> [`String])]
-                        | T_f10ab35d58 _x -> `String]);
-         ("shipping", match _x.shipping with | None -> []
-          | Some _x -> [match _x with
-                        | T_71440b2752 _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("address", let _x = _x.address in
-                              [`ObjectN
-                                 [("", [`Any]);
-                                  ("city", match _x.city with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("country", match _x.country with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("line1", match _x.line1 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("line2", match _x.line2 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("postal_code", match _x.postal_code with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("state", match _x.state with | None -> []
-                                   | Some _x -> [`String])]]);
-                             ("name", let _x = _x.name in [`String]);
-                             ("phone", match _x.phone with | None -> []
-                              | Some _x -> [`String])]
-                        | T_c7e2f5d7d1 _x -> `String]);
-         ("tax", match _x.tax with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("ip_address", match _x.ip_address with
-                            | None -> []
-                            | Some _x -> [match _x with
-                                          | String_ _x -> `String
-                                          | T_211b3860a7 _x -> `String])]]);
-         ("tax_exempt", match _x.tax_exempt with | None -> []
-          | Some _x -> [`String]);
-         ("tax_ids", match _x.tax_ids with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_2b21e7c70c) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("type", let _x = _x.type_ in [`String]);
-                                    ("value", let _x = _x.value in [`String])]))
-                              _x))])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f6eb04d2e3)
+        [("", `Any);
+         ("address", begin match _x.address with | None -> `Null | Some _x ->
+          begin match _x with
+          | T_74b30847f1 _x ->
+            `ObjectN
+              [("", `Any);
+               ("city", begin match _x.city with | None -> `Null | Some _x ->
+                `String end);
+               ("country", begin match _x.country with | None -> `Null
+                | Some _x -> `String end);
+               ("line1", begin match _x.line1 with | None -> `Null
+                | Some _x -> `String end);
+               ("line2", begin match _x.line2 with | None -> `Null
+                | Some _x -> `String end);
+               ("postal_code", begin match _x.postal_code with
+                | None -> `Null | Some _x -> `String end);
+               ("state", begin match _x.state with | None -> `Null
+                | Some _x -> `String end)]
+          | T_2e65d33e0b _x -> `String
+          end end);
+         ("shipping", begin match _x.shipping with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_743992c530 _x ->
+            `ObjectN
+              [("", `Any);
+               ("address", let _x = _x.address in
+                `ObjectN
+                  [("", `Any);
+                   ("city", begin match _x.city with | None -> `Null
+                    | Some _x -> `String end);
+                   ("country", begin match _x.country with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line1", begin match _x.line1 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line2", begin match _x.line2 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("postal_code", begin match _x.postal_code with
+                    | None -> `Null | Some _x -> `String end);
+                   ("state", begin match _x.state with | None -> `Null
+                    | Some _x -> `String end)]);
+               ("name", let _x = _x.name in `String);
+               ("phone", begin match _x.phone with | None -> `Null
+                | Some _x -> `String end)]
+          | T_7287935059 _x -> `String
+          end end);
+         ("tax", begin match _x.tax with | None -> `Null | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("ip_address", begin match _x.ip_address with | None -> `Null
+              | Some _x ->
+              begin match _x with
+              | String_ _x -> `String
+              | T_9dc7923852 _x -> `String
+              end end)]
+          end);
+         ("tax_exempt", begin match _x.tax_exempt with | None -> `Null
+          | Some _x -> `String end);
+         ("tax_ids", begin match _x.tax_ids with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_dc0dec9e3d) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any); ("type", let _x = _x.type_ in `String);
+                      ("value", let _x = _x.value in `String)])) _x))
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_428991b112)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f6eb04d2e3 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f6eb04d2e3) in _string_to
+  let string_to_t_428991b112 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_428991b112) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]);
+               [("", `Any);
                 ("address",
+                 `Choice
                  [`ObjectN
-                    [("", [`Any]); ("city", [`String]);
-                     ("country", [`String]); ("line1", [`String]);
-                     ("line2", [`String]); ("postal_code", [`String]);
-                     ("state", [`String])];
+                    [("", `Any); ("city", `String); ("country", `String);
+                     ("line1", `String); ("line2", `String);
+                     ("postal_code", `String); ("state", `String)];
                   `String]);
                 ("shipping",
+                 `Choice
                  [`ObjectN
-                    [("", [`Any]);
+                    [("", `Any);
                      ("address",
-                      [`ObjectN
-                         [("", [`Any]); ("city", [`String]);
-                          ("country", [`String]); ("line1", [`String]);
-                          ("line2", [`String]); ("postal_code", [`String]);
-                          ("state", [`String])]]);
-                     ("name", [`String]); ("phone", [`String])];
+                      `ObjectN
+                        [("", `Any); ("city", `String); ("country", `String);
+                         ("line1", `String); ("line2", `String);
+                         ("postal_code", `String); ("state", `String)]);
+                     ("name", `String); ("phone", `String)];
                   `String]);
                 ("tax",
-                 [`ObjectN [("", [`Any]); ("ip_address", [`String;
-                                                          `String])]]);
-                ("tax_exempt", [`String]);
+                 `ObjectN
+                   [("", `Any); ("ip_address", `Choice
+                                               [`String; `String])]);
+                ("tax_exempt", `String);
                 ("tax_ids",
-                 [`Array
-                    [(`List
-                        (`ObjectN
-                           [("", [`Any]); ("type", [`String]);
-                            ("value", [`String])]))]])])
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any); ("type", `String); ("value", `String)]))])])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_f6eb04d2e3 ~p ~op ~loc ~style ~explode
-    (_x : t_f6eb04d2e3) =
+  let namevalues_of_t_428991b112 ~p ~op ~loc ~style ~explode
+    (_x : t_428991b112) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("address", match _x.address with | None -> []
-          | Some _x -> [match _x with
-                        | T_4e08799e12 _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("city", match _x.city with | None -> []
-                              | Some _x -> [`String]);
-                             ("country", match _x.country with | None -> []
-                              | Some _x -> [`String]);
-                             ("line1", match _x.line1 with | None -> []
-                              | Some _x -> [`String]);
-                             ("line2", match _x.line2 with | None -> []
-                              | Some _x -> [`String]);
-                             ("postal_code", match _x.postal_code with
-                              | None -> [] | Some _x -> [`String]);
-                             ("state", match _x.state with | None -> []
-                              | Some _x -> [`String])]
-                        | T_f10ab35d58 _x -> `String]);
-         ("shipping", match _x.shipping with | None -> []
-          | Some _x -> [match _x with
-                        | T_71440b2752 _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("address", let _x = _x.address in
-                              [`ObjectN
-                                 [("", [`Any]);
-                                  ("city", match _x.city with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("country", match _x.country with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("line1", match _x.line1 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("line2", match _x.line2 with | None -> []
-                                   | Some _x -> [`String]);
-                                  ("postal_code", match _x.postal_code with
-                                   | None -> [] | Some _x -> [`String]);
-                                  ("state", match _x.state with | None -> []
-                                   | Some _x -> [`String])]]);
-                             ("name", let _x = _x.name in [`String]);
-                             ("phone", match _x.phone with | None -> []
-                              | Some _x -> [`String])]
-                        | T_c7e2f5d7d1 _x -> `String]);
-         ("tax", match _x.tax with | None -> []
-          | Some _x -> [`ObjectN
-                          [("", [`Any]);
-                           ("ip_address", match _x.ip_address with
-                            | None -> []
-                            | Some _x -> [match _x with
-                                          | String_ _x -> `String
-                                          | T_211b3860a7 _x -> `String])]]);
-         ("tax_exempt", match _x.tax_exempt with | None -> []
-          | Some _x -> [`String]);
-         ("tax_ids", match _x.tax_ids with | None -> []
-          | Some _x -> [`Array
-                          ((List.map (fun (_x : t_2b21e7c70c) ->
-                              `Singleton
-                                (`ObjectN
-                                   [("", [`Any]);
-                                    ("type", let _x = _x.type_ in [`String]);
-                                    ("value", let _x = _x.value in [`String])]))
-                              _x))])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f6eb04d2e3)
+        [("", `Any);
+         ("address", begin match _x.address with | None -> `Null | Some _x ->
+          begin match _x with
+          | T_74b30847f1 _x ->
+            `ObjectN
+              [("", `Any);
+               ("city", begin match _x.city with | None -> `Null | Some _x ->
+                `String end);
+               ("country", begin match _x.country with | None -> `Null
+                | Some _x -> `String end);
+               ("line1", begin match _x.line1 with | None -> `Null
+                | Some _x -> `String end);
+               ("line2", begin match _x.line2 with | None -> `Null
+                | Some _x -> `String end);
+               ("postal_code", begin match _x.postal_code with
+                | None -> `Null | Some _x -> `String end);
+               ("state", begin match _x.state with | None -> `Null
+                | Some _x -> `String end)]
+          | T_2e65d33e0b _x -> `String
+          end end);
+         ("shipping", begin match _x.shipping with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_743992c530 _x ->
+            `ObjectN
+              [("", `Any);
+               ("address", let _x = _x.address in
+                `ObjectN
+                  [("", `Any);
+                   ("city", begin match _x.city with | None -> `Null
+                    | Some _x -> `String end);
+                   ("country", begin match _x.country with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line1", begin match _x.line1 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("line2", begin match _x.line2 with | None -> `Null
+                    | Some _x -> `String end);
+                   ("postal_code", begin match _x.postal_code with
+                    | None -> `Null | Some _x -> `String end);
+                   ("state", begin match _x.state with | None -> `Null
+                    | Some _x -> `String end)]);
+               ("name", let _x = _x.name in `String);
+               ("phone", begin match _x.phone with | None -> `Null
+                | Some _x -> `String end)]
+          | T_7287935059 _x -> `String
+          end end);
+         ("tax", begin match _x.tax with | None -> `Null | Some _x ->
+          `ObjectN
+            [("", `Any);
+             ("ip_address", begin match _x.ip_address with | None -> `Null
+              | Some _x ->
+              begin match _x with
+              | String_ _x -> `String
+              | T_9dc7923852 _x -> `String
+              end end)]
+          end);
+         ("tax_exempt", begin match _x.tax_exempt with | None -> `Null
+          | Some _x -> `String end);
+         ("tax_ids", begin match _x.tax_ids with | None -> `Null | Some _x ->
+          `Array
+            ((List.map (fun (_x : t_dc0dec9e3d) ->
+                `Singleton
+                  (`ObjectN
+                     [("", `Any); ("type", let _x = _x.type_ in `String);
+                      ("value", let _x = _x.value in `String)])) _x))
+          end)]) ~ctr:(Json_encoding.construct Encoders'.t_428991b112)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_81e673c9db ~p ~op ~loc ~style ~explode
-    (_x : t_81e673c9db) =
+  let string_of_t_ec12d0adc5 ~p ~op ~loc ~style ~explode
+    (_x : t_ec12d0adc5) =
     _string_of ~kind:(
-      match _x with
-      | T_a52f088048 _x ->
+      begin match _x with
+      | T_ce45932982 _x ->
         `Array
-          ((List.map (fun (_x : t_b14f4ca400) ->
+          ((List.map (fun (_x : t_b90aee23ca) ->
               `Singleton
                 (`ObjectN
-                   [("", [`Any]);
-                    ("coupon", match _x.coupon with | None -> []
-                     | Some _x -> [`String]);
-                    ("discount", match _x.discount with | None -> []
-                     | Some _x -> [`String]);
-                    ("promotion_code", match _x.promotion_code with
-                     | None -> [] | Some _x -> [`String])])) _x))
-      | T_d89f3a5c69 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_81e673c9db)
+                   [("", `Any);
+                    ("coupon", begin match _x.coupon with | None -> `Null
+                     | Some _x -> `String end);
+                    ("discount", begin match _x.discount with | None -> `Null
+                     | Some _x -> `String end);
+                    ("promotion_code", begin match _x.promotion_code with
+                     | None -> `Null | Some _x -> `String end)])) _x))
+      | T_4884e1ec72 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ec12d0adc5)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_81e673c9db ~loc ~style ~explode (_x : string) =
+  let string_to_t_ec12d0adc5 ~loc ~style ~explode (_x : string) =
     [(let kind = `Array
                    [(`List
                        (`ObjectN
-                          [("", [`Any]); ("coupon", [`String]);
-                           ("discount", [`String]);
-                           ("promotion_code", [`String])]))] in
-        let dtr = (Json_encoding.destruct Encoders'.t_a52f088048) in
-        Option.map (fun _y : t_81e673c9db -> T_a52f088048 _y)
+                          [("", `Any); ("coupon", `String);
+                           ("discount", `String);
+                           ("promotion_code", `String)]))] in
+        let dtr = (Json_encoding.destruct Encoders'.t_ce45932982) in
+        Option.map (fun _y : t_ec12d0adc5 -> T_ce45932982 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_d89f3a5c69) in
-        Option.map (fun _y : t_81e673c9db -> T_d89f3a5c69 _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_4884e1ec72) in
+        Option.map (fun _y : t_ec12d0adc5 -> T_4884e1ec72 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_81e673c9db ~p ~op ~loc ~style ~explode
-    (_x : t_81e673c9db) =
+  let namevalues_of_t_ec12d0adc5 ~p ~op ~loc ~style ~explode
+    (_x : t_ec12d0adc5) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_a52f088048 _x ->
+      begin match _x with
+      | T_ce45932982 _x ->
         `Array
-          ((List.map (fun (_x : t_b14f4ca400) ->
+          ((List.map (fun (_x : t_b90aee23ca) ->
               `Singleton
                 (`ObjectN
-                   [("", [`Any]);
-                    ("coupon", match _x.coupon with | None -> []
-                     | Some _x -> [`String]);
-                    ("discount", match _x.discount with | None -> []
-                     | Some _x -> [`String]);
-                    ("promotion_code", match _x.promotion_code with
-                     | None -> [] | Some _x -> [`String])])) _x))
-      | T_d89f3a5c69 _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_81e673c9db)
+                   [("", `Any);
+                    ("coupon", begin match _x.coupon with | None -> `Null
+                     | Some _x -> `String end);
+                    ("discount", begin match _x.discount with | None -> `Null
+                     | Some _x -> `String end);
+                    ("promotion_code", begin match _x.promotion_code with
+                     | None -> `Null | Some _x -> `String end)])) _x))
+      | T_4884e1ec72 _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ec12d0adc5)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e3fa4586a5 ~p ~op ~loc ~style ~explode
-    (_x : t_e3fa4586a5) =
+  let string_of_t_6de1e50279 ~p ~op ~loc ~style ~explode
+    (_x : t_6de1e50279) =
     _string_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_317cc693fa) ->
+        ((List.map (fun (_x : t_2f6b36b766) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("currency", match _x.currency with | None -> []
-                   | Some _x -> [`String]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("discountable", match _x.discountable with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_b6fbd19489 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_eba1896f54) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_75e192ab3b _x -> `String]);
-                  ("invoiceitem", match _x.invoiceitem with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_d5faec94d6 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_ff74322a57 _x -> `String]);
-                  ("period", match _x.period with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("end", let _x = _x.end_ in [`Integer]);
-                                    ("start", let _x = _x.start in
-                                     [`Integer])]]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_behavior", match _x.tax_behavior with | None -> []
-                   | Some _x -> [`String]);
-                  ("tax_code", match _x.tax_code with | None -> []
-                   | Some _x -> [match _x with
-                                 | String_ _x -> `String
-                                 | T_a2f16d27e9 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_ed5b045fa6 _x -> `String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_e3fa4586a5)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("currency", begin match _x.currency with | None -> `Null
+                   | Some _x -> `String end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("discountable", begin match _x.discountable with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_6b1c6a8d52 _x ->
+                     `Array
+                       ((List.map (fun (_x : t_a39e51dc77) ->
+                           `Singleton (`Null)) _x))
+                   | T_251f58b73c _x -> `String
+                   end end);
+                  ("invoiceitem", begin match _x.invoiceitem with
+                   | None -> `Null | Some _x -> `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_4fd7b468a5 _x -> `ObjectN [("", `Null)]
+                   | T_b31a36a7b0 _x -> `String
+                   end end);
+                  ("period", begin match _x.period with | None -> `Null
+                   | Some _x ->
+                   `ObjectN
+                     [("", `Any); ("end", let _x = _x.end_ in `Integer);
+                      ("start", let _x = _x.start in `Integer)]
+                   end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_behavior", begin match _x.tax_behavior with
+                   | None -> `Null | Some _x -> `String end);
+                  ("tax_code", begin match _x.tax_code with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | String_ _x -> `String
+                   | T_71c3497b63 _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_754223ab79 _x -> `String
+                   end end);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_6de1e50279)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e3fa4586a5 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e3fa4586a5) in _string_to
+  let string_to_t_6de1e50279 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6de1e50279) in _string_to
       ~kind:(`Array
                [(`List
                    (`ObjectN
-                      [("", [`Any]); ("amount", [`Integer]);
-                       ("currency", [`String]); ("description", [`String]);
-                       ("discountable", [`Boolean]);
-                       ("discounts", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("invoiceitem", [`String]);
-                       ("metadata", [`ObjectN [("", [`Null])];
-                                     `String]);
+                      [("", `Any); ("amount", `Integer);
+                       ("currency", `String); ("description", `String);
+                       ("discountable", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("invoiceitem", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
                        ("period",
-                        [`ObjectN
-                           [("", [`Any]); ("end", [`Integer]);
-                            ("start", [`Integer])]]);
-                       ("price", [`String]);
+                        `ObjectN
+                          [("", `Any); ("end", `Integer);
+                           ("start", `Integer)]);
+                       ("price", `String);
                        ("price_data",
-                        [`ObjectN
-                           [("", [`Any]); ("currency", [`String]);
-                            ("product", [`String]);
-                            ("tax_behavior", [`String]);
-                            ("unit_amount", [`Integer]);
-                            ("unit_amount_decimal", [`String])]]);
-                       ("quantity", [`Integer]); ("tax_behavior", [`String]);
-                       ("tax_code", [`String;
-                                     `String]);
-                       ("tax_rates", [`Array [(`List (`Null))];
-                                      `String]);
-                       ("unit_amount", [`Integer]);
-                       ("unit_amount_decimal", [`String])]))])
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String); ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer); ("tax_behavior", `String);
+                       ("tax_code", `Choice
+                                    [`String; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_e3fa4586a5 ~p ~op ~loc ~style ~explode
-    (_x : t_e3fa4586a5) =
+  let namevalues_of_t_6de1e50279 ~p ~op ~loc ~style ~explode
+    (_x : t_6de1e50279) =
     _namevalues_of ~kind:(
       `Array
-        ((List.map (fun (_x : t_317cc693fa) ->
+        ((List.map (fun (_x : t_2f6b36b766) ->
             `Singleton
               (`ObjectN
-                 [("", [`Any]);
-                  ("amount", match _x.amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("currency", match _x.currency with | None -> []
-                   | Some _x -> [`String]);
-                  ("description", match _x.description with | None -> []
-                   | Some _x -> [`String]);
-                  ("discountable", match _x.discountable with | None -> []
-                   | Some _x -> [`Boolean]);
-                  ("discounts", match _x.discounts with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_b6fbd19489 _x ->
-                                   `Array
-                                     ((List.map (fun (_x : t_eba1896f54) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_75e192ab3b _x -> `String]);
-                  ("invoiceitem", match _x.invoiceitem with | None -> []
-                   | Some _x -> [`String]);
-                  ("metadata", match _x.metadata with | None -> []
-                   | Some _x -> [match _x with
-                                 | T_d5faec94d6 _x ->
-                                   `ObjectN [("", [`Null])]
-                                 | T_ff74322a57 _x -> `String]);
-                  ("period", match _x.period with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("end", let _x = _x.end_ in [`Integer]);
-                                    ("start", let _x = _x.start in
-                                     [`Integer])]]);
-                  ("price", match _x.price with | None -> []
-                   | Some _x -> [`String]);
-                  ("price_data", match _x.price_data with | None -> []
-                   | Some _x -> [`ObjectN
-                                   [("", [`Any]);
-                                    ("currency", let _x = _x.currency in
-                                     [`String]);
-                                    ("product", let _x = _x.product in
-                                     [`String]);
-                                    ("tax_behavior",
-                                     match _x.tax_behavior with | None -> []
-                                     | Some _x -> [`String]);
-                                    ("unit_amount", match _x.unit_amount with
-                                     | None -> [] | Some _x -> [`Integer]);
-                                    ("unit_amount_decimal",
-                                     match _x.unit_amount_decimal with
-                                     | None -> [] | Some _x -> [`String])]]);
-                  ("quantity", match _x.quantity with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("tax_behavior", match _x.tax_behavior with | None -> []
-                   | Some _x -> [`String]);
-                  ("tax_code", match _x.tax_code with | None -> []
-                   | Some _x -> [match _x with
-                                 | String_ _x -> `String
-                                 | T_a2f16d27e9 _x -> `String]);
-                  ("tax_rates", match _x.tax_rates with | None -> []
-                   | Some _x -> [match _x with
-                                 | StringList _x ->
-                                   `Array
-                                     ((List.map (fun (_x : string) ->
-                                         `Singleton (`Null)) _x))
-                                 | T_ed5b045fa6 _x -> `String]);
-                  ("unit_amount", match _x.unit_amount with | None -> []
-                   | Some _x -> [`Integer]);
-                  ("unit_amount_decimal", match _x.unit_amount_decimal with
-                   | None -> [] | Some _x -> [`String])])) _x)))
-      ~ctr:(Json_encoding.construct Encoders'.t_e3fa4586a5)
+                 [("", `Any);
+                  ("amount", begin match _x.amount with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("currency", begin match _x.currency with | None -> `Null
+                   | Some _x -> `String end);
+                  ("description", begin match _x.description with
+                   | None -> `Null | Some _x -> `String end);
+                  ("discountable", begin match _x.discountable with
+                   | None -> `Null | Some _x -> `Boolean end);
+                  ("discounts", begin match _x.discounts with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_6b1c6a8d52 _x ->
+                     `Array
+                       ((List.map (fun (_x : t_a39e51dc77) ->
+                           `Singleton (`Null)) _x))
+                   | T_251f58b73c _x -> `String
+                   end end);
+                  ("invoiceitem", begin match _x.invoiceitem with
+                   | None -> `Null | Some _x -> `String end);
+                  ("metadata", begin match _x.metadata with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | T_4fd7b468a5 _x -> `ObjectN [("", `Null)]
+                   | T_b31a36a7b0 _x -> `String
+                   end end);
+                  ("period", begin match _x.period with | None -> `Null
+                   | Some _x ->
+                   `ObjectN
+                     [("", `Any); ("end", let _x = _x.end_ in `Integer);
+                      ("start", let _x = _x.start in `Integer)]
+                   end);
+                  ("price", begin match _x.price with | None -> `Null
+                   | Some _x -> `String end);
+                  ("price_data", begin match _x.price_data with
+                   | None -> `Null | Some _x ->
+                   `ObjectN
+                     [("", `Any);
+                      ("currency", let _x = _x.currency in `String);
+                      ("product", let _x = _x.product in `String);
+                      ("tax_behavior", begin match _x.tax_behavior with
+                       | None -> `Null | Some _x -> `String end);
+                      ("unit_amount", begin match _x.unit_amount with
+                       | None -> `Null | Some _x -> `Integer end);
+                      ("unit_amount_decimal",
+                       begin match _x.unit_amount_decimal with
+                       | None -> `Null | Some _x -> `String end)]
+                   end);
+                  ("quantity", begin match _x.quantity with | None -> `Null
+                   | Some _x -> `Integer end);
+                  ("tax_behavior", begin match _x.tax_behavior with
+                   | None -> `Null | Some _x -> `String end);
+                  ("tax_code", begin match _x.tax_code with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | String_ _x -> `String
+                   | T_71c3497b63 _x -> `String
+                   end end);
+                  ("tax_rates", begin match _x.tax_rates with | None -> `Null
+                   | Some _x ->
+                   begin match _x with
+                   | StringList _x ->
+                     `Array
+                       ((List.map (fun (_x : string) -> `Singleton (`Null))
+                           _x))
+                   | T_754223ab79 _x -> `String
+                   end end);
+                  ("unit_amount", begin match _x.unit_amount with
+                   | None -> `Null | Some _x -> `Integer end);
+                  ("unit_amount_decimal",
+                   begin match _x.unit_amount_decimal with | None -> `Null
+                   | Some _x -> `String end)])) _x)))
+      ~ctr:(Json_encoding.construct Encoders'.t_6de1e50279)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_d7df29a1b1 ~p ~op ~loc ~style ~explode
-    (_x : t_d7df29a1b1) =
+  let string_of_t_f2803c8215 ~p ~op ~loc ~style ~explode
+    (_x : t_f2803c8215) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("type", let _x = _x.type_ in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_d7df29a1b1)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("type", let _x = _x.type_ in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_f2803c8215)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d7df29a1b1 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_d7df29a1b1) in _string_to
-      ~kind:(`ObjectN
-               [("", [`Any]); ("account", [`String]); ("type", [`String])])
+  let string_to_t_f2803c8215 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f2803c8215) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("account", `String); ("type", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_d7df29a1b1 ~p ~op ~loc ~style ~explode
-    (_x : t_d7df29a1b1) =
+  let namevalues_of_t_f2803c8215 ~p ~op ~loc ~style ~explode
+    (_x : t_f2803c8215) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("type", let _x = _x.type_ in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_d7df29a1b1)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("type", let _x = _x.type_ in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_f2803c8215)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_696a3e9ebe ~p ~op ~loc ~style ~explode
-    (_x : t_696a3e9ebe) =
+  let string_of_t_28b874eafa ~p ~op ~loc ~style ~explode
+    (_x : t_28b874eafa) =
     _string_of ~kind:(
-      match _x with
-      | T_ad3d0907b2 _x ->
+      begin match _x with
+      | T_aa2791e997 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_696a3e9ebe)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_28b874eafa)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_696a3e9ebe ~loc ~style ~explode (_x : string) =
+  let string_to_t_28b874eafa ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_ad3d0907b2) in
-        Option.map (fun _y : t_696a3e9ebe -> T_ad3d0907b2 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_aa2791e997) in
+        Option.map (fun _y : t_28b874eafa -> T_aa2791e997 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_696a3e9ebe -> Int _y)
+        Option.map (fun _y : t_28b874eafa -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_696a3e9ebe ~p ~op ~loc ~style ~explode
-    (_x : t_696a3e9ebe) =
+  let namevalues_of_t_28b874eafa ~p ~op ~loc ~style ~explode
+    (_x : t_28b874eafa) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_ad3d0907b2 _x ->
+      begin match _x with
+      | T_aa2791e997 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_696a3e9ebe)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_28b874eafa)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_4eafe4d677 ~p ~op ~loc ~style ~explode
-    (_x : t_4eafe4d677) =
+  let string_of_t_e7c047a717 ~p ~op ~loc ~style ~explode
+    (_x : t_e7c047a717) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_4eafe4d677)
+      ~ctr:(Json_encoding.construct Encoders'.t_e7c047a717)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4eafe4d677 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4eafe4d677) in _string_to
+  let string_to_t_e7c047a717 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e7c047a717) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_4eafe4d677 ~p ~op ~loc ~style ~explode
-    (_x : t_4eafe4d677) =
+  let namevalues_of_t_e7c047a717 ~p ~op ~loc ~style ~explode
+    (_x : t_e7c047a717) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_4eafe4d677)
+      ~ctr:(Json_encoding.construct Encoders'.t_e7c047a717)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_c208f0f2be ~p ~op ~loc ~style ~explode
-    (_x : t_c208f0f2be) =
+  let string_of_t_5e23dd8315 ~p ~op ~loc ~style ~explode
+    (_x : t_5e23dd8315) =
     _string_of ~kind:(
-      match _x with
-      | T_63d10e5660 _x ->
+      begin match _x with
+      | T_6da4b6eaaf _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_c208f0f2be)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_5e23dd8315)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c208f0f2be ~loc ~style ~explode (_x : string) =
+  let string_to_t_5e23dd8315 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_63d10e5660) in
-        Option.map (fun _y : t_c208f0f2be -> T_63d10e5660 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6da4b6eaaf) in
+        Option.map (fun _y : t_5e23dd8315 -> T_6da4b6eaaf _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_c208f0f2be -> Int _y)
+        Option.map (fun _y : t_5e23dd8315 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_c208f0f2be ~p ~op ~loc ~style ~explode
-    (_x : t_c208f0f2be) =
+  let namevalues_of_t_5e23dd8315 ~p ~op ~loc ~style ~explode
+    (_x : t_5e23dd8315) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_63d10e5660 _x ->
+      begin match _x with
+      | T_6da4b6eaaf _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_c208f0f2be)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_5e23dd8315)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_42e95c716a ~p ~op ~loc ~style ~explode
-    (_x : t_42e95c716a) =
+  let string_of_t_d05018810d ~p ~op ~loc ~style ~explode
+    (_x : t_d05018810d) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_42e95c716a)
+      ~ctr:(Json_encoding.construct Encoders'.t_d05018810d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_42e95c716a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_42e95c716a) in _string_to
+  let string_to_t_d05018810d ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_d05018810d) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_42e95c716a ~p ~op ~loc ~style ~explode
-    (_x : t_42e95c716a) =
+  let namevalues_of_t_d05018810d ~p ~op ~loc ~style ~explode
+    (_x : t_d05018810d) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_42e95c716a)
+      ~ctr:(Json_encoding.construct Encoders'.t_d05018810d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_04f985ad81 ~p ~op ~loc ~style ~explode
-    (_x : t_04f985ad81) =
+  let string_of_t_9b139b4e87 ~p ~op ~loc ~style ~explode
+    (_x : t_9b139b4e87) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_04f985ad81)
+      ~ctr:(Json_encoding.construct Encoders'.t_9b139b4e87)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_04f985ad81 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_04f985ad81) in _string_to
+  let string_to_t_9b139b4e87 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_9b139b4e87) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_04f985ad81 ~p ~op ~loc ~style ~explode
-    (_x : t_04f985ad81) =
+  let namevalues_of_t_9b139b4e87 ~p ~op ~loc ~style ~explode
+    (_x : t_9b139b4e87) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_04f985ad81)
+      ~ctr:(Json_encoding.construct Encoders'.t_9b139b4e87)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e67ab51d5e ~p ~op ~loc ~style ~explode
-    (_x : t_e67ab51d5e) =
+  let string_of_t_fd32e6450f ~p ~op ~loc ~style ~explode
+    (_x : t_fd32e6450f) =
     _string_of ~kind:(
-      match _x with
-      | T_0f859376f3 _x ->
+      begin match _x with
+      | T_c2905ff31f _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_e67ab51d5e)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_fd32e6450f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e67ab51d5e ~loc ~style ~explode (_x : string) =
+  let string_to_t_fd32e6450f ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_0f859376f3) in
-        Option.map (fun _y : t_e67ab51d5e -> T_0f859376f3 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_c2905ff31f) in
+        Option.map (fun _y : t_fd32e6450f -> T_c2905ff31f _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_e67ab51d5e -> Int _y)
+        Option.map (fun _y : t_fd32e6450f -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_e67ab51d5e ~p ~op ~loc ~style ~explode
-    (_x : t_e67ab51d5e) =
+  let namevalues_of_t_fd32e6450f ~p ~op ~loc ~style ~explode
+    (_x : t_fd32e6450f) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_0f859376f3 _x ->
+      begin match _x with
+      | T_c2905ff31f _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_e67ab51d5e)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_fd32e6450f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_5cacf53388 ~p ~op ~loc ~style ~explode
-    (_x : t_5cacf53388) =
+  let string_of_t_e2b1b56eac ~p ~op ~loc ~style ~explode
+    (_x : t_e2b1b56eac) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_5cacf53388)
+      ~ctr:(Json_encoding.construct Encoders'.t_e2b1b56eac)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_5cacf53388 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_5cacf53388) in _string_to
+  let string_to_t_e2b1b56eac ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e2b1b56eac) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_5cacf53388 ~p ~op ~loc ~style ~explode
-    (_x : t_5cacf53388) =
+  let namevalues_of_t_e2b1b56eac ~p ~op ~loc ~style ~explode
+    (_x : t_e2b1b56eac) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_5cacf53388)
+      ~ctr:(Json_encoding.construct Encoders'.t_e2b1b56eac)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_b413e28022 ~p ~op ~loc ~style ~explode
-    (_x : t_b413e28022) =
+  let string_of_t_e42a3414c1 ~p ~op ~loc ~style ~explode
+    (_x : t_e42a3414c1) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b413e28022)
+      ~ctr:(Json_encoding.construct Encoders'.t_e42a3414c1)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b413e28022 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b413e28022) in _string_to
+  let string_to_t_e42a3414c1 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e42a3414c1) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_b413e28022 ~p ~op ~loc ~style ~explode
-    (_x : t_b413e28022) =
+  let namevalues_of_t_e42a3414c1 ~p ~op ~loc ~style ~explode
+    (_x : t_e42a3414c1) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b413e28022)
+      ~ctr:(Json_encoding.construct Encoders'.t_e42a3414c1)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_1179a06704 ~p ~op ~loc ~style ~explode
-    (_x : t_1179a06704) =
+  let string_of_t_be86c12b19 ~p ~op ~loc ~style ~explode
+    (_x : t_be86c12b19) =
     _string_of ~kind:(
-      match _x with
-      | T_5e5642e567 _x ->
+      begin match _x with
+      | T_acdb658c9d _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_1179a06704)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_be86c12b19)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1179a06704 ~loc ~style ~explode (_x : string) =
+  let string_to_t_be86c12b19 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_5e5642e567) in
-        Option.map (fun _y : t_1179a06704 -> T_5e5642e567 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_acdb658c9d) in
+        Option.map (fun _y : t_be86c12b19 -> T_acdb658c9d _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_1179a06704 -> Int _y)
+        Option.map (fun _y : t_be86c12b19 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_1179a06704 ~p ~op ~loc ~style ~explode
-    (_x : t_1179a06704) =
+  let namevalues_of_t_be86c12b19 ~p ~op ~loc ~style ~explode
+    (_x : t_be86c12b19) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_5e5642e567 _x ->
+      begin match _x with
+      | T_acdb658c9d _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_1179a06704)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_be86c12b19)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_1da3cd165a ~p ~op ~loc ~style ~explode
-    (_x : t_1da3cd165a) =
+  let string_of_t_4b1fd7d313 ~p ~op ~loc ~style ~explode
+    (_x : t_4b1fd7d313) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_1da3cd165a)
+      ~ctr:(Json_encoding.construct Encoders'.t_4b1fd7d313)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1da3cd165a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_1da3cd165a) in _string_to
+  let string_to_t_4b1fd7d313 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4b1fd7d313) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_1da3cd165a ~p ~op ~loc ~style ~explode
-    (_x : t_1da3cd165a) =
+  let namevalues_of_t_4b1fd7d313 ~p ~op ~loc ~style ~explode
+    (_x : t_4b1fd7d313) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_1da3cd165a)
+      ~ctr:(Json_encoding.construct Encoders'.t_4b1fd7d313)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_1a2156a726 ~p ~op ~loc ~style ~explode
-    (_x : t_1a2156a726) =
+  let string_of_t_6565ec2878 ~p ~op ~loc ~style ~explode
+    (_x : t_6565ec2878) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("is_default", match _x.is_default with | None -> []
-          | Some _x -> [`Boolean]);
-         ("is_platform_default", match _x.is_platform_default with
-          | None -> [] | Some _x -> [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_1a2156a726)
+        [("", `Any);
+         ("is_default", begin match _x.is_default with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("is_platform_default", begin match _x.is_platform_default with
+          | None -> `Null | Some _x -> `Boolean end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_6565ec2878)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1a2156a726 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_1a2156a726) in _string_to
+  let string_to_t_6565ec2878 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6565ec2878) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("is_default", [`Boolean]);
-                ("is_platform_default", [`Boolean])])
+               [("", `Any); ("is_default", `Boolean);
+                ("is_platform_default", `Boolean)]) ~dtr ~loc ~style ~explode
+      _x
+  
+  let namevalues_of_t_6565ec2878 ~p ~op ~loc ~style ~explode
+    (_x : t_6565ec2878) =
+    _namevalues_of ~kind:(
+      `ObjectN
+        [("", `Any);
+         ("is_default", begin match _x.is_default with | None -> `Null
+          | Some _x -> `Boolean end);
+         ("is_platform_default", begin match _x.is_platform_default with
+          | None -> `Null | Some _x -> `Boolean end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_6565ec2878)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_386a8a09fc ~p ~op ~loc ~style ~explode
+    (_x : t_386a8a09fc) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_386a8a09fc)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_386a8a09fc ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_386a8a09fc) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_386a8a09fc ~p ~op ~loc ~style ~explode
+    (_x : t_386a8a09fc) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_386a8a09fc)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_3d82a38285 ~p ~op ~loc ~style ~explode
+    (_x : t_3d82a38285) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_3d82a38285)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_3d82a38285 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3d82a38285) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_3d82a38285 ~p ~op ~loc ~style ~explode
+    (_x : t_3d82a38285) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_3d82a38285)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_00d4956c80 ~p ~op ~loc ~style ~explode
+    (_x : t_00d4956c80) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_00d4956c80)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_00d4956c80 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_00d4956c80) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_00d4956c80 ~p ~op ~loc ~style ~explode
+    (_x : t_00d4956c80) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_00d4956c80)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_a985a64df2 ~p ~op ~loc ~style ~explode
+    (_x : t_a985a64df2) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_b6181859f2 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_a985a64df2)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_a985a64df2 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_b6181859f2) in
+        Option.map (fun _y : t_a985a64df2 -> T_b6181859f2 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_a985a64df2 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_a985a64df2 ~p ~op ~loc ~style ~explode
+    (_x : t_a985a64df2) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_b6181859f2 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_a985a64df2)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_9463e4703f ~p ~op ~loc ~style ~explode
+    (_x : t_9463e4703f) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_9463e4703f)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_9463e4703f ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_9463e4703f) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_9463e4703f ~p ~op ~loc ~style ~explode
+    (_x : t_9463e4703f) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_9463e4703f)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_a6ed41322f ~p ~op ~loc ~style ~explode
+    (_x : t_a6ed41322f) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_0bcc6214c1 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_a6ed41322f)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_a6ed41322f ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_0bcc6214c1) in
+        Option.map (fun _y : t_a6ed41322f -> T_0bcc6214c1 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_a6ed41322f -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_a6ed41322f ~p ~op ~loc ~style ~explode
+    (_x : t_a6ed41322f) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_0bcc6214c1 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_a6ed41322f)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_a13fab6ce7 ~p ~op ~loc ~style ~explode
+    (_x : t_a13fab6ce7) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_a13fab6ce7)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_a13fab6ce7 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a13fab6ce7) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_a13fab6ce7 ~p ~op ~loc ~style ~explode
+    (_x : t_a13fab6ce7) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_a13fab6ce7)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_89676accde ~p ~op ~loc ~style ~explode
+    (_x : t_89676accde) =
+    _string_of ~kind:(
+      `ObjectN
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("customer", begin match _x.customer with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_89676accde)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_89676accde ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_89676accde) in _string_to
+      ~kind:(`ObjectN
+               [("", `Any); ("account", `String); ("customer", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_1a2156a726 ~p ~op ~loc ~style ~explode
-    (_x : t_1a2156a726) =
+  let namevalues_of_t_89676accde ~p ~op ~loc ~style ~explode
+    (_x : t_89676accde) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("is_default", match _x.is_default with | None -> []
-          | Some _x -> [`Boolean]);
-         ("is_platform_default", match _x.is_platform_default with
-          | None -> [] | Some _x -> [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_1a2156a726)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("customer", begin match _x.customer with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_89676accde)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_e7cf5da208 ~p ~op ~loc ~style ~explode
-    (_x : t_e7cf5da208) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_e7cf5da208)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_e7cf5da208 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e7cf5da208) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_e7cf5da208 ~p ~op ~loc ~style ~explode
-    (_x : t_e7cf5da208) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_e7cf5da208)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_8fef9d57c9 ~p ~op ~loc ~style ~explode
-    (_x : t_8fef9d57c9) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8fef9d57c9)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_8fef9d57c9 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_8fef9d57c9) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_8fef9d57c9 ~p ~op ~loc ~style ~explode
-    (_x : t_8fef9d57c9) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8fef9d57c9)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_849ed17da9 ~p ~op ~loc ~style ~explode
-    (_x : t_849ed17da9) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_849ed17da9)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_849ed17da9 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_849ed17da9) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_849ed17da9 ~p ~op ~loc ~style ~explode
-    (_x : t_849ed17da9) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_849ed17da9)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_16deab6c5d ~p ~op ~loc ~style ~explode
-    (_x : t_16deab6c5d) =
+  let string_of_t_94e066c621 ~p ~op ~loc ~style ~explode
+    (_x : t_94e066c621) =
     _string_of ~kind:(
-      match _x with
-      | T_679fee6239 _x ->
+      begin match _x with
+      | T_92de2c55be _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_16deab6c5d)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_94e066c621)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_16deab6c5d ~loc ~style ~explode (_x : string) =
+  let string_to_t_94e066c621 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_679fee6239) in
-        Option.map (fun _y : t_16deab6c5d -> T_679fee6239 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_92de2c55be) in
+        Option.map (fun _y : t_94e066c621 -> T_92de2c55be _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_16deab6c5d -> Int _y)
+        Option.map (fun _y : t_94e066c621 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_16deab6c5d ~p ~op ~loc ~style ~explode
-    (_x : t_16deab6c5d) =
+  let namevalues_of_t_94e066c621 ~p ~op ~loc ~style ~explode
+    (_x : t_94e066c621) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_679fee6239 _x ->
+      begin match _x with
+      | T_92de2c55be _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_16deab6c5d)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_94e066c621)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_11e340ed02 ~p ~op ~loc ~style ~explode
-    (_x : t_11e340ed02) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_11e340ed02)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_11e340ed02 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_11e340ed02) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_11e340ed02 ~p ~op ~loc ~style ~explode
-    (_x : t_11e340ed02) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_11e340ed02)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_0e1a6c56e3 ~p ~op ~loc ~style ~explode
-    (_x : t_0e1a6c56e3) =
+  let string_of_t_41b2207b76 ~p ~op ~loc ~style ~explode
+    (_x : t_41b2207b76) =
     _string_of ~kind:(
-      match _x with
-      | T_9010f53dfa _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_0e1a6c56e3)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_0e1a6c56e3 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_9010f53dfa) in
-        Option.map (fun _y : t_0e1a6c56e3 -> T_9010f53dfa _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_0e1a6c56e3 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_0e1a6c56e3 ~p ~op ~loc ~style ~explode
-    (_x : t_0e1a6c56e3) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_9010f53dfa _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_0e1a6c56e3)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_a6d8c1a3b9 ~p ~op ~loc ~style ~explode
-    (_x : t_a6d8c1a3b9) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_a6d8c1a3b9)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_a6d8c1a3b9 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_a6d8c1a3b9) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_a6d8c1a3b9 ~p ~op ~loc ~style ~explode
-    (_x : t_a6d8c1a3b9) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_a6d8c1a3b9)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_7916492c96 ~p ~op ~loc ~style ~explode
-    (_x : t_7916492c96) =
-    _string_of ~kind:(
-      `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("customer", match _x.customer with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_7916492c96)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_7916492c96 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_7916492c96) in _string_to
-      ~kind:(`ObjectN
-               [("", [`Any]); ("account", [`String]);
-                ("customer", [`String])]) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_7916492c96 ~p ~op ~loc ~style ~explode
-    (_x : t_7916492c96) =
-    _namevalues_of ~kind:(
-      `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("customer", match _x.customer with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_7916492c96)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_ccfa0625d1 ~p ~op ~loc ~style ~explode
-    (_x : t_ccfa0625d1) =
-    _string_of ~kind:(
-      match _x with
-      | T_77b9426cb6 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_ccfa0625d1)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_ccfa0625d1 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_77b9426cb6) in
-        Option.map (fun _y : t_ccfa0625d1 -> T_77b9426cb6 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_ccfa0625d1 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_ccfa0625d1 ~p ~op ~loc ~style ~explode
-    (_x : t_ccfa0625d1) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_77b9426cb6 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_ccfa0625d1)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_6fdb9283b0 ~p ~op ~loc ~style ~explode
-    (_x : t_6fdb9283b0) =
-    _string_of ~kind:(
-      match _x with
+      begin match _x with
       | String_ _x -> `String
-      | T_d0cc26608d _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_6fdb9283b0)
+      | T_15b592bd4c _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_41b2207b76)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_6fdb9283b0 ~loc ~style ~explode (_x : string) =
+  let string_to_t_41b2207b76 ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Json_encoding.string) in
-        Option.map (fun _y : t_6fdb9283b0 -> String_ _y)
+        Option.map (fun _y : t_41b2207b76 -> String_ _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
-        let dtr = (Json_encoding.destruct Encoders'.t_d0cc26608d) in
-        Option.map (fun _y : t_6fdb9283b0 -> T_d0cc26608d _y)
+        let dtr = (Json_encoding.destruct Encoders'.t_15b592bd4c) in
+        Option.map (fun _y : t_41b2207b76 -> T_15b592bd4c _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_6fdb9283b0 ~p ~op ~loc ~style ~explode
-    (_x : t_6fdb9283b0) =
+  let namevalues_of_t_41b2207b76 ~p ~op ~loc ~style ~explode
+    (_x : t_41b2207b76) =
     _namevalues_of ~kind:(
-      match _x with
+      begin match _x with
       | String_ _x -> `String
-      | T_d0cc26608d _x -> `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_6fdb9283b0)
+      | T_15b592bd4c _x -> `String
+      end) ~ctr:(Json_encoding.construct Encoders'.t_41b2207b76)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_cecc48b8cb ~p ~op ~loc ~style ~explode
-    (_x : t_cecc48b8cb) =
+  let string_of_t_735ee27343 ~p ~op ~loc ~style ~explode
+    (_x : t_735ee27343) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_cecc48b8cb)
+      ~ctr:(Json_encoding.construct Encoders'.t_735ee27343)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_cecc48b8cb ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_cecc48b8cb) in _string_to
+  let string_to_t_735ee27343 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_735ee27343) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_cecc48b8cb ~p ~op ~loc ~style ~explode
-    (_x : t_cecc48b8cb) =
+  let namevalues_of_t_735ee27343 ~p ~op ~loc ~style ~explode
+    (_x : t_735ee27343) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_cecc48b8cb)
+      ~ctr:(Json_encoding.construct Encoders'.t_735ee27343)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_bd57aeef7a ~p ~op ~loc ~style ~explode
-    (_x : t_bd57aeef7a) =
+  let string_of_t_dfda23638e ~p ~op ~loc ~style ~explode
+    (_x : t_dfda23638e) =
     _string_of ~kind:(
-      match _x with
-      | T_12ebff1666 _x ->
+      begin match _x with
+      | T_f942927e0c _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_bd57aeef7a)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_dfda23638e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_bd57aeef7a ~loc ~style ~explode (_x : string) =
+  let string_to_t_dfda23638e ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_12ebff1666) in
-        Option.map (fun _y : t_bd57aeef7a -> T_12ebff1666 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f942927e0c) in
+        Option.map (fun _y : t_dfda23638e -> T_f942927e0c _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_bd57aeef7a -> Int _y)
+        Option.map (fun _y : t_dfda23638e -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_bd57aeef7a ~p ~op ~loc ~style ~explode
-    (_x : t_bd57aeef7a) =
+  let namevalues_of_t_dfda23638e ~p ~op ~loc ~style ~explode
+    (_x : t_dfda23638e) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_12ebff1666 _x ->
+      begin match _x with
+      | T_f942927e0c _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_bd57aeef7a)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_dfda23638e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_d3ce6eb417 ~p ~op ~loc ~style ~explode
-    (_x : t_d3ce6eb417) =
+  let string_of_t_78f6837d46 ~p ~op ~loc ~style ~explode
+    (_x : t_78f6837d46) =
     _string_of ~kind:(
-      match _x with
-      | T_43eb7a27c0 _x ->
+      begin match _x with
+      | T_fb7e928310 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d3ce6eb417)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_78f6837d46)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d3ce6eb417 ~loc ~style ~explode (_x : string) =
+  let string_to_t_78f6837d46 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_43eb7a27c0) in
-        Option.map (fun _y : t_d3ce6eb417 -> T_43eb7a27c0 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_fb7e928310) in
+        Option.map (fun _y : t_78f6837d46 -> T_fb7e928310 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_d3ce6eb417 -> Int _y)
+        Option.map (fun _y : t_78f6837d46 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_d3ce6eb417 ~p ~op ~loc ~style ~explode
-    (_x : t_d3ce6eb417) =
+  let namevalues_of_t_78f6837d46 ~p ~op ~loc ~style ~explode
+    (_x : t_78f6837d46) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_43eb7a27c0 _x ->
+      begin match _x with
+      | T_fb7e928310 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d3ce6eb417)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_78f6837d46)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_d4fbe66228 ~p ~op ~loc ~style ~explode
-    (_x : t_d4fbe66228) =
+  let string_of_t_c85fb118c6 ~p ~op ~loc ~style ~explode
+    (_x : t_c85fb118c6) =
     _string_of ~kind:(
-      match _x with
-      | T_ddf2c3a961 _x ->
+      begin match _x with
+      | T_918279e85e _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d4fbe66228)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c85fb118c6)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d4fbe66228 ~loc ~style ~explode (_x : string) =
+  let string_to_t_c85fb118c6 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_ddf2c3a961) in
-        Option.map (fun _y : t_d4fbe66228 -> T_ddf2c3a961 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_918279e85e) in
+        Option.map (fun _y : t_c85fb118c6 -> T_918279e85e _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_d4fbe66228 -> Int _y)
+        Option.map (fun _y : t_c85fb118c6 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_d4fbe66228 ~p ~op ~loc ~style ~explode
-    (_x : t_d4fbe66228) =
+  let namevalues_of_t_c85fb118c6 ~p ~op ~loc ~style ~explode
+    (_x : t_c85fb118c6) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_ddf2c3a961 _x ->
+      begin match _x with
+      | T_918279e85e _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_d4fbe66228)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c85fb118c6)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_6bdfe70bb0 ~p ~op ~loc ~style ~explode
-    (_x : t_6bdfe70bb0) =
+  let string_of_t_5c423aae2d ~p ~op ~loc ~style ~explode
+    (_x : t_5c423aae2d) =
     _string_of ~kind:(
-      match _x with
-      | T_5041768af0 _x ->
+      begin match _x with
+      | T_156f1957fc _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_6bdfe70bb0)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_5c423aae2d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_6bdfe70bb0 ~loc ~style ~explode (_x : string) =
+  let string_to_t_5c423aae2d ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_5041768af0) in
-        Option.map (fun _y : t_6bdfe70bb0 -> T_5041768af0 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_156f1957fc) in
+        Option.map (fun _y : t_5c423aae2d -> T_156f1957fc _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_6bdfe70bb0 -> Int _y)
+        Option.map (fun _y : t_5c423aae2d -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_6bdfe70bb0 ~p ~op ~loc ~style ~explode
-    (_x : t_6bdfe70bb0) =
+  let namevalues_of_t_5c423aae2d ~p ~op ~loc ~style ~explode
+    (_x : t_5c423aae2d) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_5041768af0 _x ->
+      begin match _x with
+      | T_156f1957fc _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_6bdfe70bb0)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_5c423aae2d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_2774ea4fcd ~p ~op ~loc ~style ~explode
-    (_x : t_2774ea4fcd) =
+  let string_of_t_806c738ca8 ~p ~op ~loc ~style ~explode
+    (_x : t_806c738ca8) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_2774ea4fcd)
+      ~ctr:(Json_encoding.construct Encoders'.t_806c738ca8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2774ea4fcd ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_2774ea4fcd) in _string_to
+  let string_to_t_806c738ca8 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_806c738ca8) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_2774ea4fcd ~p ~op ~loc ~style ~explode
-    (_x : t_2774ea4fcd) =
+  let namevalues_of_t_806c738ca8 ~p ~op ~loc ~style ~explode
+    (_x : t_806c738ca8) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_2774ea4fcd)
+      ~ctr:(Json_encoding.construct Encoders'.t_806c738ca8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_0aad2a8fdd ~p ~op ~loc ~style ~explode
-    (_x : t_0aad2a8fdd) =
+  let string_of_t_54d3503cdb ~p ~op ~loc ~style ~explode
+    (_x : t_54d3503cdb) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("interval", match _x.interval with | None -> []
-          | Some _x -> [`String]);
-         ("meter", match _x.meter with | None -> [] | Some _x -> [`String]);
-         ("usage_type", match _x.usage_type with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_0aad2a8fdd)
+        [("", `Any);
+         ("interval", begin match _x.interval with | None -> `Null
+          | Some _x -> `String end);
+         ("meter", begin match _x.meter with | None -> `Null | Some _x ->
+          `String end);
+         ("usage_type", begin match _x.usage_type with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_54d3503cdb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0aad2a8fdd ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_0aad2a8fdd) in _string_to
+  let string_to_t_54d3503cdb ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_54d3503cdb) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("interval", [`String]); ("meter", [`String]);
-                ("usage_type", [`String])]) ~dtr ~loc ~style ~explode _x
+               [("", `Any); ("interval", `String); ("meter", `String);
+                ("usage_type", `String)]) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_0aad2a8fdd ~p ~op ~loc ~style ~explode
-    (_x : t_0aad2a8fdd) =
+  let namevalues_of_t_54d3503cdb ~p ~op ~loc ~style ~explode
+    (_x : t_54d3503cdb) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("interval", match _x.interval with | None -> []
-          | Some _x -> [`String]);
-         ("meter", match _x.meter with | None -> [] | Some _x -> [`String]);
-         ("usage_type", match _x.usage_type with | None -> []
-          | Some _x -> [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_0aad2a8fdd)
+        [("", `Any);
+         ("interval", begin match _x.interval with | None -> `Null
+          | Some _x -> `String end);
+         ("meter", begin match _x.meter with | None -> `Null | Some _x ->
+          `String end);
+         ("usage_type", begin match _x.usage_type with | None -> `Null
+          | Some _x -> `String end)])
+      ~ctr:(Json_encoding.construct Encoders'.t_54d3503cdb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_08493db080 ~p ~op ~loc ~style ~explode
-    (_x : t_08493db080) =
+  let string_of_t_c04b129744 ~p ~op ~loc ~style ~explode
+    (_x : t_c04b129744) =
     _string_of ~kind:(
-      match _x with
-      | T_770e6696c9 _x ->
+      begin match _x with
+      | T_818f6dfe63 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_08493db080)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c04b129744)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_08493db080 ~loc ~style ~explode (_x : string) =
+  let string_to_t_c04b129744 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_770e6696c9) in
-        Option.map (fun _y : t_08493db080 -> T_770e6696c9 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_818f6dfe63) in
+        Option.map (fun _y : t_c04b129744 -> T_818f6dfe63 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_08493db080 -> Int _y)
+        Option.map (fun _y : t_c04b129744 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_08493db080 ~p ~op ~loc ~style ~explode
-    (_x : t_08493db080) =
+  let namevalues_of_t_c04b129744 ~p ~op ~loc ~style ~explode
+    (_x : t_c04b129744) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_770e6696c9 _x ->
+      begin match _x with
+      | T_818f6dfe63 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_08493db080)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c04b129744)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_4c5ec3b7e2 ~p ~op ~loc ~style ~explode
-    (_x : t_4c5ec3b7e2) =
+  let string_of_t_1d3358b59f ~p ~op ~loc ~style ~explode
+    (_x : t_1d3358b59f) =
     _string_of ~kind:(
-      match _x with
-      | T_e879f1315e _x ->
+      begin match _x with
+      | T_5a93111bd9 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_4c5ec3b7e2)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_1d3358b59f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4c5ec3b7e2 ~loc ~style ~explode (_x : string) =
+  let string_to_t_1d3358b59f ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_e879f1315e) in
-        Option.map (fun _y : t_4c5ec3b7e2 -> T_e879f1315e _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_5a93111bd9) in
+        Option.map (fun _y : t_1d3358b59f -> T_5a93111bd9 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_4c5ec3b7e2 -> Int _y)
+        Option.map (fun _y : t_1d3358b59f -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_4c5ec3b7e2 ~p ~op ~loc ~style ~explode
-    (_x : t_4c5ec3b7e2) =
+  let namevalues_of_t_1d3358b59f ~p ~op ~loc ~style ~explode
+    (_x : t_1d3358b59f) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_e879f1315e _x ->
+      begin match _x with
+      | T_5a93111bd9 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_4c5ec3b7e2)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_1d3358b59f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_2bdd288b56 ~p ~op ~loc ~style ~explode
-    (_x : t_2bdd288b56) =
+  let string_of_t_b2c88d22a6 ~p ~op ~loc ~style ~explode
+    (_x : t_b2c88d22a6) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_2bdd288b56)
+      ~ctr:(Json_encoding.construct Encoders'.t_b2c88d22a6)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2bdd288b56 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_2bdd288b56) in _string_to
+  let string_to_t_b2c88d22a6 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b2c88d22a6) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_2bdd288b56 ~p ~op ~loc ~style ~explode
-    (_x : t_2bdd288b56) =
+  let namevalues_of_t_b2c88d22a6 ~p ~op ~loc ~style ~explode
+    (_x : t_b2c88d22a6) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_2bdd288b56)
+      ~ctr:(Json_encoding.construct Encoders'.t_b2c88d22a6)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_33d7eada29 ~p ~op ~loc ~style ~explode
-    (_x : t_33d7eada29) =
+  let string_of_t_902cd52d55 ~p ~op ~loc ~style ~explode
+    (_x : t_902cd52d55) =
     _string_of ~kind:(
-      match _x with
-      | T_117ccb3cf4 _x ->
+      begin match _x with
+      | T_0942bf866d _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_33d7eada29)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_902cd52d55)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_33d7eada29 ~loc ~style ~explode (_x : string) =
+  let string_to_t_902cd52d55 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_117ccb3cf4) in
-        Option.map (fun _y : t_33d7eada29 -> T_117ccb3cf4 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_0942bf866d) in
+        Option.map (fun _y : t_902cd52d55 -> T_0942bf866d _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_33d7eada29 -> Int _y)
+        Option.map (fun _y : t_902cd52d55 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_33d7eada29 ~p ~op ~loc ~style ~explode
-    (_x : t_33d7eada29) =
+  let namevalues_of_t_902cd52d55 ~p ~op ~loc ~style ~explode
+    (_x : t_902cd52d55) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_117ccb3cf4 _x ->
+      begin match _x with
+      | T_0942bf866d _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_33d7eada29)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_902cd52d55)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_9ab8527734 ~p ~op ~loc ~style ~explode
-    (_x : t_9ab8527734) =
+  let string_of_t_438f8e3e47 ~p ~op ~loc ~style ~explode
+    (_x : t_438f8e3e47) =
     _string_of ~kind:(
-      match _x with
-      | T_f4df2ca6e3 _x ->
+      begin match _x with
+      | T_6c02505772 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9ab8527734)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_438f8e3e47)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9ab8527734 ~loc ~style ~explode (_x : string) =
+  let string_to_t_438f8e3e47 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_f4df2ca6e3) in
-        Option.map (fun _y : t_9ab8527734 -> T_f4df2ca6e3 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6c02505772) in
+        Option.map (fun _y : t_438f8e3e47 -> T_6c02505772 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_9ab8527734 -> Int _y)
+        Option.map (fun _y : t_438f8e3e47 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_9ab8527734 ~p ~op ~loc ~style ~explode
-    (_x : t_9ab8527734) =
+  let namevalues_of_t_438f8e3e47 ~p ~op ~loc ~style ~explode
+    (_x : t_438f8e3e47) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_f4df2ca6e3 _x ->
+      begin match _x with
+      | T_6c02505772 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9ab8527734)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_438f8e3e47)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_485be60dff ~p ~op ~loc ~style ~explode
-    (_x : t_485be60dff) =
+  let string_of_t_b205fb898b ~p ~op ~loc ~style ~explode
+    (_x : t_b205fb898b) =
     _string_of ~kind:(
-      match _x with
-      | T_4ae3a56714 _x ->
+      begin match _x with
+      | T_f99ca180bb _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_485be60dff)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b205fb898b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_485be60dff ~loc ~style ~explode (_x : string) =
+  let string_to_t_b205fb898b ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_4ae3a56714) in
-        Option.map (fun _y : t_485be60dff -> T_4ae3a56714 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f99ca180bb) in
+        Option.map (fun _y : t_b205fb898b -> T_f99ca180bb _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_485be60dff -> Int _y)
+        Option.map (fun _y : t_b205fb898b -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_485be60dff ~p ~op ~loc ~style ~explode
-    (_x : t_485be60dff) =
+  let namevalues_of_t_b205fb898b ~p ~op ~loc ~style ~explode
+    (_x : t_b205fb898b) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_4ae3a56714 _x ->
+      begin match _x with
+      | T_f99ca180bb _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_485be60dff)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b205fb898b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_94f3045432 ~p ~op ~loc ~style ~explode
-    (_x : t_94f3045432) =
+  let string_of_t_c862988285 ~p ~op ~loc ~style ~explode
+    (_x : t_c862988285) =
     _string_of ~kind:(
-      match _x with
-      | T_4bda2929bc _x ->
+      begin match _x with
+      | T_a7f5f95f2b _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_94f3045432)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c862988285)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_94f3045432 ~loc ~style ~explode (_x : string) =
+  let string_to_t_c862988285 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_4bda2929bc) in
-        Option.map (fun _y : t_94f3045432 -> T_4bda2929bc _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_a7f5f95f2b) in
+        Option.map (fun _y : t_c862988285 -> T_a7f5f95f2b _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_94f3045432 -> Int _y)
+        Option.map (fun _y : t_c862988285 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_94f3045432 ~p ~op ~loc ~style ~explode
-    (_x : t_94f3045432) =
+  let namevalues_of_t_c862988285 ~p ~op ~loc ~style ~explode
+    (_x : t_c862988285) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_4bda2929bc _x ->
+      begin match _x with
+      | T_a7f5f95f2b _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_94f3045432)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c862988285)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_bfeba0d067 ~p ~op ~loc ~style ~explode
-    (_x : t_bfeba0d067) =
+  let string_of_t_95b7b73ff8 ~p ~op ~loc ~style ~explode
+    (_x : t_95b7b73ff8) =
     _string_of ~kind:(
-      match _x with
-      | T_d0739df243 _x ->
+      begin match _x with
+      | T_3e044be4e2 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_bfeba0d067)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_95b7b73ff8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_bfeba0d067 ~loc ~style ~explode (_x : string) =
+  let string_to_t_95b7b73ff8 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_d0739df243) in
-        Option.map (fun _y : t_bfeba0d067 -> T_d0739df243 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_3e044be4e2) in
+        Option.map (fun _y : t_95b7b73ff8 -> T_3e044be4e2 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_bfeba0d067 -> Int _y)
+        Option.map (fun _y : t_95b7b73ff8 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_bfeba0d067 ~p ~op ~loc ~style ~explode
-    (_x : t_bfeba0d067) =
+  let namevalues_of_t_95b7b73ff8 ~p ~op ~loc ~style ~explode
+    (_x : t_95b7b73ff8) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_d0739df243 _x ->
+      begin match _x with
+      | T_3e044be4e2 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_bfeba0d067)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_95b7b73ff8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_977617a7a1 ~p ~op ~loc ~style ~explode
-    (_x : t_977617a7a1) =
+  let string_of_t_91991d11ce ~p ~op ~loc ~style ~explode
+    (_x : t_91991d11ce) =
     _string_of ~kind:(
-      match _x with
-      | T_c4a4990e10 _x ->
+      begin match _x with
+      | T_d267e559df _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_977617a7a1)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_91991d11ce)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_977617a7a1 ~loc ~style ~explode (_x : string) =
+  let string_to_t_91991d11ce ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_c4a4990e10) in
-        Option.map (fun _y : t_977617a7a1 -> T_c4a4990e10 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_d267e559df) in
+        Option.map (fun _y : t_91991d11ce -> T_d267e559df _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_977617a7a1 -> Int _y)
+        Option.map (fun _y : t_91991d11ce -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_977617a7a1 ~p ~op ~loc ~style ~explode
-    (_x : t_977617a7a1) =
+  let namevalues_of_t_91991d11ce ~p ~op ~loc ~style ~explode
+    (_x : t_91991d11ce) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_c4a4990e10 _x ->
+      begin match _x with
+      | T_d267e559df _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_977617a7a1)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_91991d11ce)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_55fe964136 ~p ~op ~loc ~style ~explode
-    (_x : t_55fe964136) =
+  let string_of_t_62ebe57aa0 ~p ~op ~loc ~style ~explode
+    (_x : t_62ebe57aa0) =
     _string_of ~kind:(
-      match _x with
-      | T_76bd2f1645 _x ->
+      begin match _x with
+      | T_c8869a1e90 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_55fe964136)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_62ebe57aa0)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_55fe964136 ~loc ~style ~explode (_x : string) =
+  let string_to_t_62ebe57aa0 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_76bd2f1645) in
-        Option.map (fun _y : t_55fe964136 -> T_76bd2f1645 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_c8869a1e90) in
+        Option.map (fun _y : t_62ebe57aa0 -> T_c8869a1e90 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_55fe964136 -> Int _y)
+        Option.map (fun _y : t_62ebe57aa0 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_55fe964136 ~p ~op ~loc ~style ~explode
-    (_x : t_55fe964136) =
+  let namevalues_of_t_62ebe57aa0 ~p ~op ~loc ~style ~explode
+    (_x : t_62ebe57aa0) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_76bd2f1645 _x ->
+      begin match _x with
+      | T_c8869a1e90 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_55fe964136)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_62ebe57aa0)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_a26042e7d2 ~p ~op ~loc ~style ~explode
-    (_x : t_a26042e7d2) =
+  let string_of_t_47dcc46a23 ~p ~op ~loc ~style ~explode
+    (_x : t_47dcc46a23) =
     _string_of ~kind:(
-      match _x with
-      | T_047bcb5a00 _x ->
+      begin match _x with
+      | T_0a007f4c7b _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_a26042e7d2)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_47dcc46a23)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a26042e7d2 ~loc ~style ~explode (_x : string) =
+  let string_to_t_47dcc46a23 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_047bcb5a00) in
-        Option.map (fun _y : t_a26042e7d2 -> T_047bcb5a00 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_0a007f4c7b) in
+        Option.map (fun _y : t_47dcc46a23 -> T_0a007f4c7b _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_a26042e7d2 -> Int _y)
+        Option.map (fun _y : t_47dcc46a23 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_a26042e7d2 ~p ~op ~loc ~style ~explode
-    (_x : t_a26042e7d2) =
+  let namevalues_of_t_47dcc46a23 ~p ~op ~loc ~style ~explode
+    (_x : t_47dcc46a23) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_047bcb5a00 _x ->
+      begin match _x with
+      | T_0a007f4c7b _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_a26042e7d2)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_47dcc46a23)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_098e02745c ~p ~op ~loc ~style ~explode
-    (_x : t_098e02745c) =
+  let string_of_t_3115fde6ed ~p ~op ~loc ~style ~explode
+    (_x : t_3115fde6ed) =
     _string_of ~kind:(
-      match _x with
-      | T_3a3e536ba6 _x ->
+      begin match _x with
+      | T_8e372f4d99 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_098e02745c)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_3115fde6ed)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_098e02745c ~loc ~style ~explode (_x : string) =
+  let string_to_t_3115fde6ed ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_3a3e536ba6) in
-        Option.map (fun _y : t_098e02745c -> T_3a3e536ba6 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8e372f4d99) in
+        Option.map (fun _y : t_3115fde6ed -> T_8e372f4d99 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_098e02745c -> Int _y)
+        Option.map (fun _y : t_3115fde6ed -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_098e02745c ~p ~op ~loc ~style ~explode
-    (_x : t_098e02745c) =
+  let namevalues_of_t_3115fde6ed ~p ~op ~loc ~style ~explode
+    (_x : t_3115fde6ed) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_3a3e536ba6 _x ->
+      begin match _x with
+      | T_8e372f4d99 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_098e02745c)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_3115fde6ed)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_b40f11dd64 ~p ~op ~loc ~style ~explode
-    (_x : t_b40f11dd64) =
+  let string_of_t_edb9c04aba ~p ~op ~loc ~style ~explode
+    (_x : t_edb9c04aba) =
     _string_of ~kind:(
-      match _x with
-      | T_e6fbfafc9e _x ->
+      begin match _x with
+      | T_8dfd931249 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_b40f11dd64)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_edb9c04aba)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b40f11dd64 ~loc ~style ~explode (_x : string) =
+  let string_to_t_edb9c04aba ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_e6fbfafc9e) in
-        Option.map (fun _y : t_b40f11dd64 -> T_e6fbfafc9e _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8dfd931249) in
+        Option.map (fun _y : t_edb9c04aba -> T_8dfd931249 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_b40f11dd64 -> Int _y)
+        Option.map (fun _y : t_edb9c04aba -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_b40f11dd64 ~p ~op ~loc ~style ~explode
-    (_x : t_b40f11dd64) =
+  let namevalues_of_t_edb9c04aba ~p ~op ~loc ~style ~explode
+    (_x : t_edb9c04aba) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_e6fbfafc9e _x ->
+      begin match _x with
+      | T_8dfd931249 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_b40f11dd64)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_edb9c04aba)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_9e8c6bcf30 ~p ~op ~loc ~style ~explode
-    (_x : t_9e8c6bcf30) =
+  let string_of_t_b053f4a10e ~p ~op ~loc ~style ~explode
+    (_x : t_b053f4a10e) =
     _string_of ~kind:(
-      match _x with
-      | T_4e99cdf5bf _x ->
+      begin match _x with
+      | T_7e5129cd97 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9e8c6bcf30)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b053f4a10e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9e8c6bcf30 ~loc ~style ~explode (_x : string) =
+  let string_to_t_b053f4a10e ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_4e99cdf5bf) in
-        Option.map (fun _y : t_9e8c6bcf30 -> T_4e99cdf5bf _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_7e5129cd97) in
+        Option.map (fun _y : t_b053f4a10e -> T_7e5129cd97 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_9e8c6bcf30 -> Int _y)
+        Option.map (fun _y : t_b053f4a10e -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_9e8c6bcf30 ~p ~op ~loc ~style ~explode
-    (_x : t_9e8c6bcf30) =
+  let namevalues_of_t_b053f4a10e ~p ~op ~loc ~style ~explode
+    (_x : t_b053f4a10e) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_4e99cdf5bf _x ->
+      begin match _x with
+      | T_7e5129cd97 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9e8c6bcf30)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_b053f4a10e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_a1fe692430 ~p ~op ~loc ~style ~explode
-    (_x : t_a1fe692430) =
+  let string_of_t_8dd946adeb ~p ~op ~loc ~style ~explode
+    (_x : t_8dd946adeb) =
     _string_of ~kind:(
-      match _x with
-      | T_89d68ef140 _x ->
+      begin match _x with
+      | T_704964c184 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_a1fe692430)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8dd946adeb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a1fe692430 ~loc ~style ~explode (_x : string) =
+  let string_to_t_8dd946adeb ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_89d68ef140) in
-        Option.map (fun _y : t_a1fe692430 -> T_89d68ef140 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_704964c184) in
+        Option.map (fun _y : t_8dd946adeb -> T_704964c184 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_a1fe692430 -> Int _y)
+        Option.map (fun _y : t_8dd946adeb -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_a1fe692430 ~p ~op ~loc ~style ~explode
-    (_x : t_a1fe692430) =
+  let namevalues_of_t_8dd946adeb ~p ~op ~loc ~style ~explode
+    (_x : t_8dd946adeb) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_89d68ef140 _x ->
+      begin match _x with
+      | T_704964c184 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_a1fe692430)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_8dd946adeb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_9aa6380ae2 ~p ~op ~loc ~style ~explode
-    (_x : t_9aa6380ae2) =
+  let string_of_t_e65a202262 ~p ~op ~loc ~style ~explode
+    (_x : t_e65a202262) =
     _string_of ~kind:(
-      match _x with
-      | T_6dfe2361cf _x ->
+      begin match _x with
+      | T_153437e623 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9aa6380ae2)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_e65a202262)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9aa6380ae2 ~loc ~style ~explode (_x : string) =
+  let string_to_t_e65a202262 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_6dfe2361cf) in
-        Option.map (fun _y : t_9aa6380ae2 -> T_6dfe2361cf _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_153437e623) in
+        Option.map (fun _y : t_e65a202262 -> T_153437e623 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_9aa6380ae2 -> Int _y)
+        Option.map (fun _y : t_e65a202262 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_9aa6380ae2 ~p ~op ~loc ~style ~explode
-    (_x : t_9aa6380ae2) =
+  let namevalues_of_t_e65a202262 ~p ~op ~loc ~style ~explode
+    (_x : t_e65a202262) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_6dfe2361cf _x ->
+      begin match _x with
+      | T_153437e623 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9aa6380ae2)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_e65a202262)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_0a6220e696 ~p ~op ~loc ~style ~explode
-    (_x : t_0a6220e696) =
+  let string_of_t_b1188f80a4 ~p ~op ~loc ~style ~explode
+    (_x : t_b1188f80a4) =
     _string_of ~kind:(
-      `ObjectN [("", [`Any]); ("enabled", let _x = _x.enabled in [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_0a6220e696)
+      `ObjectN [("", `Any); ("enabled", let _x = _x.enabled in `Boolean)])
+      ~ctr:(Json_encoding.construct Encoders'.t_b1188f80a4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0a6220e696 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_0a6220e696) in _string_to
-      ~kind:(`ObjectN [("", [`Any]); ("enabled", [`Boolean])])
+  let string_to_t_b1188f80a4 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b1188f80a4) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("enabled", `Boolean)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_0a6220e696 ~p ~op ~loc ~style ~explode
-    (_x : t_0a6220e696) =
+  let namevalues_of_t_b1188f80a4 ~p ~op ~loc ~style ~explode
+    (_x : t_b1188f80a4) =
     _namevalues_of ~kind:(
-      `ObjectN [("", [`Any]); ("enabled", let _x = _x.enabled in [`Boolean])])
-      ~ctr:(Json_encoding.construct Encoders'.t_0a6220e696)
+      `ObjectN [("", `Any); ("enabled", let _x = _x.enabled in `Boolean)])
+      ~ctr:(Json_encoding.construct Encoders'.t_b1188f80a4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_f32678b2ef ~p ~op ~loc ~style ~explode
-    (_x : t_f32678b2ef) =
+  let string_of_t_d2098cac25 ~p ~op ~loc ~style ~explode
+    (_x : t_d2098cac25) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_f32678b2ef)
+      ~ctr:(Json_encoding.construct Encoders'.t_d2098cac25)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f32678b2ef ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f32678b2ef) in _string_to
+  let string_to_t_d2098cac25 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_d2098cac25) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_f32678b2ef ~p ~op ~loc ~style ~explode
-    (_x : t_f32678b2ef) =
+  let namevalues_of_t_d2098cac25 ~p ~op ~loc ~style ~explode
+    (_x : t_d2098cac25) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_f32678b2ef)
+      ~ctr:(Json_encoding.construct Encoders'.t_d2098cac25)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_21215fdec6 ~p ~op ~loc ~style ~explode
-    (_x : t_21215fdec6) =
+  let string_of_t_a6b80cd539 ~p ~op ~loc ~style ~explode
+    (_x : t_a6b80cd539) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_21215fdec6)
+      ~ctr:(Json_encoding.construct Encoders'.t_a6b80cd539)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_21215fdec6 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_21215fdec6) in _string_to
+  let string_to_t_a6b80cd539 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a6b80cd539) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_21215fdec6 ~p ~op ~loc ~style ~explode
-    (_x : t_21215fdec6) =
+  let namevalues_of_t_a6b80cd539 ~p ~op ~loc ~style ~explode
+    (_x : t_a6b80cd539) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_21215fdec6)
+      ~ctr:(Json_encoding.construct Encoders'.t_a6b80cd539)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_9e4c050846 ~p ~op ~loc ~style ~explode
-    (_x : t_9e4c050846) =
+  let string_of_t_900f55e0e4 ~p ~op ~loc ~style ~explode
+    (_x : t_900f55e0e4) =
     _string_of ~kind:(
-      match _x with
-      | T_99933d97fe _x ->
+      begin match _x with
+      | T_c53ac2a9cd _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9e4c050846)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_900f55e0e4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9e4c050846 ~loc ~style ~explode (_x : string) =
+  let string_to_t_900f55e0e4 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_99933d97fe) in
-        Option.map (fun _y : t_9e4c050846 -> T_99933d97fe _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_c53ac2a9cd) in
+        Option.map (fun _y : t_900f55e0e4 -> T_c53ac2a9cd _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_9e4c050846 -> Int _y)
+        Option.map (fun _y : t_900f55e0e4 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_9e4c050846 ~p ~op ~loc ~style ~explode
-    (_x : t_9e4c050846) =
+  let namevalues_of_t_900f55e0e4 ~p ~op ~loc ~style ~explode
+    (_x : t_900f55e0e4) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_99933d97fe _x ->
+      begin match _x with
+      | T_c53ac2a9cd _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_9e4c050846)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_900f55e0e4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_ab910df305 ~p ~op ~loc ~style ~explode
-    (_x : t_ab910df305) =
+  let string_of_t_dad4a4ac5b ~p ~op ~loc ~style ~explode
+    (_x : t_dad4a4ac5b) =
     _string_of ~kind:(
-      match _x with
-      | T_52a47d24e3 _x ->
+      begin match _x with
+      | T_d1eb4a98f5 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_ab910df305)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_dad4a4ac5b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ab910df305 ~loc ~style ~explode (_x : string) =
+  let string_to_t_dad4a4ac5b ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_52a47d24e3) in
-        Option.map (fun _y : t_ab910df305 -> T_52a47d24e3 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_d1eb4a98f5) in
+        Option.map (fun _y : t_dad4a4ac5b -> T_d1eb4a98f5 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_ab910df305 -> Int _y)
+        Option.map (fun _y : t_dad4a4ac5b -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_ab910df305 ~p ~op ~loc ~style ~explode
-    (_x : t_ab910df305) =
+  let namevalues_of_t_dad4a4ac5b ~p ~op ~loc ~style ~explode
+    (_x : t_dad4a4ac5b) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_52a47d24e3 _x ->
+      begin match _x with
+      | T_d1eb4a98f5 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_ab910df305)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_dad4a4ac5b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_81e3b88aad ~p ~op ~loc ~style ~explode
-    (_x : t_81e3b88aad) =
+  let string_of_t_dce85b0bb2 ~p ~op ~loc ~style ~explode
+    (_x : t_dce85b0bb2) =
     _string_of ~kind:(
-      match _x with
-      | T_c423040d1d _x ->
+      begin match _x with
+      | T_f89b48aae9 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_81e3b88aad)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_dce85b0bb2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_81e3b88aad ~loc ~style ~explode (_x : string) =
+  let string_to_t_dce85b0bb2 ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_c423040d1d) in
-        Option.map (fun _y : t_81e3b88aad -> T_c423040d1d _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f89b48aae9) in
+        Option.map (fun _y : t_dce85b0bb2 -> T_f89b48aae9 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_81e3b88aad -> Int _y)
+        Option.map (fun _y : t_dce85b0bb2 -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_81e3b88aad ~p ~op ~loc ~style ~explode
-    (_x : t_81e3b88aad) =
+  let namevalues_of_t_dce85b0bb2 ~p ~op ~loc ~style ~explode
+    (_x : t_dce85b0bb2) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_c423040d1d _x ->
+      begin match _x with
+      | T_f89b48aae9 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_81e3b88aad)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_dce85b0bb2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_8df96af889 ~p ~op ~loc ~style ~explode
-    (_x : t_8df96af889) =
+  let string_of_t_66eb6371e3 ~p ~op ~loc ~style ~explode
+    (_x : t_66eb6371e3) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8df96af889)
+      ~ctr:(Json_encoding.construct Encoders'.t_66eb6371e3)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8df96af889 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_8df96af889) in _string_to
+  let string_to_t_66eb6371e3 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_66eb6371e3) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_8df96af889 ~p ~op ~loc ~style ~explode
-    (_x : t_8df96af889) =
+  let namevalues_of_t_66eb6371e3 ~p ~op ~loc ~style ~explode
+    (_x : t_66eb6371e3) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8df96af889)
+      ~ctr:(Json_encoding.construct Encoders'.t_66eb6371e3)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_f47c871206 ~p ~op ~loc ~style ~explode
-    (_x : t_f47c871206) =
+  let string_of_t_17690afaaf ~p ~op ~loc ~style ~explode
+    (_x : t_17690afaaf) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("customer", match _x.customer with | None -> []
-          | Some _x -> [`String]);
-         ("type", let _x = _x.type_ in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f47c871206)
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("customer", begin match _x.customer with | None -> `Null
+          | Some _x -> `String end);
+         ("type", let _x = _x.type_ in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_17690afaaf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f47c871206 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f47c871206) in _string_to
+  let string_to_t_17690afaaf ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_17690afaaf) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]); ("account", [`String]);
-                ("customer", [`String]); ("type", [`String])])
+               [("", `Any); ("account", `String); ("customer", `String);
+                ("type", `String)]) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_17690afaaf ~p ~op ~loc ~style ~explode
+    (_x : t_17690afaaf) =
+    _namevalues_of ~kind:(
+      `ObjectN
+        [("", `Any);
+         ("account", begin match _x.account with | None -> `Null | Some _x ->
+          `String end);
+         ("customer", begin match _x.customer with | None -> `Null
+          | Some _x -> `String end);
+         ("type", let _x = _x.type_ in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_17690afaaf)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_ef1df523db ~p ~op ~loc ~style ~explode
+    (_x : t_ef1df523db) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_81c4215133 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ef1df523db)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_ef1df523db ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_81c4215133) in
+        Option.map (fun _y : t_ef1df523db -> T_81c4215133 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_ef1df523db -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_ef1df523db ~p ~op ~loc ~style ~explode
+    (_x : t_ef1df523db) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_81c4215133 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ef1df523db)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_477c159e47 ~p ~op ~loc ~style ~explode
+    (_x : t_477c159e47) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_477c159e47)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_477c159e47 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_477c159e47) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_477c159e47 ~p ~op ~loc ~style ~explode
+    (_x : t_477c159e47) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_477c159e47)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_76a6cf8994 ~p ~op ~loc ~style ~explode
+    (_x : t_76a6cf8994) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_76a6cf8994)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_76a6cf8994 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_76a6cf8994) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_76a6cf8994 ~p ~op ~loc ~style ~explode
+    (_x : t_76a6cf8994) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_76a6cf8994)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_6684cf5aa7 ~p ~op ~loc ~style ~explode
+    (_x : t_6684cf5aa7) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_1149c5a72c _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_6684cf5aa7)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_6684cf5aa7 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_1149c5a72c) in
+        Option.map (fun _y : t_6684cf5aa7 -> T_1149c5a72c _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_6684cf5aa7 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_6684cf5aa7 ~p ~op ~loc ~style ~explode
+    (_x : t_6684cf5aa7) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_1149c5a72c _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_6684cf5aa7)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_ca787dca43 ~p ~op ~loc ~style ~explode
+    (_x : t_ca787dca43) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_5a45966f13 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ca787dca43)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_ca787dca43 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_5a45966f13) in
+        Option.map (fun _y : t_ca787dca43 -> T_5a45966f13 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_ca787dca43 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_ca787dca43 ~p ~op ~loc ~style ~explode
+    (_x : t_ca787dca43) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_5a45966f13 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_ca787dca43)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_ce1d711154 ~p ~op ~loc ~style ~explode
+    (_x : t_ce1d711154) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_ce1d711154)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_ce1d711154 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ce1d711154) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_ce1d711154 ~p ~op ~loc ~style ~explode
+    (_x : t_ce1d711154) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_ce1d711154)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_c5c22bba1c ~p ~op ~loc ~style ~explode
+    (_x : t_c5c22bba1c) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_5b06d5fa4f _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c5c22bba1c)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_c5c22bba1c ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_5b06d5fa4f) in
+        Option.map (fun _y : t_c5c22bba1c -> T_5b06d5fa4f _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_c5c22bba1c -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_c5c22bba1c ~p ~op ~loc ~style ~explode
+    (_x : t_c5c22bba1c) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_5b06d5fa4f _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_c5c22bba1c)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_de06274f51 ~p ~op ~loc ~style ~explode
+    (_x : t_de06274f51) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_de06274f51)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_de06274f51 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_de06274f51) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_de06274f51 ~p ~op ~loc ~style ~explode
+    (_x : t_de06274f51) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_de06274f51)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_ed1d428d1e ~p ~op ~loc ~style ~explode
+    (_x : t_ed1d428d1e) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_ed1d428d1e)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_ed1d428d1e ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ed1d428d1e) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_ed1d428d1e ~p ~op ~loc ~style ~explode
+    (_x : t_ed1d428d1e) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_ed1d428d1e)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_e27a5a13e2 ~p ~op ~loc ~style ~explode
+    (_x : t_e27a5a13e2) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_e27a5a13e2)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_e27a5a13e2 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e27a5a13e2) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_e27a5a13e2 ~p ~op ~loc ~style ~explode
+    (_x : t_e27a5a13e2) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_e27a5a13e2)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_9096085c5b ~p ~op ~loc ~style ~explode
+    (_x : t_9096085c5b) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_8bc900449d _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9096085c5b)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_9096085c5b ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8bc900449d) in
+        Option.map (fun _y : t_9096085c5b -> T_8bc900449d _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_9096085c5b -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_9096085c5b ~p ~op ~loc ~style ~explode
+    (_x : t_9096085c5b) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_8bc900449d _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_9096085c5b)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_bda61eb198 ~p ~op ~loc ~style ~explode
+    (_x : t_bda61eb198) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_bda61eb198)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_bda61eb198 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_bda61eb198) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_bda61eb198 ~p ~op ~loc ~style ~explode
+    (_x : t_bda61eb198) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_bda61eb198)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_fd0b444db8 ~p ~op ~loc ~style ~explode
+    (_x : t_fd0b444db8) =
+    _string_of ~kind:(
+      begin match _x with
+      | T_34d236a9e5 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_fd0b444db8)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_fd0b444db8 ~loc ~style ~explode (_x : string) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_34d236a9e5) in
+        Option.map (fun _y : t_fd0b444db8 -> T_34d236a9e5 _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_fd0b444db8 -> Int _y)
+          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_opt Option.is_some
+  
+  let namevalues_of_t_fd0b444db8 ~p ~op ~loc ~style ~explode
+    (_x : t_fd0b444db8) =
+    _namevalues_of ~kind:(
+      begin match _x with
+      | T_34d236a9e5 _x ->
+        `ObjectN
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_fd0b444db8)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_e134f021a2 ~p ~op ~loc ~style ~explode
+    (_x : t_e134f021a2) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_e134f021a2)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_e134f021a2 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e134f021a2) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_e134f021a2 ~p ~op ~loc ~style ~explode
+    (_x : t_e134f021a2) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_e134f021a2)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_7e023d3347 ~p ~op ~loc ~style ~explode
+    (_x : t_7e023d3347) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_7e023d3347)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_7e023d3347 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7e023d3347) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_7e023d3347 ~p ~op ~loc ~style ~explode
+    (_x : t_7e023d3347) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_7e023d3347)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_99ae8c4576 ~p ~op ~loc ~style ~explode
+    (_x : t_99ae8c4576) =
+    _string_of ~kind:(
+      `ObjectN
+        [("", `Any);
+         ("source_flow_type", let _x = _x.source_flow_type in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_99ae8c4576)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_99ae8c4576 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_99ae8c4576) in _string_to
+      ~kind:(`ObjectN [("", `Any); ("source_flow_type", `String)])
       ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_f47c871206 ~p ~op ~loc ~style ~explode
-    (_x : t_f47c871206) =
+  let namevalues_of_t_99ae8c4576 ~p ~op ~loc ~style ~explode
+    (_x : t_99ae8c4576) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("account", match _x.account with | None -> []
-          | Some _x -> [`String]);
-         ("customer", match _x.customer with | None -> []
-          | Some _x -> [`String]);
-         ("type", let _x = _x.type_ in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f47c871206)
+        [("", `Any);
+         ("source_flow_type", let _x = _x.source_flow_type in `String)])
+      ~ctr:(Json_encoding.construct Encoders'.t_99ae8c4576)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_08f3f13308 ~p ~op ~loc ~style ~explode
-    (_x : t_08f3f13308) =
+  let string_of_t_ae96c50be4 ~p ~op ~loc ~style ~explode
+    (_x : t_ae96c50be4) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_ae96c50be4)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_ae96c50be4 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ae96c50be4) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_ae96c50be4 ~p ~op ~loc ~style ~explode
+    (_x : t_ae96c50be4) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_ae96c50be4)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_fe86a832fb ~p ~op ~loc ~style ~explode
+    (_x : t_fe86a832fb) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_fe86a832fb)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_fe86a832fb ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_fe86a832fb) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_fe86a832fb ~p ~op ~loc ~style ~explode
+    (_x : t_fe86a832fb) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_fe86a832fb)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_01243047ea ~p ~op ~loc ~style ~explode
+    (_x : t_01243047ea) =
     _string_of ~kind:(
-      match _x with
-      | T_0199a192ee _x ->
+      begin match _x with
+      | T_8a5740cf7a _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_08f3f13308)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_01243047ea)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_08f3f13308 ~loc ~style ~explode (_x : string) =
+  let string_to_t_01243047ea ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_0199a192ee) in
-        Option.map (fun _y : t_08f3f13308 -> T_0199a192ee _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8a5740cf7a) in
+        Option.map (fun _y : t_01243047ea -> T_8a5740cf7a _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_08f3f13308 -> Int _y)
+        Option.map (fun _y : t_01243047ea -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_08f3f13308 ~p ~op ~loc ~style ~explode
-    (_x : t_08f3f13308) =
+  let namevalues_of_t_01243047ea ~p ~op ~loc ~style ~explode
+    (_x : t_01243047ea) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_0199a192ee _x ->
+      begin match _x with
+      | T_8a5740cf7a _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_08f3f13308)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_01243047ea)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_b35c50c323 ~p ~op ~loc ~style ~explode
-    (_x : t_b35c50c323) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b35c50c323)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_b35c50c323 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b35c50c323) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_b35c50c323 ~p ~op ~loc ~style ~explode
-    (_x : t_b35c50c323) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_b35c50c323)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_cdedbe876a ~p ~op ~loc ~style ~explode
-    (_x : t_cdedbe876a) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_cdedbe876a)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_cdedbe876a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_cdedbe876a) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_cdedbe876a ~p ~op ~loc ~style ~explode
-    (_x : t_cdedbe876a) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_cdedbe876a)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_c4b1ad0571 ~p ~op ~loc ~style ~explode
-    (_x : t_c4b1ad0571) =
+  let string_of_t_fa33b5a2bd ~p ~op ~loc ~style ~explode
+    (_x : t_fa33b5a2bd) =
     _string_of ~kind:(
-      match _x with
-      | T_ac8c38ff95 _x ->
+      begin match _x with
+      | T_99d78357ad _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_c4b1ad0571)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_fa33b5a2bd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c4b1ad0571 ~loc ~style ~explode (_x : string) =
+  let string_to_t_fa33b5a2bd ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_ac8c38ff95) in
-        Option.map (fun _y : t_c4b1ad0571 -> T_ac8c38ff95 _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_99d78357ad) in
+        Option.map (fun _y : t_fa33b5a2bd -> T_99d78357ad _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_c4b1ad0571 -> Int _y)
+        Option.map (fun _y : t_fa33b5a2bd -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_c4b1ad0571 ~p ~op ~loc ~style ~explode
-    (_x : t_c4b1ad0571) =
+  let namevalues_of_t_fa33b5a2bd ~p ~op ~loc ~style ~explode
+    (_x : t_fa33b5a2bd) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_ac8c38ff95 _x ->
+      begin match _x with
+      | T_99d78357ad _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_c4b1ad0571)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_fa33b5a2bd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_0ffc3b1d59 ~p ~op ~loc ~style ~explode
-    (_x : t_0ffc3b1d59) =
+  let string_of_t_1f08681071 ~p ~op ~loc ~style ~explode
+    (_x : t_1f08681071) =
+    _string_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_1f08681071)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_to_t_1f08681071 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_1f08681071) in _string_to
+      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
+  let namevalues_of_t_1f08681071 ~p ~op ~loc ~style ~explode
+    (_x : t_1f08681071) =
+    _namevalues_of ~kind:( `String)
+      ~ctr:(Json_encoding.construct Encoders'.t_1f08681071)
+      ~p ~op ~loc ~style ~explode _x
+  
+  let string_of_t_2bb01eccbd ~p ~op ~loc ~style ~explode
+    (_x : t_2bb01eccbd) =
     _string_of ~kind:(
-      match _x with
-      | T_0764eaa89a _x ->
+      begin match _x with
+      | T_f34b1e7619 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_0ffc3b1d59)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_2bb01eccbd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0ffc3b1d59 ~loc ~style ~explode (_x : string) =
+  let string_to_t_2bb01eccbd ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_0764eaa89a) in
-        Option.map (fun _y : t_0ffc3b1d59 -> T_0764eaa89a _y)
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f34b1e7619) in
+        Option.map (fun _y : t_2bb01eccbd -> T_f34b1e7619 _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_0ffc3b1d59 -> Int _y)
+        Option.map (fun _y : t_2bb01eccbd -> Int _y)
           (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
       |> List.find_opt Option.is_some
   
-  let namevalues_of_t_0ffc3b1d59 ~p ~op ~loc ~style ~explode
-    (_x : t_0ffc3b1d59) =
+  let namevalues_of_t_2bb01eccbd ~p ~op ~loc ~style ~explode
+    (_x : t_2bb01eccbd) =
     _namevalues_of ~kind:(
-      match _x with
-      | T_0764eaa89a _x ->
+      begin match _x with
+      | T_f34b1e7619 _x ->
         `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_0ffc3b1d59)
+          [("", `Any);
+           ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+            `Integer end);
+           ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+            `Integer end)]
+      | Int _x -> `Integer
+      end) ~ctr:(Json_encoding.construct Encoders'.t_2bb01eccbd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_09df6faafb ~p ~op ~loc ~style ~explode
-    (_x : t_09df6faafb) =
+  let string_of_t_65e58eb6da ~p ~op ~loc ~style ~explode
+    (_x : t_65e58eb6da) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_09df6faafb)
+      ~ctr:(Json_encoding.construct Encoders'.t_65e58eb6da)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_09df6faafb ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_09df6faafb) in _string_to
+  let string_to_t_65e58eb6da ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_65e58eb6da) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_09df6faafb ~p ~op ~loc ~style ~explode
-    (_x : t_09df6faafb) =
+  let namevalues_of_t_65e58eb6da ~p ~op ~loc ~style ~explode
+    (_x : t_65e58eb6da) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_09df6faafb)
+      ~ctr:(Json_encoding.construct Encoders'.t_65e58eb6da)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_48bbea3497 ~p ~op ~loc ~style ~explode
-    (_x : t_48bbea3497) =
-    _string_of ~kind:(
-      match _x with
-      | T_be953a7826 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_48bbea3497)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_48bbea3497 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_be953a7826) in
-        Option.map (fun _y : t_48bbea3497 -> T_be953a7826 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_48bbea3497 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_48bbea3497 ~p ~op ~loc ~style ~explode
-    (_x : t_48bbea3497) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_be953a7826 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_48bbea3497)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_bc1bb0e62b ~p ~op ~loc ~style ~explode
-    (_x : t_bc1bb0e62b) =
+  let string_of_t_6f04380d09 ~p ~op ~loc ~style ~explode
+    (_x : t_6f04380d09) =
     _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_bc1bb0e62b)
+      ~ctr:(Json_encoding.construct Encoders'.t_6f04380d09)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_bc1bb0e62b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_bc1bb0e62b) in _string_to
+  let string_to_t_6f04380d09 ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6f04380d09) in _string_to
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_bc1bb0e62b ~p ~op ~loc ~style ~explode
-    (_x : t_bc1bb0e62b) =
+  let namevalues_of_t_6f04380d09 ~p ~op ~loc ~style ~explode
+    (_x : t_6f04380d09) =
     _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_bc1bb0e62b)
+      ~ctr:(Json_encoding.construct Encoders'.t_6f04380d09)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_of_t_8c672cee18 ~p ~op ~loc ~style ~explode
-    (_x : t_8c672cee18) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8c672cee18)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_8c672cee18 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_8c672cee18) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_8c672cee18 ~p ~op ~loc ~style ~explode
-    (_x : t_8c672cee18) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8c672cee18)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_8d4454e1e7 ~p ~op ~loc ~style ~explode
-    (_x : t_8d4454e1e7) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8d4454e1e7)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_8d4454e1e7 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_8d4454e1e7) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_8d4454e1e7 ~p ~op ~loc ~style ~explode
-    (_x : t_8d4454e1e7) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_8d4454e1e7)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_3d6f926201 ~p ~op ~loc ~style ~explode
-    (_x : t_3d6f926201) =
-    _string_of ~kind:(
-      match _x with
-      | T_b43f2b203b _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_3d6f926201)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_3d6f926201 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_b43f2b203b) in
-        Option.map (fun _y : t_3d6f926201 -> T_b43f2b203b _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_3d6f926201 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_3d6f926201 ~p ~op ~loc ~style ~explode
-    (_x : t_3d6f926201) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_b43f2b203b _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_3d6f926201)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_f9dbcc1790 ~p ~op ~loc ~style ~explode
-    (_x : t_f9dbcc1790) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_f9dbcc1790)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_f9dbcc1790 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f9dbcc1790) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_f9dbcc1790 ~p ~op ~loc ~style ~explode
-    (_x : t_f9dbcc1790) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_f9dbcc1790)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_940f841aad ~p ~op ~loc ~style ~explode
-    (_x : t_940f841aad) =
-    _string_of ~kind:(
-      match _x with
-      | T_2922b72a55 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_940f841aad)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_940f841aad ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_2922b72a55) in
-        Option.map (fun _y : t_940f841aad -> T_2922b72a55 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_940f841aad -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_940f841aad ~p ~op ~loc ~style ~explode
-    (_x : t_940f841aad) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_2922b72a55 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_940f841aad)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_05ed840b39 ~p ~op ~loc ~style ~explode
-    (_x : t_05ed840b39) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_05ed840b39)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_05ed840b39 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_05ed840b39) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_05ed840b39 ~p ~op ~loc ~style ~explode
-    (_x : t_05ed840b39) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_05ed840b39)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_57ebe3c863 ~p ~op ~loc ~style ~explode
-    (_x : t_57ebe3c863) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_57ebe3c863)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_57ebe3c863 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_57ebe3c863) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_57ebe3c863 ~p ~op ~loc ~style ~explode
-    (_x : t_57ebe3c863) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_57ebe3c863)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_d7899c5733 ~p ~op ~loc ~style ~explode
-    (_x : t_d7899c5733) =
+  let string_of_t_b458f1b6fb ~p ~op ~loc ~style ~explode
+    (_x : t_b458f1b6fb) =
     _string_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("source_flow_type", let _x = _x.source_flow_type in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_d7899c5733)
+        [("", `Any);
+         ("posted_at", begin match _x.posted_at with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_9dc26ca392 _x ->
+            `ObjectN
+              [("", `Any);
+               ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+                `Integer end);
+               ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+                `Integer end);
+               ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+                `Integer end);
+               ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+                `Integer end)]
+          | Int _x -> `Integer
+          end end)]) ~ctr:(Json_encoding.construct Encoders'.t_b458f1b6fb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d7899c5733 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_d7899c5733) in _string_to
-      ~kind:(`ObjectN [("", [`Any]); ("source_flow_type", [`String])])
-      ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_d7899c5733 ~p ~op ~loc ~style ~explode
-    (_x : t_d7899c5733) =
-    _namevalues_of ~kind:(
-      `ObjectN
-        [("", [`Any]);
-         ("source_flow_type", let _x = _x.source_flow_type in [`String])])
-      ~ctr:(Json_encoding.construct Encoders'.t_d7899c5733)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_e5e83a4d6b ~p ~op ~loc ~style ~explode
-    (_x : t_e5e83a4d6b) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_e5e83a4d6b)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_e5e83a4d6b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e5e83a4d6b) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_e5e83a4d6b ~p ~op ~loc ~style ~explode
-    (_x : t_e5e83a4d6b) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_e5e83a4d6b)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_50ce7697c2 ~p ~op ~loc ~style ~explode
-    (_x : t_50ce7697c2) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_50ce7697c2)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_50ce7697c2 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_50ce7697c2) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_50ce7697c2 ~p ~op ~loc ~style ~explode
-    (_x : t_50ce7697c2) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_50ce7697c2)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_4c0b4f6fc6 ~p ~op ~loc ~style ~explode
-    (_x : t_4c0b4f6fc6) =
-    _string_of ~kind:(
-      match _x with
-      | T_d3ee36a85d _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_4c0b4f6fc6)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_4c0b4f6fc6 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_d3ee36a85d) in
-        Option.map (fun _y : t_4c0b4f6fc6 -> T_d3ee36a85d _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_4c0b4f6fc6 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_4c0b4f6fc6 ~p ~op ~loc ~style ~explode
-    (_x : t_4c0b4f6fc6) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_d3ee36a85d _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_4c0b4f6fc6)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_4316f9bdd6 ~p ~op ~loc ~style ~explode
-    (_x : t_4316f9bdd6) =
-    _string_of ~kind:(
-      match _x with
-      | T_d189722c39 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_4316f9bdd6)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_4316f9bdd6 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_d189722c39) in
-        Option.map (fun _y : t_4316f9bdd6 -> T_d189722c39 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_4316f9bdd6 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_4316f9bdd6 ~p ~op ~loc ~style ~explode
-    (_x : t_4316f9bdd6) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_d189722c39 _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_4316f9bdd6)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_bc07bb4360 ~p ~op ~loc ~style ~explode
-    (_x : t_bc07bb4360) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_bc07bb4360)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_bc07bb4360 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_bc07bb4360) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_bc07bb4360 ~p ~op ~loc ~style ~explode
-    (_x : t_bc07bb4360) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_bc07bb4360)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_e0080bc683 ~p ~op ~loc ~style ~explode
-    (_x : t_e0080bc683) =
-    _string_of ~kind:(
-      match _x with
-      | T_b64b437f2c _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_e0080bc683)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_e0080bc683 ~loc ~style ~explode (_x : string) =
-    [(let kind = `ObjectN
-                   [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                    ("lt", [`Integer]); ("lte", [`Integer])] in
-        let dtr = (Json_encoding.destruct Encoders'.t_b64b437f2c) in
-        Option.map (fun _y : t_e0080bc683 -> T_b64b437f2c _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
-     (let kind = `Integer in
-        let dtr = (Json_encoding.destruct Json_encoding.int) in
-        Option.map (fun _y : t_e0080bc683 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
-  
-  let namevalues_of_t_e0080bc683 ~p ~op ~loc ~style ~explode
-    (_x : t_e0080bc683) =
-    _namevalues_of ~kind:(
-      match _x with
-      | T_b64b437f2c _x ->
-        `ObjectN
-          [("", [`Any]);
-           ("gt", match _x.gt with | None -> [] | Some _x -> [`Integer]);
-           ("gte", match _x.gte with | None -> [] | Some _x -> [`Integer]);
-           ("lt", match _x.lt with | None -> [] | Some _x -> [`Integer]);
-           ("lte", match _x.lte with | None -> [] | Some _x -> [`Integer])]
-      | Int _x -> `Integer)
-      ~ctr:(Json_encoding.construct Encoders'.t_e0080bc683)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_04484736af ~p ~op ~loc ~style ~explode
-    (_x : t_04484736af) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_04484736af)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_04484736af ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_04484736af) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_04484736af ~p ~op ~loc ~style ~explode
-    (_x : t_04484736af) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_04484736af)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_6695658151 ~p ~op ~loc ~style ~explode
-    (_x : t_6695658151) =
-    _string_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_6695658151)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_6695658151 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_6695658151) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
-  
-  let namevalues_of_t_6695658151 ~p ~op ~loc ~style ~explode
-    (_x : t_6695658151) =
-    _namevalues_of ~kind:( `String)
-      ~ctr:(Json_encoding.construct Encoders'.t_6695658151)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_of_t_f88b9725ad ~p ~op ~loc ~style ~explode
-    (_x : t_f88b9725ad) =
-    _string_of ~kind:(
-      `ObjectN
-        [("", [`Any]);
-         ("posted_at", match _x.posted_at with | None -> []
-          | Some _x -> [match _x with
-                        | T_50de03f409 _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("gt", match _x.gt with | None -> []
-                              | Some _x -> [`Integer]);
-                             ("gte", match _x.gte with | None -> []
-                              | Some _x -> [`Integer]);
-                             ("lt", match _x.lt with | None -> []
-                              | Some _x -> [`Integer]);
-                             ("lte", match _x.lte with | None -> []
-                              | Some _x -> [`Integer])]
-                        | Int _x -> `Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f88b9725ad)
-      ~p ~op ~loc ~style ~explode _x
-  
-  let string_to_t_f88b9725ad ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f88b9725ad) in _string_to
+  let string_to_t_b458f1b6fb ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b458f1b6fb) in _string_to
       ~kind:(`ObjectN
-               [("", [`Any]);
+               [("", `Any);
                 ("posted_at",
+                 `Choice
                  [`ObjectN
-                    [("", [`Any]); ("gt", [`Integer]); ("gte", [`Integer]);
-                     ("lt", [`Integer]); ("lte", [`Integer])];
+                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                     ("lt", `Integer); ("lte", `Integer)];
                   `Integer])]) ~dtr ~loc ~style ~explode _x
   
-  let namevalues_of_t_f88b9725ad ~p ~op ~loc ~style ~explode
-    (_x : t_f88b9725ad) =
+  let namevalues_of_t_b458f1b6fb ~p ~op ~loc ~style ~explode
+    (_x : t_b458f1b6fb) =
     _namevalues_of ~kind:(
       `ObjectN
-        [("", [`Any]);
-         ("posted_at", match _x.posted_at with | None -> []
-          | Some _x -> [match _x with
-                        | T_50de03f409 _x ->
-                          `ObjectN
-                            [("", [`Any]);
-                             ("gt", match _x.gt with | None -> []
-                              | Some _x -> [`Integer]);
-                             ("gte", match _x.gte with | None -> []
-                              | Some _x -> [`Integer]);
-                             ("lt", match _x.lt with | None -> []
-                              | Some _x -> [`Integer]);
-                             ("lte", match _x.lte with | None -> []
-                              | Some _x -> [`Integer])]
-                        | Int _x -> `Integer])])
-      ~ctr:(Json_encoding.construct Encoders'.t_f88b9725ad)
+        [("", `Any);
+         ("posted_at", begin match _x.posted_at with | None -> `Null
+          | Some _x ->
+          begin match _x with
+          | T_9dc26ca392 _x ->
+            `ObjectN
+              [("", `Any);
+               ("gt", begin match _x.gt with | None -> `Null | Some _x ->
+                `Integer end);
+               ("gte", begin match _x.gte with | None -> `Null | Some _x ->
+                `Integer end);
+               ("lt", begin match _x.lt with | None -> `Null | Some _x ->
+                `Integer end);
+               ("lte", begin match _x.lte with | None -> `Null | Some _x ->
+                `Integer end)]
+          | Int _x -> `Integer
+          end end)]) ~ctr:(Json_encoding.construct Encoders'.t_b458f1b6fb)
       ~p ~op ~loc ~style ~explode _x
   
   
