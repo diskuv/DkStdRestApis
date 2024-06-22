@@ -48,7 +48,8 @@ opam install --subpath src/ . --yes --deps-only
 #  2. REST clients are generated. Bring your own web agent backend. Includes an
 #  example for an unreleased [cohttp-curl-lwt] (+9 deps).
 opam pin add cohttp-curl git+https://github.com/mirage/ocaml-cohttp.git#77fb272f8eac61b9d94067450c75b58fe4c2e122 --yes
-opam install tiny_httpd cohttp-curl-lwt utop ocaml-lsp-server odoc --yes
+opam pin add tiny_httpd git+https://github.com/c-cube/tiny_httpd.git#9eb3cbfc70d112d09eccada835667b76d1f758f6 --yes
+opam install cohttp-curl-lwt utop ocaml-lsp-server odoc --yes
 ```
 
 and then start exploring the [Stripe REST API](https://docs.stripe.com/api)
