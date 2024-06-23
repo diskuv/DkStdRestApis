@@ -1156,7 +1156,7 @@ module Paths' = struct
     Routes.(s "v1" / s "webhook_endpoints"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"webhook_endpoint" ~op:"/v1/webhook_endpoints/{webhook_endpoint}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"webhook_endpoint" ~loc:`Path ~style:`Simple ~explode:false)
           ":webhook_endpoint" /? nil)
   
   (** <p>Updates the webhook endpoint. You may edit the <code>url</code>, the list of <code>enabled_events</code>, and the status of your endpoint.</p>
@@ -1167,7 +1167,7 @@ module Paths' = struct
     Routes.(s "v1" / s "webhook_endpoints"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"webhook_endpoint" ~op:"/v1/webhook_endpoints/{webhook_endpoint}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"webhook_endpoint" ~loc:`Path ~style:`Simple ~explode:false)
           ":webhook_endpoint" /? nil)
   
   (** <p>Retrieves the webhook endpoint with the given ID.</p>
@@ -1178,7 +1178,7 @@ module Paths' = struct
     Routes.(s "v1" / s "webhook_endpoints"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"webhook_endpoint" ~op:"/v1/webhook_endpoints/{webhook_endpoint}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"webhook_endpoint" ~loc:`Path ~style:`Simple ~explode:false)
           ":webhook_endpoint" /? nil)
   
   (** <p>Increment a test-mode Authorization.</p>
@@ -1189,7 +1189,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/test_helpers/issuing/authorizations/{authorization}/increment" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" / s "increment" /? nil)
   
   (** <p>Permanently deletes a customer. It cannot be undone. Also immediately cancels any active subscriptions on the customer.</p>
@@ -1200,7 +1200,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" /? nil)
   
   (** <p>Updates the specified customer by setting the values of the parameters passed. Any parameters not provided will be left unchanged. For example, if you pass the <strong>source</strong> parameter, that becomes the customer’s active source (e.g., a card) to be used for all charges in the future. When you update a customer to a new valid card source by passing the <strong>source</strong> parameter: for each of the customer’s current subscriptions, if the subscription bills automatically and is in the <code>past_due</code> state, then the latest open invoice for the subscription with automatic collection enabled will be retried. This retry will not count as an automatic retry, and will not affect the next regularly scheduled payment for the invoice. Changing the <strong>default_source</strong> for a customer will not trigger this behavior.</p>
@@ -1213,7 +1213,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" /? nil)
   
   (** <p>Retrieves a Customer object.</p>
@@ -1224,7 +1224,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" /? nil)
   
   (** <p>Deleting plans means new subscribers can’t be added. Existing subscribers aren’t affected.</p>
@@ -1235,7 +1235,7 @@ module Paths' = struct
     Routes.(s "v1" / s "plans"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"plan" ~op:"/v1/plans/{plan}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"plan" ~loc:`Path ~style:`Simple ~explode:false)
           ":plan" /? nil)
   
   (** <p>Updates the specified plan by setting the values of the parameters passed. Any parameters not provided are left unchanged. By design, you cannot change a plan’s ID, amount, currency, or billing cycle.</p>
@@ -1246,7 +1246,7 @@ module Paths' = struct
     Routes.(s "v1" / s "plans"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"plan" ~op:"/v1/plans/{plan}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"plan" ~loc:`Path ~style:`Simple ~explode:false)
           ":plan" /? nil)
   
   (** <p>Retrieves the plan with the given ID.</p>
@@ -1257,7 +1257,7 @@ module Paths' = struct
     Routes.(s "v1" / s "plans"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"plan" ~op:"/v1/plans/{plan}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"plan" ~loc:`Path ~style:`Simple ~explode:false)
           ":plan" /? nil)
   
   (** <p>With <a href="/connect">Connect</a>, you can delete accounts you manage.</p>
@@ -1274,7 +1274,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" /? nil)
   
   (** <p>Updates a <a href="/connect/accounts">connected account</a> by setting the values of the parameters passed. Any parameters not provided are
@@ -1297,7 +1297,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" /? nil)
   
   (** <p>Retrieves the details of an account.</p>
@@ -1308,7 +1308,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" /? nil)
   
   (** <p>Cancels an InboundTransfer.</p>
@@ -1319,7 +1319,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "inbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"inbound_transfer" ~op:"/v1/treasury/inbound_transfers/{inbound_transfer}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"inbound_transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":inbound_transfer" / s "cancel" /? nil)
   
   (** <p>Deletes a <code>Configuration</code> object.</p>
@@ -1330,7 +1330,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "configurations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"configuration" ~op:"/v1/terminal/configurations/{configuration}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"configuration" ~loc:`Path ~style:`Simple ~explode:false)
           ":configuration" /? nil)
   
   (** <p>Updates a new <code>Configuration</code> object.</p>
@@ -1341,7 +1341,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "configurations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"configuration" ~op:"/v1/terminal/configurations/{configuration}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"configuration" ~loc:`Path ~style:`Simple ~explode:false)
           ":configuration" /? nil)
   
   (** <p>Retrieves a <code>Configuration</code> object.</p>
@@ -1352,7 +1352,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "configurations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"configuration" ~op:"/v1/terminal/configurations/{configuration}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"configuration" ~loc:`Path ~style:`Simple ~explode:false)
           ":configuration" /? nil)
   
   (** <p>Retrieves the details of a Financial Connections <code>Session</code></p>
@@ -1363,7 +1363,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/financial_connections/sessions/{session}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" /? nil)
   
   (** <p>Finalizes the quote.</p>
@@ -1374,7 +1374,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}/finalize" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" / s "finalize" /? nil)
   
   (** <p>Starts advancing a test clock to a specified time in the future. Advancement is done when status changes to <code>Ready</code>.</p>
@@ -1385,7 +1385,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "test_clocks"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"test_clock" ~op:"/v1/test_helpers/test_clocks/{test_clock}/advance" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"test_clock" ~loc:`Path ~style:`Simple ~explode:false)
           ":test_clock" / s "advance" /? nil)
   
   (** <p>List source transactions for a given source.</p>
@@ -1396,7 +1396,7 @@ module Paths' = struct
     Routes.(s "v1" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"source" ~op:"/v1/sources/{source}/source_transactions" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"source" ~loc:`Path ~style:`Simple ~explode:false)
           ":source" / s "source_transactions" /? nil)
   
   (** <p>Updates the specified charge by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -1407,7 +1407,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" /? nil)
   
   (** <p>Retrieves the details of a charge that has previously been created. Supply the unique charge ID that was returned from your previous request, and Stripe will return the corresponding charge information. The same information is returned when creating or refunding the charge.</p>
@@ -1418,7 +1418,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" /? nil)
   
   (** <p>Updates a payment link.</p>
@@ -1429,7 +1429,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_links"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_link" ~op:"/v1/payment_links/{payment_link}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_link" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_link" /? nil)
   
   (** <p>Retrieve a payment link.</p>
@@ -1440,7 +1440,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_links"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_link" ~op:"/v1/payment_links/{payment_link}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_link" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_link" /? nil)
   
   (** <p>Retrieves the details of an existing ReceivedCredit by passing the unique ReceivedCredit ID from the ReceivedCredit list.</p>
@@ -1451,7 +1451,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "received_credits"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/treasury/received_credits/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates a test mode created OutboundTransfer with tracking details. The OutboundTransfer must not be cancelable, and cannot be in the <code>canceled</code> or <code>failed</code> states.</p>
@@ -1462,7 +1462,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"outbound_transfer" ~op:"/v1/test_helpers/treasury/outbound_transfers/{outbound_transfer}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"outbound_transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":outbound_transfer" /? nil)
   
   (** <p>Updates an existing subscription schedule.</p>
@@ -1473,7 +1473,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_schedules"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"schedule" ~op:"/v1/subscription_schedules/{schedule}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"schedule" ~loc:`Path ~style:`Simple ~explode:false)
           ":schedule" /? nil)
   
   (** <p>Retrieves the details of an existing subscription schedule. You only need to supply the unique subscription schedule identifier that was returned upon subscription schedule creation.</p>
@@ -1484,7 +1484,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_schedules"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"schedule" ~op:"/v1/subscription_schedules/{schedule}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"schedule" ~loc:`Path ~style:`Simple ~explode:false)
           ":schedule" /? nil)
   
   (** <p>Updates a VerificationSession object.</p>
@@ -1498,7 +1498,7 @@ module Paths' = struct
     Routes.(s "v1" / s "identity" / s "verification_sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/identity/verification_sessions/{session}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" /? nil)
   
   (** <p>Retrieves the details of a VerificationSession that was previously created.</p>
@@ -1512,7 +1512,7 @@ module Paths' = struct
     Routes.(s "v1" / s "identity" / s "verification_sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/identity/verification_sessions/{session}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" /? nil)
   
   (** <p>Updates a PaymentMethod object. A PaymentMethod must be attached a customer to be updated.</p>
@@ -1523,7 +1523,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_methods"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method" ~op:"/v1/payment_methods/{payment_method}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method" /? nil)
   
   (** <p>Retrieves a PaymentMethod object attached to the StripeAccount. To retrieve a payment method attached to a Customer, you should use <a href="/docs/api/payment_methods/customer">Retrieve a Customer’s PaymentMethods</a></p>
@@ -1534,7 +1534,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_methods"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method" ~op:"/v1/payment_methods/{payment_method}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method" /? nil)
   
   (** <p>Retrieves a Session object.</p>
@@ -1545,7 +1545,7 @@ module Paths' = struct
     Routes.(s "v1" / s "checkout" / s "sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/checkout/sessions/{session}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" /? nil)
   
   (** <p>Initiates a setup intent flow on a Reader.</p>
@@ -1556,7 +1556,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}/process_setup_intent" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" / s "process_setup_intent" /? nil)
   
   (** <p>Deletes a <code>ValueList</code> object, also deleting any items contained within the value list. To be deleted, a value list must not be referenced in any rules.</p>
@@ -1567,7 +1567,7 @@ module Paths' = struct
     Routes.(s "v1" / s "radar" / s "value_lists"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"value_list" ~op:"/v1/radar/value_lists/{value_list}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"value_list" ~loc:`Path ~style:`Simple ~explode:false)
           ":value_list" /? nil)
   
   (** <p>Updates a <code>ValueList</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged. Note that <code>item_type</code> is immutable.</p>
@@ -1578,7 +1578,7 @@ module Paths' = struct
     Routes.(s "v1" / s "radar" / s "value_lists"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"value_list" ~op:"/v1/radar/value_lists/{value_list}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"value_list" ~loc:`Path ~style:`Simple ~explode:false)
           ":value_list" /? nil)
   
   (** <p>Retrieves a <code>ValueList</code> object.</p>
@@ -1589,7 +1589,7 @@ module Paths' = struct
     Routes.(s "v1" / s "radar" / s "value_lists"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"value_list" ~op:"/v1/radar/value_lists/{value_list}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"value_list" ~loc:`Path ~style:`Simple ~explode:false)
           ":value_list" /? nil)
   
   (** <p>When you get a dispute, contacting your customer is always the best first step. If that doesn’t work, you can submit evidence to help us resolve the dispute in your favor. You can do this in your <a href="https://dashboard.stripe.com/disputes">dashboard</a>, but if you prefer, you can use the API to submit evidence programmatically.</p>
@@ -1602,7 +1602,7 @@ module Paths' = struct
     Routes.(s "v1" / s "disputes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"dispute" ~op:"/v1/disputes/{dispute}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"dispute" ~loc:`Path ~style:`Simple ~explode:false)
           ":dispute" /? nil)
   
   (** <p>Retrieves the dispute with the given ID.</p>
@@ -1613,7 +1613,7 @@ module Paths' = struct
     Routes.(s "v1" / s "disputes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"dispute" ~op:"/v1/disputes/{dispute}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"dispute" ~loc:`Path ~style:`Simple ~explode:false)
           ":dispute" /? nil)
   
   (** <p>Retrieves a physical bundle object.</p>
@@ -1624,7 +1624,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "physical_bundles"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"physical_bundle" ~op:"/v1/issuing/physical_bundles/{physical_bundle}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"physical_bundle" ~loc:`Path ~style:`Simple ~explode:false)
           ":physical_bundle" /? nil)
   
   (** <p>Retrieves the details of an existing CreditReversal by passing the unique CreditReversal ID from either the CreditReversal creation request or CreditReversal list</p>
@@ -1635,7 +1635,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "credit_reversals"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"credit_reversal" ~op:"/v1/treasury/credit_reversals/{credit_reversal}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"credit_reversal" ~loc:`Path ~style:`Simple ~explode:false)
           ":credit_reversal" /? nil)
   
   (** <p>Retrieves the line items of a committed standalone transaction as a collection.</p>
@@ -1646,7 +1646,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax" / s "transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/tax/transactions/{transaction}/line_items" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" / s "line_items" /? nil)
   
   (** <p>Stripe will automatically send invoices to customers according to your <a href="https://dashboard.stripe.com/account/billing/automatic">subscriptions settings</a>. However, if you’d like to manually send an invoice to your customer out of the normal schedule, you can do so. When sending invoices that have already been paid, there will be no reference to the payment in the email.</p>
@@ -1659,7 +1659,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}/send" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" / s "send" /? nil)
   
   (** <p>Deactivates a billing meter</p>
@@ -1670,7 +1670,7 @@ module Paths' = struct
     Routes.(s "v1" / s "billing" / s "meters"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/billing/meters/{id}/deactivate" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "deactivate" /? nil)
   
   (** <p>Updates the <code>status</code> of the specified testmode personalization design object to <code>rejected</code>.</p>
@@ -1682,7 +1682,7 @@ module Paths' = struct
       / s "personalization_designs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"personalization_design" ~op:"/v1/test_helpers/issuing/personalization_designs/{personalization_design}/reject" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"personalization_design" ~loc:`Path ~style:`Simple ~explode:false)
           ":personalization_design" / s "reject" /? nil)
   
   (** <p>Verifies microdeposits on a SetupIntent object.</p>
@@ -1693,7 +1693,7 @@ module Paths' = struct
     Routes.(s "v1" / s "setup_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/setup_intents/{intent}/verify_microdeposits" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "verify_microdeposits" /? nil)
   
   (** <p>Changes the settings on a customer’s cash balance.</p>
@@ -1704,7 +1704,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cash_balance" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cash_balance" /? nil)
   
   (** <p>Retrieves a customer’s cash balance.</p>
@@ -1715,7 +1715,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cash_balance" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cash_balance" /? nil)
   
   (** <p>Updates properties on a PaymentIntent object without confirming.</p>
@@ -1732,7 +1732,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" /? nil)
   
   (** <p>Retrieves the details of a PaymentIntent that has previously been created. </p>
@@ -1747,7 +1747,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" /? nil)
   
   (** <p>Retrieves a TransactionEntry object.</p>
@@ -1758,7 +1758,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "transaction_entries"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/treasury/transaction_entries/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Deletes an invoice item, removing it from an invoice. Deleting invoice items is only possible when they’re not attached to invoices, or if it’s attached to a draft invoice.</p>
@@ -1769,7 +1769,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoiceitems"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoiceitem" ~op:"/v1/invoiceitems/{invoiceitem}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoiceitem" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoiceitem" /? nil)
   
   (** <p>Updates the amount or description of an invoice item on an upcoming invoice. Updating an invoice item is only possible before the invoice it’s attached to is closed.</p>
@@ -1780,7 +1780,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoiceitems"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoiceitem" ~op:"/v1/invoiceitems/{invoiceitem}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoiceitem" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoiceitem" /? nil)
   
   (** <p>Retrieves the invoice item with the given ID.</p>
@@ -1791,7 +1791,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoiceitems"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoiceitem" ~op:"/v1/invoiceitems/{invoiceitem}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoiceitem" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoiceitem" /? nil)
   
   (** <p>Create an incoming testmode bank transfer</p>
@@ -1802,7 +1802,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/test_helpers/customers/{customer}/fund_cash_balance" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "fund_cash_balance" /? nil)
   
   (** <p>Updates the specified order by setting the values of the parameters passed.</p>
@@ -1813,7 +1813,7 @@ module Paths' = struct
     Routes.(s "v1" / s "climate" / s "orders"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"order" ~op:"/v1/climate/orders/{order}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"order" ~loc:`Path ~style:`Simple ~explode:false)
           ":order" /? nil)
   
   (** <p>Retrieves the details of a Climate order object with the given ID.</p>
@@ -1824,7 +1824,7 @@ module Paths' = struct
     Routes.(s "v1" / s "climate" / s "orders"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"order" ~op:"/v1/climate/orders/{order}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"order" ~loc:`Path ~style:`Simple ~explode:false)
           ":order" /? nil)
   
   (** <p>Retrieve funding instructions for a customer cash balance. If funding instructions do not yet exist for the customer, new
@@ -1837,7 +1837,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/funding_instructions" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "funding_instructions" /? nil)
   
   (** <p>Updates the specified payout by setting the values of the parameters you pass. We don’t change parameters that you don’t provide. This request only accepts the metadata as arguments.</p>
@@ -1848,7 +1848,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payouts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payout" ~op:"/v1/payouts/{payout}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payout" ~loc:`Path ~style:`Simple ~explode:false)
           ":payout" /? nil)
   
   (** <p>Retrieves the details of an existing payout. Supply the unique payout ID from either a payout creation request or the payout list. Stripe returns the corresponding payout information.</p>
@@ -1859,7 +1859,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payouts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payout" ~op:"/v1/payouts/{payout}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payout" ~loc:`Path ~style:`Simple ~explode:false)
           ":payout" /? nil)
   
   (** <p>Creates a new person.</p>
@@ -1870,7 +1870,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/people" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "people" /? nil)
   
   (** <p>Returns a list of people associated with the account’s legal entity. The people are returned sorted by creation date, with the most recent people appearing first.</p>
@@ -1881,7 +1881,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/people" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "people" /? nil)
   
   (** <p>Updates the details of a FinancialAccount.</p>
@@ -1892,7 +1892,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "financial_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"financial_account" ~op:"/v1/treasury/financial_accounts/{financial_account}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"financial_account" ~loc:`Path ~style:`Simple ~explode:false)
           ":financial_account" /? nil)
   
   (** <p>Retrieves the details of a FinancialAccount.</p>
@@ -1903,7 +1903,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "financial_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"financial_account" ~op:"/v1/treasury/financial_accounts/{financial_account}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"financial_account" ~loc:`Path ~style:`Simple ~explode:false)
           ":financial_account" /? nil)
   
   (** <p>Expire a refund with a status of <code>requires_action</code>.</p>
@@ -1914,7 +1914,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"refund" ~op:"/v1/test_helpers/refunds/{refund}/expire" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"refund" ~loc:`Path ~style:`Simple ~explode:false)
           ":refund" / s "expire" /? nil)
   
   (** <p>Retrieves the details of an scheduled query run.</p>
@@ -1925,7 +1925,7 @@ module Paths' = struct
     Routes.(s "v1" / s "sigma" / s "scheduled_query_runs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"scheduled_query_run" ~op:"/v1/sigma/scheduled_query_runs/{scheduled_query_run}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"scheduled_query_run" ~loc:`Path ~style:`Simple ~explode:false)
           ":scheduled_query_run" /? nil)
   
   (** <p>Refreshes the data associated with a Financial Connections <code>Account</code>.</p>
@@ -1936,7 +1936,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/financial_connections/accounts/{account}/refresh" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "refresh" /? nil)
   
   (** <p>Confirm that your customer intends to pay with current or provided
@@ -1968,7 +1968,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}/confirm" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "confirm" /? nil)
   
   (** <p>Updates a configuration that describes the functionality of the customer portal.</p>
@@ -1979,7 +1979,7 @@ module Paths' = struct
     Routes.(s "v1" / s "billing_portal" / s "configurations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"configuration" ~op:"/v1/billing_portal/configurations/{configuration}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"configuration" ~loc:`Path ~style:`Simple ~explode:false)
           ":configuration" /? nil)
   
   (** <p>Retrieves a configuration that describes the functionality of the customer portal.</p>
@@ -1990,7 +1990,7 @@ module Paths' = struct
     Routes.(s "v1" / s "billing_portal" / s "configurations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"configuration" ~op:"/v1/billing_portal/configurations/{configuration}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"configuration" ~loc:`Path ~style:`Simple ~explode:false)
           ":configuration" /? nil)
   
   (** <p>Deletes an existing account or customer <code>tax_id</code> object.</p>
@@ -2001,7 +2001,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax_ids"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/tax_ids/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves an account or customer <code>tax_id</code> object.</p>
@@ -2012,7 +2012,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax_ids"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/tax_ids/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>A quote models prices and services for a customer.</p>
@@ -2023,7 +2023,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" /? nil)
   
   (** <p>Retrieves the quote with the given ID.</p>
@@ -2034,7 +2034,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" /? nil)
   
   (** <p>Marks a credit note as void. Learn more about <a href="/docs/billing/invoices/credit-notes#voiding">voiding credit notes</a>.</p>
@@ -2045,7 +2045,7 @@ module Paths' = struct
     Routes.(s "v1" / s "credit_notes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/credit_notes/{id}/void" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "void" /? nil)
   
   (** <p>\[Deprecated\] Approves a pending Issuing <code>Authorization</code> object. This request should be made within the timeout window of the <a href="/docs/issuing/controls/real-time-authorizations">real-time authorization</a> flow. 
@@ -2057,7 +2057,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/issuing/authorizations/{authorization}/approve" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" / s "approve" /? nil)
   
   (** <p>Retrieves a ForwardingRequest object.</p>
@@ -2068,7 +2068,7 @@ module Paths' = struct
     Routes.(s "v1" / s "forwarding" / s "requests"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/forwarding/requests/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves the details of an early fraud warning that has previously been created. </p>
@@ -2081,7 +2081,7 @@ module Paths' = struct
     Routes.(s "v1" / s "radar" / s "early_fraud_warnings"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"early_fraud_warning" ~op:"/v1/radar/early_fraud_warnings/{early_fraud_warning}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"early_fraud_warning" ~loc:`Path ~style:`Simple ~explode:false)
           ":early_fraud_warning" /? nil)
   
   (** <p>Updates a test mode created OutboundPayment with tracking details. The OutboundPayment must not be cancelable, and cannot be in the <code>canceled</code> or <code>failed</code> states.</p>
@@ -2092,7 +2092,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_payments"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/test_helpers/treasury/outbound_payments/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Deletes an item from the subscription. Removing a subscription item from a subscription will not cancel the subscription.</p>
@@ -2103,7 +2103,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_items"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"item" ~op:"/v1/subscription_items/{item}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"item" ~loc:`Path ~style:`Simple ~explode:false)
           ":item" /? nil)
   
   (** <p>Updates the plan or quantity of an item on a current subscription.</p>
@@ -2114,7 +2114,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_items"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"item" ~op:"/v1/subscription_items/{item}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"item" ~loc:`Path ~style:`Simple ~explode:false)
           ":item" /? nil)
   
   (** <p>Retrieves the subscription item with the given ID.</p>
@@ -2125,7 +2125,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_items"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"item" ~op:"/v1/subscription_items/{item}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"item" ~loc:`Path ~style:`Simple ~explode:false)
           ":item" /? nil)
   
   (** <p>When you create a new refund, you must specify either a Charge or a PaymentIntent object.</p>
@@ -2146,7 +2146,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/refund" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "refund" /? nil)
   
   (** <p>Submits an Issuing <code>Dispute</code> to the card network. Stripe validates that all evidence fields required for the dispute’s reason are present. For more details, see <a href="/docs/issuing/purchases/disputes#dispute-reasons-and-evidence">Dispute reasons and evidence</a>.</p>
@@ -2157,7 +2157,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "disputes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"dispute" ~op:"/v1/issuing/disputes/{dispute}/submit" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"dispute" ~loc:`Path ~style:`Simple ~explode:false)
           ":dispute" / s "submit" /? nil)
   
   (** <p>When you create a new reversal, you must specify a transfer to create it on.</p>
@@ -2172,7 +2172,7 @@ module Paths' = struct
     Routes.(s "v1" / s "transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/transfers/{id}/reversals" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "reversals" /? nil)
   
   (** <p>You can see a list of the reversals belonging to a specific transfer. Note that the 10 most recent reversals are always available by default on the transfer object. If you need more than those 10, you can use this API method and the <code>limit</code> and <code>starting_after</code> parameters to page through additional reversals.</p>
@@ -2183,7 +2183,7 @@ module Paths' = struct
     Routes.(s "v1" / s "transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/transfers/{id}/reversals" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "reversals" /? nil)
   
   (** <p>Returns a Country Spec for a given Country code.</p>
@@ -2194,7 +2194,7 @@ module Paths' = struct
     Routes.(s "v1" / s "country_specs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"country" ~op:"/v1/country_specs/{country}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"country" ~loc:`Path ~style:`Simple ~explode:false)
           ":country" /? nil)
   
   (** <p>Refreshes the data associated with a Financial Connections <code>Account</code>.</p>
@@ -2205,7 +2205,7 @@ module Paths' = struct
     Routes.(s "v1" / s "linked_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/linked_accounts/{account}/refresh" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "refresh" /? nil)
   
   (** <p>Updates the shipping status of the specified Issuing <code>Card</code> object to <code>returned</code>.</p>
@@ -2216,7 +2216,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"card" ~op:"/v1/test_helpers/issuing/cards/{card}/shipping/return" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"card" ~loc:`Path ~style:`Simple ~explode:false)
           ":card" / s "shipping" / s "return" /? nil)
   
   (** <p>With <a href="/connect">Connect</a>, you can reject accounts that you have flagged as suspicious.</p>
@@ -2229,7 +2229,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/reject" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "reject" /? nil)
   
   (** <p>When retrieving an invoice, you’ll get a <strong>lines</strong> property containing the total count of line items and the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.</p>
@@ -2240,7 +2240,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}/lines" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" / s "lines" /? nil)
   
   (** <p>Retrieves the details of an existing Transaction.</p>
@@ -2251,7 +2251,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/treasury/transactions/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Capture a test-mode authorization.</p>
@@ -2262,7 +2262,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/test_helpers/issuing/authorizations/{authorization}/capture" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" / s "capture" /? nil)
   
   (** <p>Reverses a payout by debiting the destination bank account. At this time, you can only reverse payouts for connected accounts to US bank accounts. If the payout is manual and in the <code>pending</code> status, use <code>/v1/payouts/:id/cancel</code> instead.</p>
@@ -2275,7 +2275,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payouts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payout" ~op:"/v1/payouts/{payout}/reverse" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payout" ~loc:`Path ~style:`Simple ~explode:false)
           ":payout" / s "reverse" /? nil)
   
   (** <p>Removes the currently applied discount on a subscription.</p>
@@ -2286,7 +2286,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/subscriptions/{subscription_exposed_id}/discount" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" / s "discount" /? nil)
   
   (** <p>Creates a new person.</p>
@@ -2297,7 +2297,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/persons" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "persons" /? nil)
   
   (** <p>Returns a list of people associated with the account’s legal entity. The people are returned sorted by creation date, with the most recent people appearing first.</p>
@@ -2308,7 +2308,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/persons" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "persons" /? nil)
   
   (** <p>Cancels the quote.</p>
@@ -2319,7 +2319,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" / s "cancel" /? nil)
   
   (** <p>Updates an existing tax rate.</p>
@@ -2330,7 +2330,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax_rates"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"tax_rate" ~op:"/v1/tax_rates/{tax_rate}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"tax_rate" ~loc:`Path ~style:`Simple ~explode:false)
           ":tax_rate" /? nil)
   
   (** <p>Retrieves a tax rate with the given ID</p>
@@ -2341,7 +2341,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax_rates"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"tax_rate" ~op:"/v1/tax_rates/{tax_rate}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"tax_rate" ~loc:`Path ~style:`Simple ~explode:false)
           ":tax_rate" /? nil)
   
   (** <p>Updates the specified source by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -2354,7 +2354,7 @@ module Paths' = struct
     Routes.(s "v1" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"source" ~op:"/v1/sources/{source}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"source" ~loc:`Path ~style:`Simple ~explode:false)
           ":source" /? nil)
   
   (** <p>Retrieves an existing source object. Supply the unique source ID from a source creation request and Stripe will return the corresponding up-to-date source object information.</p>
@@ -2365,7 +2365,7 @@ module Paths' = struct
     Routes.(s "v1" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"source" ~op:"/v1/sources/{source}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"source" ~loc:`Path ~style:`Simple ~explode:false)
           ":source" /? nil)
   
   (** <p>Unsubscribes from periodic refreshes of data associated with a Financial Connections <code>Account</code>.</p>
@@ -2376,7 +2376,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/financial_connections/accounts/{account}/unsubscribe" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "unsubscribe" /? nil)
   
   (** <p>Verifies microdeposits on a PaymentIntent object.</p>
@@ -2387,7 +2387,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}/verify_microdeposits" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "verify_microdeposits" /? nil)
   
   (** <p>An OutboundTransfer can be canceled if the funds have not yet been paid out.</p>
@@ -2398,7 +2398,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "outbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"outbound_transfer" ~op:"/v1/treasury/outbound_transfers/{outbound_transfer}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"outbound_transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":outbound_transfer" / s "cancel" /? nil)
   
   (** <p>Transitions a test mode created OutboundPayment to the <code>posted</code> status. The OutboundPayment must already be in the <code>processing</code> state.</p>
@@ -2409,7 +2409,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_payments"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/test_helpers/treasury/outbound_payments/{id}/post" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "post" /? nil)
   
   (** <p>Creates a usage record for a specified subscription item and date, and fills it with a quantity.</p>
@@ -2426,7 +2426,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_items"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_item" ~op:"/v1/subscription_items/{subscription_item}/usage_records" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_item" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_item" / s "usage_records" /? nil)
   
   (** <p>Retrieves an existing VerificationReport</p>
@@ -2437,7 +2437,7 @@ module Paths' = struct
     Routes.(s "v1" / s "identity" / s "verification_reports"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"report" ~op:"/v1/identity/verification_reports/{report}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"report" ~loc:`Path ~style:`Simple ~explode:false)
           ":report" /? nil)
   
   (** <p>Some payment methods such as Apple Pay require additional steps to verify a domain. If the requirements weren’t satisfied when the domain was created, the payment method will be inactive on the domain.
@@ -2453,7 +2453,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_method_domains"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method_domain" ~op:"/v1/payment_method_domains/{payment_method_domain}/validate" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method_domain" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method_domain" / s "validate" /? nil)
   
   (** <p>Cancels the current reader action.</p>
@@ -2464,7 +2464,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}/cancel_action" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" / s "cancel_action" /? nil)
   
   (** <p>Deletes a <code>ValueListItem</code> object, removing it from its parent value list.</p>
@@ -2475,7 +2475,7 @@ module Paths' = struct
     Routes.(s "v1" / s "radar" / s "value_list_items"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"item" ~op:"/v1/radar/value_list_items/{item}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"item" ~loc:`Path ~style:`Simple ~explode:false)
           ":item" /? nil)
   
   (** <p>Retrieves a <code>ValueListItem</code> object.</p>
@@ -2486,7 +2486,7 @@ module Paths' = struct
     Routes.(s "v1" / s "radar" / s "value_list_items"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"item" ~op:"/v1/radar/value_list_items/{item}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"item" ~loc:`Path ~style:`Simple ~explode:false)
           ":item" /? nil)
   
   (** @param id id
@@ -2495,7 +2495,7 @@ module Paths' = struct
     Routes.(s "v1" / s "application_fees"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/application_fees/{id}/refund" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "refund" /? nil)
   
   (** <p>Updates a card personalization object.</p>
@@ -2506,7 +2506,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "personalization_designs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"personalization_design" ~op:"/v1/issuing/personalization_designs/{personalization_design}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"personalization_design" ~loc:`Path ~style:`Simple ~explode:false)
           ":personalization_design" /? nil)
   
   (** <p>Retrieves a personalization design object.</p>
@@ -2517,7 +2517,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "personalization_designs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"personalization_design" ~op:"/v1/issuing/personalization_designs/{personalization_design}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"personalization_design" ~loc:`Path ~style:`Simple ~explode:false)
           ":personalization_design" /? nil)
   
   (** <p>When you create a new credit card, you must specify a customer or recipient on which to create it.</p>
@@ -2532,7 +2532,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cards" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cards" /? nil)
   
   (** <p>You can see a list of the cards belonging to a customer.
@@ -2545,7 +2545,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cards" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cards" /? nil)
   
   (** <p>Delete a product. Deleting a product is only possible if it has no prices associated with it. Additionally, deleting a product with <code>type=good</code> is only possible if it has no SKUs associated with it.</p>
@@ -2556,7 +2556,7 @@ module Paths' = struct
     Routes.(s "v1" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/products/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates the specific product by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -2567,7 +2567,7 @@ module Paths' = struct
     Routes.(s "v1" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/products/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves the details of an existing product. Supply the unique product ID from either a product creation request or the product list, and Stripe will return the corresponding product information.</p>
@@ -2578,7 +2578,7 @@ module Paths' = struct
     Routes.(s "v1" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/products/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates the <code>status</code> of the specified testmode personalization design object to <code>active</code>.</p>
@@ -2590,7 +2590,7 @@ module Paths' = struct
       / s "personalization_designs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"personalization_design" ~op:"/v1/test_helpers/issuing/personalization_designs/{personalization_design}/activate" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"personalization_design" ~loc:`Path ~style:`Simple ~explode:false)
           ":personalization_design" / s "activate" /? nil)
   
   (** <p>You can cancel a SetupIntent object when it’s in one of these statuses: <code>requires_payment_method</code>, <code>requires_confirmation</code>, or <code>requires_action</code>. </p>
@@ -2603,7 +2603,7 @@ module Paths' = struct
     Routes.(s "v1" / s "setup_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/setup_intents/{intent}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "cancel" /? nil)
   
   (** <p>You can delete coupons via the <a href="https://dashboard.stripe.com/coupons">coupon management</a> page of the Stripe dashboard. However, deleting a coupon does not affect any customers who have already applied the coupon; it means that new customers can’t redeem the coupon. You can also delete coupons via the API.</p>
@@ -2614,7 +2614,7 @@ module Paths' = struct
     Routes.(s "v1" / s "coupons"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"coupon" ~op:"/v1/coupons/{coupon}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"coupon" ~loc:`Path ~style:`Simple ~explode:false)
           ":coupon" /? nil)
   
   (** <p>Updates the metadata of a coupon. Other coupon details (currency, duration, amount_off) are, by design, not editable.</p>
@@ -2625,7 +2625,7 @@ module Paths' = struct
     Routes.(s "v1" / s "coupons"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"coupon" ~op:"/v1/coupons/{coupon}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"coupon" ~loc:`Path ~style:`Simple ~explode:false)
           ":coupon" /? nil)
   
   (** <p>Retrieves the coupon with the given ID.</p>
@@ -2636,7 +2636,7 @@ module Paths' = struct
     Routes.(s "v1" / s "coupons"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"coupon" ~op:"/v1/coupons/{coupon}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"coupon" ~loc:`Path ~style:`Simple ~explode:false)
           ":coupon" /? nil)
   
   (** <p>Marking an invoice as uncollectible is useful for keeping track of bad debts that can be written off for accounting purposes.</p>
@@ -2647,7 +2647,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}/mark_uncollectible" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" / s "mark_uncollectible" /? nil)
   
   (** <p>Retrieves the details of an existing ReceivedDebit by passing the unique ReceivedDebit ID from the ReceivedDebit list</p>
@@ -2658,7 +2658,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "received_debits"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/treasury/received_debits/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Sets reader display to show cart details.</p>
@@ -2669,7 +2669,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}/set_reader_display" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" / s "set_reader_display" /? nil)
   
   (** <p>Redact a VerificationSession to remove all collected information from Stripe. This will redact
@@ -2698,7 +2698,7 @@ module Paths' = struct
     Routes.(s "v1" / s "identity" / s "verification_sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/identity/verification_sessions/{session}/redact" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" / s "redact" /? nil)
   
   (** <p>Updates the refund that you specify by setting the values of the passed parameters. Any parameters that you don’t provide remain unchanged.</p>
@@ -2711,7 +2711,7 @@ module Paths' = struct
     Routes.(s "v1" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"refund" ~op:"/v1/refunds/{refund}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"refund" ~loc:`Path ~style:`Simple ~explode:false)
           ":refund" /? nil)
   
   (** <p>Retrieves the details of an existing refund.</p>
@@ -2722,7 +2722,7 @@ module Paths' = struct
     Routes.(s "v1" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"refund" ~op:"/v1/refunds/{refund}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"refund" ~loc:`Path ~style:`Simple ~explode:false)
           ":refund" /? nil)
   
   (** <p>When retrieving a Checkout Session, there is an includable <strong>line_items</strong> property containing the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.</p>
@@ -2733,7 +2733,7 @@ module Paths' = struct
     Routes.(s "v1" / s "checkout" / s "sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/checkout/sessions/{session}/line_items" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" / s "line_items" /? nil)
   
   (** <p>Transitions a test mode created OutboundTransfer to the <code>posted</code> status. The OutboundTransfer must already be in the <code>processing</code> state.</p>
@@ -2744,7 +2744,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"outbound_transfer" ~op:"/v1/test_helpers/treasury/outbound_transfers/{outbound_transfer}/post" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"outbound_transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":outbound_transfer" / s "post" /? nil)
   
   (** <p>Releases the subscription schedule immediately, which will stop scheduling of its phases, but leave any existing subscription in place. A schedule can only be released if its status is <code>not_started</code> or <code>active</code>. If the subscription schedule is currently associated with a subscription, releasing it will remove its <code>subscription</code> property and set the subscription’s ID to the <code>released_subscription</code> property.</p>
@@ -2755,7 +2755,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_schedules"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"schedule" ~op:"/v1/subscription_schedules/{schedule}/release" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"schedule" ~loc:`Path ~style:`Simple ~explode:false)
           ":schedule" / s "release" /? nil)
   
   (** <p>When retrieving a credit note, you’ll get a <strong>lines</strong> property containing the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.</p>
@@ -2766,7 +2766,7 @@ module Paths' = struct
     Routes.(s "v1" / s "credit_notes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"credit_note" ~op:"/v1/credit_notes/{credit_note}/lines" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"credit_note" ~loc:`Path ~style:`Simple ~explode:false)
           ":credit_note" / s "lines" /? nil)
   
   (** <p>Detaches a PaymentMethod object from a Customer. After a PaymentMethod is detached, it can no longer be used for a payment or re-attached to a Customer.</p>
@@ -2777,7 +2777,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_methods"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method" ~op:"/v1/payment_methods/{payment_method}/detach" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method" / s "detach" /? nil)
   
   (** <p>Retrieves a DebitReversal object.</p>
@@ -2788,7 +2788,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "debit_reversals"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"debit_reversal" ~op:"/v1/treasury/debit_reversals/{debit_reversal}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"debit_reversal" ~loc:`Path ~style:`Simple ~explode:false)
           ":debit_reversal" /? nil)
   
   (** <p>Retrieves the details of an existing tax code. Supply the unique tax code ID and Stripe will return the corresponding tax code information.</p>
@@ -2799,7 +2799,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax_codes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/tax_codes/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Disables your access to a Financial Connections <code>Account</code>. You will no longer be able to access data associated with the account (e.g. balances, transactions).</p>
@@ -2810,7 +2810,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/financial_connections/accounts/{account}/disconnect" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "disconnect" /? nil)
   
   (** <p>Updates the specified promotion code by setting the values of the parameters passed. Most fields are, by design, not editable.</p>
@@ -2821,7 +2821,7 @@ module Paths' = struct
     Routes.(s "v1" / s "promotion_codes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"promotion_code" ~op:"/v1/promotion_codes/{promotion_code}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"promotion_code" ~loc:`Path ~style:`Simple ~explode:false)
           ":promotion_code" /? nil)
   
   (** <p>Retrieves the promotion code with the given ID. In order to retrieve a promotion code by the customer-facing <code>code</code> use <a href="/docs/api/promotion_codes/list">list</a> with the desired <code>code</code>.</p>
@@ -2832,7 +2832,7 @@ module Paths' = struct
     Routes.(s "v1" / s "promotion_codes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"promotion_code" ~op:"/v1/promotion_codes/{promotion_code}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"promotion_code" ~loc:`Path ~style:`Simple ~explode:false)
           ":promotion_code" /? nil)
   
   (** <p>Updates an existing shipping rate object.</p>
@@ -2843,7 +2843,7 @@ module Paths' = struct
     Routes.(s "v1" / s "shipping_rates"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"shipping_rate_token" ~op:"/v1/shipping_rates/{shipping_rate_token}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"shipping_rate_token" ~loc:`Path ~style:`Simple ~explode:false)
           ":shipping_rate_token" /? nil)
   
   (** <p>Returns the shipping rate object with the given ID.</p>
@@ -2854,7 +2854,7 @@ module Paths' = struct
     Routes.(s "v1" / s "shipping_rates"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"shipping_rate_token" ~op:"/v1/shipping_rates/{shipping_rate_token}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"shipping_rate_token" ~loc:`Path ~style:`Simple ~explode:false)
           ":shipping_rate_token" /? nil)
   
   (** <p>Reactivates a billing meter</p>
@@ -2865,7 +2865,7 @@ module Paths' = struct
     Routes.(s "v1" / s "billing" / s "meters"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/billing/meters/{id}/reactivate" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "reactivate" /? nil)
   
   (** <p>You can cancel a PaymentIntent object when it’s in one of these statuses: <code>requires_payment_method</code>, <code>requires_capture</code>, <code>requires_confirmation</code>, <code>requires_action</code> or, <a href="/docs/payments/intents">in rare cases</a>, <code>processing</code>. </p>
@@ -2880,7 +2880,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "cancel" /? nil)
   
   (** <p>Retrieves the details of an existing OutboundPayment by passing the unique OutboundPayment ID from either the OutboundPayment creation request or OutboundPayment list.</p>
@@ -2891,7 +2891,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "outbound_payments"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/treasury/outbound_payments/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves the details of a Financial Connections <code>Transaction</code></p>
@@ -2902,7 +2902,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/financial_connections/transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" /? nil)
   
   (** <p>Download the PDF for a finalized quote. Explanation for special handling can be found <a href="https://docs.corp.stripe.com/quotes/overview#quote_pdf">here</a></p>
@@ -2913,7 +2913,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}/pdf" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" / s "pdf" /? nil)
   
   (** @param charge charge
@@ -2922,7 +2922,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/dispute" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "dispute" /? nil)
   
   (** <p>Retrieve a dispute for a specified charge.</p>
@@ -2933,7 +2933,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/dispute" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "dispute" /? nil)
   
   (** <p>Marks the test mode InboundTransfer object as returned and links the InboundTransfer to a ReceivedDebit. The InboundTransfer must already be in the <code>succeeded</code> state.</p>
@@ -2944,7 +2944,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "inbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/test_helpers/treasury/inbound_transfers/{id}/return" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "return" /? nil)
   
   (** <p>Retrieves an existing ConfirmationToken object</p>
@@ -2955,7 +2955,7 @@ module Paths' = struct
     Routes.(s "v1" / s "confirmation_tokens"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"confirmation_token" ~op:"/v1/confirmation_tokens/{confirmation_token}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"confirmation_token" ~loc:`Path ~style:`Simple ~explode:false)
           ":confirmation_token" /? nil)
   
   (** <p>Verify a given source.</p>
@@ -2966,7 +2966,7 @@ module Paths' = struct
     Routes.(s "v1" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"source" ~op:"/v1/sources/{source}/verify" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"source" ~loc:`Path ~style:`Simple ~explode:false)
           ":source" / s "verify" /? nil)
   
   (** <p>Cancels a top-up. Only pending top-ups can be canceled.</p>
@@ -2977,7 +2977,7 @@ module Paths' = struct
     Routes.(s "v1" / s "topups"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"topup" ~op:"/v1/topups/{topup}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"topup" ~loc:`Path ~style:`Simple ~explode:false)
           ":topup" / s "cancel" /? nil)
   
   (** <p>Creates a new subscription on an existing customer.</p>
@@ -2988,7 +2988,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/subscriptions" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "subscriptions" /? nil)
   
   (** <p>You can see a list of the customer’s active subscriptions. Note that the 10 most recent active subscriptions are always available by default on the customer object. If you need more than those 10, you can use the limit and starting_after parameters to page through additional subscriptions.</p>
@@ -2999,7 +2999,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/subscriptions" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "subscriptions" /? nil)
   
   (** <p>Disables your access to a Financial Connections <code>Account</code>. You will no longer be able to access data associated with the account (e.g. balances, transactions).</p>
@@ -3010,7 +3010,7 @@ module Paths' = struct
     Routes.(s "v1" / s "linked_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/linked_accounts/{account}/disconnect" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "disconnect" /? nil)
   
   (** <p>Updates the shipping status of the specified Issuing <code>Card</code> object to <code>delivered</code>.</p>
@@ -3021,7 +3021,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"card" ~op:"/v1/test_helpers/issuing/cards/{card}/shipping/deliver" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"card" ~loc:`Path ~style:`Simple ~explode:false)
           ":card" / s "shipping" / s "deliver" /? nil)
   
   (** <p>Approves a <code>Review</code> object, closing it and removing it from the list of reviews.</p>
@@ -3032,7 +3032,7 @@ module Paths' = struct
     Routes.(s "v1" / s "reviews"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"review" ~op:"/v1/reviews/{review}/approve" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"review" ~loc:`Path ~style:`Simple ~explode:false)
           ":review" / s "approve" /? nil)
   
   (** <p>Delete an apple pay domain.</p>
@@ -3043,7 +3043,7 @@ module Paths' = struct
     Routes.(s "v1" / s "apple_pay" / s "domains"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"domain" ~op:"/v1/apple_pay/domains/{domain}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"domain" ~loc:`Path ~style:`Simple ~explode:false)
           ":domain" /? nil)
   
   (** <p>Retrieve an apple pay domain.</p>
@@ -3054,7 +3054,7 @@ module Paths' = struct
     Routes.(s "v1" / s "apple_pay" / s "domains"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"domain" ~op:"/v1/apple_pay/domains/{domain}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"domain" ~loc:`Path ~style:`Simple ~explode:false)
           ":domain" /? nil)
   
   (** <p>Permanently deletes a one-off invoice draft. This cannot be undone. Attempts to delete invoices that are no longer in a draft state will fail; once an invoice has been finalized or if an invoice is for a subscription, it must be <a href="#void_invoice">voided</a>.</p>
@@ -3065,7 +3065,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" /? nil)
   
   (** <p>Draft invoices are fully editable. Once an invoice is <a href="/docs/billing/invoices/workflow#finalized">finalized</a>,
@@ -3081,7 +3081,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" /? nil)
   
   (** <p>Retrieves the invoice with the given ID.</p>
@@ -3092,7 +3092,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" /? nil)
   
   (** <p>Expire a test-mode Authorization.</p>
@@ -3103,7 +3103,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/test_helpers/issuing/authorizations/{authorization}/expire" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" / s "expire" /? nil)
   
   (** <p>Retrieves the details of a Financial Connections <code>Session</code></p>
@@ -3114,7 +3114,7 @@ module Paths' = struct
     Routes.(s "v1" / s "link_account_sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/link_account_sessions/{session}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" /? nil)
   
   (** <p>Retrieves the details of a Report Type. (Certain report types require a <a href="https://stripe.com/docs/keys#test-live-modes">live-mode API key</a>.)</p>
@@ -3125,7 +3125,7 @@ module Paths' = struct
     Routes.(s "v1" / s "reporting" / s "report_types"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"report_type" ~op:"/v1/reporting/report_types/{report_type}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"report_type" ~loc:`Path ~style:`Simple ~explode:false)
           ":report_type" /? nil)
   
   (** <p>Invalidates a short-lived API key for a given resource.</p>
@@ -3136,7 +3136,7 @@ module Paths' = struct
     Routes.(s "v1" / s "ephemeral_keys"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"key" ~op:"/v1/ephemeral_keys/{key}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"key" ~loc:`Path ~style:`Simple ~explode:false)
           ":key" /? nil)
   
   (** <p>Retrieves the token with the given ID.</p>
@@ -3147,7 +3147,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tokens"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"token" ~op:"/v1/tokens/{token}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"token" ~loc:`Path ~style:`Simple ~explode:false)
           ":token" /? nil)
   
   (** <p>Initiates resumption of a paused subscription, optionally resetting the billing cycle anchor and creating prorations. If a resumption invoice is generated, it must be paid or marked uncollectible before the subscription will be unpaused. If payment succeeds the subscription will become <code>active</code>, and if payment fails the subscription will be <code>past_due</code>. The resumption invoice will void automatically if not paid by the expiration date.</p>
@@ -3158,7 +3158,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription" ~op:"/v1/subscriptions/{subscription}/resume" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription" / s "resume" /? nil)
   
   (** <p>Retrieves the details of an existing InboundTransfer.</p>
@@ -3169,7 +3169,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "inbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/treasury/inbound_transfers/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates the specified Issuing <code>Cardholder</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -3180,7 +3180,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "cardholders"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"cardholder" ~op:"/v1/issuing/cardholders/{cardholder}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"cardholder" ~loc:`Path ~style:`Simple ~explode:false)
           ":cardholder" /? nil)
   
   (** <p>Retrieves an Issuing <code>Cardholder</code> object.</p>
@@ -3191,7 +3191,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "cardholders"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"cardholder" ~op:"/v1/issuing/cardholders/{cardholder}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"cardholder" ~loc:`Path ~style:`Simple ~explode:false)
           ":cardholder" /? nil)
   
   (** <p>When retrieving a quote, there is an includable <a href="https://stripe.com/docs/api/quotes/object#quote_object-computed-upfront-line_items"><strong>computed.upfront.line_items</strong></a> property containing the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of upfront line items.</p>
@@ -3202,7 +3202,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}/computed_upfront_line_items" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" / s "computed_upfront_line_items" /? nil)
   
   (** <p>Retrieves the details of a Climate product with the given ID.</p>
@@ -3213,7 +3213,7 @@ module Paths' = struct
     Routes.(s "v1" / s "climate" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"product" ~op:"/v1/climate/products/{product}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"product" ~loc:`Path ~style:`Simple ~explode:false)
           ":product" /? nil)
   
   (** <p>Deletes a test clock.</p>
@@ -3224,7 +3224,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "test_clocks"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"test_clock" ~op:"/v1/test_helpers/test_clocks/{test_clock}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"test_clock" ~loc:`Path ~style:`Simple ~explode:false)
           ":test_clock" /? nil)
   
   (** <p>Retrieves a test clock.</p>
@@ -3235,7 +3235,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "test_clocks"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"test_clock" ~op:"/v1/test_helpers/test_clocks/{test_clock}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"test_clock" ~loc:`Path ~style:`Simple ~explode:false)
           ":test_clock" /? nil)
   
   (** <p>When you create a new credit card, you must specify a customer or recipient on which to create it.</p>
@@ -3250,7 +3250,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/sources" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "sources" /? nil)
   
   (** <p>List sources for a specified customer.</p>
@@ -3261,7 +3261,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/sources" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "sources" /? nil)
   
   (** <p>Initiates a payment flow on a Reader.</p>
@@ -3272,7 +3272,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}/process_payment_intent" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" / s "process_payment_intent" /? nil)
   
   (** <p>Transitions a test mode created OutboundPayment to the <code>returned</code> status. The OutboundPayment must already be in the <code>processing</code> state.</p>
@@ -3283,7 +3283,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_payments"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/test_helpers/treasury/outbound_payments/{id}/return" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "return" /? nil)
   
   (** <p>Creates a single-use login link for a connected account to access the Express Dashboard.</p>
@@ -3296,7 +3296,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/login_links" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "login_links" /? nil)
   
   (** <p>Retrieves a Tax <code>Transaction</code> object.</p>
@@ -3307,7 +3307,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax" / s "transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/tax/transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" /? nil)
   
   (** <p>Retrieves the details of an existing file object. After you supply a unique file ID, Stripe returns the corresponding file object. Learn how to <a href="/docs/file-upload#download-file-contents">access file contents</a>.</p>
@@ -3318,7 +3318,7 @@ module Paths' = struct
     Routes.(s "v1" / s "files"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"file" ~op:"/v1/files/{file}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"file" ~loc:`Path ~style:`Simple ~explode:false)
           ":file" /? nil)
   
   (** <p>Creates a product_feature, which represents a feature attachment to a product</p>
@@ -3329,7 +3329,7 @@ module Paths' = struct
     Routes.(s "v1" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"product" ~op:"/v1/products/{product}/features" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"product" ~loc:`Path ~style:`Simple ~explode:false)
           ":product" / s "features" /? nil)
   
   (** <p>Retrieve a list of features for a product</p>
@@ -3340,7 +3340,7 @@ module Paths' = struct
     Routes.(s "v1" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"product" ~op:"/v1/products/{product}/features" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"product" ~loc:`Path ~style:`Simple ~explode:false)
           ":product" / s "features" /? nil)
   
   (** <p>Updates the <code>status</code> of the specified testmode personalization design object to <code>inactive</code>.</p>
@@ -3352,7 +3352,7 @@ module Paths' = struct
       / s "personalization_designs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"personalization_design" ~op:"/v1/test_helpers/issuing/personalization_designs/{personalization_design}/deactivate" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"personalization_design" ~loc:`Path ~style:`Simple ~explode:false)
           ":personalization_design" / s "deactivate" /? nil)
   
   (** <p>Confirm that your customer intends to set up the current or
@@ -3376,7 +3376,7 @@ module Paths' = struct
     Routes.(s "v1" / s "setup_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/setup_intents/{intent}/confirm" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "confirm" /? nil)
   
   (** <p>Updates a billing meter</p>
@@ -3387,7 +3387,7 @@ module Paths' = struct
     Routes.(s "v1" / s "billing" / s "meters"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/billing/meters/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves a billing meter given an ID</p>
@@ -3398,7 +3398,7 @@ module Paths' = struct
     Routes.(s "v1" / s "billing" / s "meters"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/billing/meters/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Stripe automatically creates and then attempts to collect payment on invoices for customers on subscriptions according to your <a href="https://dashboard.stripe.com/account/billing/automatic">subscriptions settings</a>. However, if you’d like to attempt payment on an invoice out of the normal collection schedule or for some other reason, you can do so.</p>
@@ -3409,7 +3409,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}/pay" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" / s "pay" /? nil)
   
   (** <p>Attempts to update the specified Issuing <code>Token</code> object to the status specified.</p>
@@ -3420,7 +3420,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "tokens"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"token" ~op:"/v1/issuing/tokens/{token}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"token" ~loc:`Path ~style:`Simple ~explode:false)
           ":token" /? nil)
   
   (** <p>Retrieves an Issuing <code>Token</code> object.</p>
@@ -3431,7 +3431,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "tokens"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"token" ~op:"/v1/issuing/tokens/{token}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"token" ~loc:`Path ~style:`Simple ~explode:false)
           ":token" /? nil)
   
   (** <p>Cancels a refund with a status of <code>requires_action</code>.</p>
@@ -3444,7 +3444,7 @@ module Paths' = struct
     Routes.(s "v1" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"refund" ~op:"/v1/refunds/{refund}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"refund" ~loc:`Path ~style:`Simple ~explode:false)
           ":refund" / s "cancel" /? nil)
   
   (** <p>Updates an existing credit note.</p>
@@ -3455,7 +3455,7 @@ module Paths' = struct
     Routes.(s "v1" / s "credit_notes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/credit_notes/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves the credit note object with the given identifier.</p>
@@ -3466,7 +3466,7 @@ module Paths' = struct
     Routes.(s "v1" / s "credit_notes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/credit_notes/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Transitions a test mode created OutboundTransfer to the <code>returned</code> status. The OutboundTransfer must already be in the <code>processing</code> state.</p>
@@ -3477,7 +3477,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"outbound_transfer" ~op:"/v1/test_helpers/treasury/outbound_transfers/{outbound_transfer}/return" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"outbound_transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":outbound_transfer" / s "return" /? nil)
   
   (** <p>Retrieve an active entitlement</p>
@@ -3488,7 +3488,7 @@ module Paths' = struct
     Routes.(s "v1" / s "entitlements" / s "active_entitlements"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/entitlements/active_entitlements/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Returns a list of capabilities associated with the account. The capabilities are returned sorted by creation date, with the most recent capability appearing first.</p>
@@ -3499,7 +3499,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/capabilities" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "capabilities" /? nil)
   
   (** <p>Lists all owners for a given <code>Account</code></p>
@@ -3510,7 +3510,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/financial_connections/accounts/{account}/owners" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "owners" /? nil)
   
   (** <p>Capture the funds of an existing uncaptured PaymentIntent when its status is <code>requires_capture</code>.</p>
@@ -3525,7 +3525,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}/capture" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "capture" /? nil)
   
   (** <p>Retrieves the balance transaction with the given ID.</p>
@@ -3538,7 +3538,7 @@ module Paths' = struct
     Routes.(s "v1" / s "balance_transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/balance_transactions/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Refund a test-mode Transaction.</p>
@@ -3549,7 +3549,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/test_helpers/issuing/transactions/{transaction}/refund" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" / s "refund" /? nil)
   
   (** <p>Removes the currently applied discount on a customer.</p>
@@ -3560,7 +3560,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/discount" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "discount" /? nil)
   
   (** @param customer customer
@@ -3569,7 +3569,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/discount" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "discount" /? nil)
   
   (** <p>Updates the specified Issuing <code>Authorization</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -3580,7 +3580,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/issuing/authorizations/{authorization}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" /? nil)
   
   (** <p>Retrieves an Issuing <code>Authorization</code> object.</p>
@@ -3591,7 +3591,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/issuing/authorizations/{authorization}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" /? nil)
   
   (** <p>Cancel an OutboundPayment.</p>
@@ -3602,7 +3602,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "outbound_payments"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/treasury/outbound_payments/{id}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "cancel" /? nil)
   
   (** <p>Updates the specified Issuing <code>Dispute</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged. Properties on the <code>evidence</code> object can be unset by passing in an empty string.</p>
@@ -3613,7 +3613,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "disputes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"dispute" ~op:"/v1/issuing/disputes/{dispute}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"dispute" ~loc:`Path ~style:`Simple ~explode:false)
           ":dispute" /? nil)
   
   (** <p>Retrieves an Issuing <code>Dispute</code> object.</p>
@@ -3624,7 +3624,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "disputes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"dispute" ~op:"/v1/issuing/disputes/{dispute}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"dispute" ~loc:`Path ~style:`Simple ~explode:false)
           ":dispute" /? nil)
   
   (** <p>Deletes a <code>Location</code> object.</p>
@@ -3635,7 +3635,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "locations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"location" ~op:"/v1/terminal/locations/{location}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"location" ~loc:`Path ~style:`Simple ~explode:false)
           ":location" /? nil)
   
   (** <p>Updates a <code>Location</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -3646,7 +3646,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "locations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"location" ~op:"/v1/terminal/locations/{location}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"location" ~loc:`Path ~style:`Simple ~explode:false)
           ":location" /? nil)
   
   (** <p>Retrieves a <code>Location</code> object.</p>
@@ -3657,7 +3657,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "locations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"location" ~op:"/v1/terminal/locations/{location}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"location" ~loc:`Path ~style:`Simple ~explode:false)
           ":location" /? nil)
   
   (** <p>Transitions a test mode created InboundTransfer to the <code>succeeded</code> status. The InboundTransfer must already be in the <code>processing</code> state.</p>
@@ -3668,7 +3668,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "inbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/test_helpers/treasury/inbound_transfers/{id}/succeed" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "succeed" /? nil)
   
   (** @param charge charge
@@ -3677,7 +3677,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/dispute/close" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "dispute" / s "close" /? nil)
   
   (** <p>Update payment method configuration</p>
@@ -3688,7 +3688,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_method_configurations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"configuration" ~op:"/v1/payment_method_configurations/{configuration}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"configuration" ~loc:`Path ~style:`Simple ~explode:false)
           ":configuration" /? nil)
   
   (** <p>Retrieve payment method configuration</p>
@@ -3699,7 +3699,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_method_configurations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"configuration" ~op:"/v1/payment_method_configurations/{configuration}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"configuration" ~loc:`Path ~style:`Simple ~explode:false)
           ":configuration" /? nil)
   
   (** <p>Updates an existing Tax <code>Registration</code> object.</p>
@@ -3712,7 +3712,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax" / s "registrations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/tax/registrations/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Returns a Tax <code>Registration</code> object.</p>
@@ -3723,7 +3723,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax" / s "registrations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/tax/registrations/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves the exchange rates from the given currency to every supported currency.</p>
@@ -3734,7 +3734,7 @@ module Paths' = struct
     Routes.(s "v1" / s "exchange_rates"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"rate_id" ~op:"/v1/exchange_rates/{rate_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"rate_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":rate_id" /? nil)
   
   (** <p>Lists all owners for a given <code>Account</code></p>
@@ -3745,7 +3745,7 @@ module Paths' = struct
     Routes.(s "v1" / s "linked_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/linked_accounts/{account}/owners" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "owners" /? nil)
   
   (** <p>Refunds an application fee that has previously been collected but not yet refunded.
@@ -3764,7 +3764,7 @@ module Paths' = struct
     Routes.(s "v1" / s "application_fees"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/application_fees/{id}/refunds" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "refunds" /? nil)
   
   (** <p>You can see a list of the refunds belonging to a specific application fee. Note that the 10 most recent refunds are always available by default on the application fee object. If you need more than those 10, you can use this API method and the <code>limit</code> and <code>starting_after</code> parameters to page through additional refunds.</p>
@@ -3775,7 +3775,7 @@ module Paths' = struct
     Routes.(s "v1" / s "application_fees"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/application_fees/{id}/refunds" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "refunds" /? nil)
   
   (** <p>Updates the shipping status of the specified Issuing <code>Card</code> object to <code>failure</code>.</p>
@@ -3786,7 +3786,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"card" ~op:"/v1/test_helpers/issuing/cards/{card}/shipping/fail" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"card" ~loc:`Path ~style:`Simple ~explode:false)
           ":card" / s "shipping" / s "fail" /? nil)
   
   (** <p>Updates the specified price by setting the values of the parameters passed. Any parameters not provided are left unchanged.</p>
@@ -3797,7 +3797,7 @@ module Paths' = struct
     Routes.(s "v1" / s "prices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"price" ~op:"/v1/prices/{price}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"price" ~loc:`Path ~style:`Simple ~explode:false)
           ":price" /? nil)
   
   (** <p>Retrieves the price with the given ID.</p>
@@ -3808,7 +3808,7 @@ module Paths' = struct
     Routes.(s "v1" / s "prices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"price" ~op:"/v1/prices/{price}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"price" ~loc:`Path ~style:`Simple ~explode:false)
           ":price" /? nil)
   
   (** <p>When you create a new credit card, you must specify a customer or recipient on which to create it.</p>
@@ -3823,7 +3823,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/bank_accounts" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "bank_accounts" /? nil)
   
   (** <p>You can see a list of the bank accounts belonging to a Customer. Note that the 10 most recent sources are always available by default on the Customer. If you need more than those 10, you can use this API method and the <code>limit</code> and <code>starting_after</code> parameters to page through additional bank accounts.</p>
@@ -3834,7 +3834,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/bank_accounts" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "bank_accounts" /? nil)
   
   (** <p>Stripe automatically finalizes drafts before sending and attempting payment on invoices. However, if you’d like to finalize a draft invoice manually, you can do so using this method.</p>
@@ -3845,7 +3845,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}/finalize" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" / s "finalize" /? nil)
   
   (** <p>Updates the specified Issuing <code>Transaction</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -3856,7 +3856,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/issuing/transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" /? nil)
   
   (** <p>Retrieves an Issuing <code>Transaction</code> object.</p>
@@ -3867,7 +3867,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/issuing/transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" /? nil)
   
   (** <p>Retrieves the details of an existing Report Run.</p>
@@ -3878,7 +3878,7 @@ module Paths' = struct
     Routes.(s "v1" / s "reporting" / s "report_runs"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"report_run" ~op:"/v1/reporting/report_runs/{report_run}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"report_run" ~loc:`Path ~style:`Simple ~explode:false)
           ":report_run" /? nil)
   
   (** <p>Update a feature’s metadata or permanently deactivate it.</p>
@@ -3889,7 +3889,7 @@ module Paths' = struct
     Routes.(s "v1" / s "entitlements" / s "features"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/entitlements/features/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves a feature</p>
@@ -3900,7 +3900,7 @@ module Paths' = struct
     Routes.(s "v1" / s "entitlements" / s "features"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/entitlements/features/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>You can cancel a previously created payout if its status is <code>pending</code>. Stripe refunds the funds to your available balance. You can’t cancel automatic Stripe payouts.</p>
@@ -3911,7 +3911,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payouts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payout" ~op:"/v1/payouts/{payout}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payout" ~loc:`Path ~style:`Simple ~explode:false)
           ":payout" / s "cancel" /? nil)
   
   (** <p>Cancels a customer’s subscription immediately. The customer will not be charged again for the subscription.</p>
@@ -3926,7 +3926,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" /? nil)
   
   (** <p>Updates an existing subscription to match the specified parameters.
@@ -3957,7 +3957,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" /? nil)
   
   (** <p>Retrieves the subscription with the given ID.</p>
@@ -3968,7 +3968,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" /? nil)
   
   (** <p>Create an external account for a given account.</p>
@@ -3979,7 +3979,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/external_accounts" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "external_accounts" /? nil)
   
   (** <p>List external accounts for an account.</p>
@@ -3990,7 +3990,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/external_accounts" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "external_accounts" /? nil)
   
   (** <p>Updates the Features associated with a FinancialAccount.</p>
@@ -4001,7 +4001,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "financial_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"financial_account" ~op:"/v1/treasury/financial_accounts/{financial_account}/features" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"financial_account" ~loc:`Path ~style:`Simple ~explode:false)
           ":financial_account" / s "features" /? nil)
   
   (** <p>Retrieves Features information associated with the FinancialAccount.</p>
@@ -4012,7 +4012,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "financial_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"financial_account" ~op:"/v1/treasury/financial_accounts/{financial_account}/features" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"financial_account" ~loc:`Path ~style:`Simple ~explode:false)
           ":financial_account" / s "features" /? nil)
   
   (** <p>Subscribes to periodic refreshes of data associated with a Financial Connections <code>Account</code>.</p>
@@ -4023,7 +4023,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/financial_connections/accounts/{account}/subscribe" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "subscribe" /? nil)
   
   (** <p>Perform an incremental authorization on an eligible
@@ -4057,7 +4057,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}/increment_authorization" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "increment_authorization" /? nil)
   
   (** <p>Cancels a Climate order. You can cancel an order within 30 days of creation. Stripe refunds the
@@ -4071,7 +4071,7 @@ module Paths' = struct
     Routes.(s "v1" / s "climate" / s "orders"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"order" ~op:"/v1/climate/orders/{order}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"order" ~loc:`Path ~style:`Simple ~explode:false)
           ":order" / s "cancel" /? nil)
   
   (** <p>Presents a payment method on a simulated reader. Can be used to simulate accepting a payment, saving a card or refunding a transaction.</p>
@@ -4082,7 +4082,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/test_helpers/terminal/readers/{reader}/present_payment_method" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" / s "present_payment_method" /? nil)
   
   (** <p>Accepts the specified quote.</p>
@@ -4093,7 +4093,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}/accept" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" / s "accept" /? nil)
   
   (** <p>Returns a list of PaymentMethods for a given Customer</p>
@@ -4104,7 +4104,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/payment_methods" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "payment_methods" /? nil)
   
   (** <p>\[Deprecated\] Declines a pending Issuing <code>Authorization</code> object. This request should be made within the timeout window of the <a href="/docs/issuing/controls/real-time-authorizations">real time authorization</a> flow.
@@ -4116,7 +4116,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/issuing/authorizations/{authorization}/decline" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" / s "decline" /? nil)
   
   (** <p>Retrieves the details of an existing OutboundTransfer by passing the unique OutboundTransfer ID from either the OutboundTransfer creation request or OutboundTransfer list.</p>
@@ -4127,7 +4127,7 @@ module Paths' = struct
     Routes.(s "v1" / s "treasury" / s "outbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"outbound_transfer" ~op:"/v1/treasury/outbound_transfers/{outbound_transfer}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"outbound_transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":outbound_transfer" /? nil)
   
   (** <p>Deletes a <code>Reader</code> object.</p>
@@ -4138,7 +4138,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" /? nil)
   
   (** <p>Updates a <code>Reader</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -4149,7 +4149,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" /? nil)
   
   (** <p>Retrieves a <code>Reader</code> object.</p>
@@ -4160,7 +4160,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" /? nil)
   
   (** <p>Creates a new <code>tax_id</code> object for a customer.</p>
@@ -4171,7 +4171,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/tax_ids" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "tax_ids" /? nil)
   
   (** <p>Returns a list of tax IDs for a customer.</p>
@@ -4182,7 +4182,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/tax_ids" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "tax_ids" /? nil)
   
   (** <p>Transitions a test mode created OutboundPayment to the <code>failed</code> status. The OutboundPayment must already be in the <code>processing</code> state.</p>
@@ -4193,7 +4193,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_payments"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/test_helpers/treasury/outbound_payments/{id}/fail" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "fail" /? nil)
   
   (** <p>Updates an existing payment method domain.</p>
@@ -4204,7 +4204,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_method_domains"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method_domain" ~op:"/v1/payment_method_domains/{payment_method_domain}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method_domain" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method_domain" /? nil)
   
   (** <p>Retrieves the details of an existing payment method domain.</p>
@@ -4215,7 +4215,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_method_domains"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method_domain" ~op:"/v1/payment_method_domains/{payment_method_domain}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method_domain" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method_domain" /? nil)
   
   (** <p>For the specified subscription item, returns a list of summary objects. Each object in the list provides usage information that’s been summarized from multiple usage records and over a subscription billing period (e.g., 15 usage records in the month of September).</p>
@@ -4228,7 +4228,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_items"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_item" ~op:"/v1/subscription_items/{subscription_item}/usage_record_summaries" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_item" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_item" / s "usage_record_summaries" /? nil)
   
   (** <p>Create an external account for a given account.</p>
@@ -4239,7 +4239,7 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/bank_accounts" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "bank_accounts" /? nil)
   
   (** <p>Updates the specified transfer by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -4252,7 +4252,7 @@ module Paths' = struct
     Routes.(s "v1" / s "transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transfer" ~op:"/v1/transfers/{transfer}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":transfer" /? nil)
   
   (** <p>Retrieves the details of an existing transfer. Supply the unique transfer ID from either a transfer creation request or the transfer list, and Stripe will return the corresponding transfer information.</p>
@@ -4263,7 +4263,7 @@ module Paths' = struct
     Routes.(s "v1" / s "transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transfer" ~op:"/v1/transfers/{transfer}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":transfer" /? nil)
   
   (** <p>Retrieves a Mandate object.</p>
@@ -4274,7 +4274,7 @@ module Paths' = struct
     Routes.(s "v1" / s "mandates"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"mandate" ~op:"/v1/mandates/{mandate}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"mandate" ~loc:`Path ~style:`Simple ~explode:false)
           ":mandate" /? nil)
   
   (** <p>Updates the shipping status of the specified Issuing <code>Card</code> object to <code>shipped</code>.</p>
@@ -4285,7 +4285,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"card" ~op:"/v1/test_helpers/issuing/cards/{card}/shipping/ship" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"card" ~loc:`Path ~style:`Simple ~explode:false)
           ":card" / s "shipping" / s "ship" /? nil)
   
   (** <p>Updates a SetupIntent object.</p>
@@ -4296,7 +4296,7 @@ module Paths' = struct
     Routes.(s "v1" / s "setup_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/setup_intents/{intent}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" /? nil)
   
   (** <p>Retrieves the details of a SetupIntent that has previously been created. </p>
@@ -4311,7 +4311,7 @@ module Paths' = struct
     Routes.(s "v1" / s "setup_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/setup_intents/{intent}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" /? nil)
   
   (** <p>When you create a new refund, you must specify a Charge or a PaymentIntent object on which to create it.</p>
@@ -4332,7 +4332,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/refunds" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "refunds" /? nil)
   
   (** <p>You can see a list of the refunds belonging to a specific charge. Note that the 10 most recent refunds are always available by default on the charge object. If you need more than those 10, you can use this API method and the <code>limit</code> and <code>starting_after</code> parameters to page through additional refunds.</p>
@@ -4343,7 +4343,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/refunds" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "refunds" /? nil)
   
   (** <p>Updates an existing file link object. Expired links can no longer be updated.</p>
@@ -4354,7 +4354,7 @@ module Paths' = struct
     Routes.(s "v1" / s "file_links"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"link" ~op:"/v1/file_links/{link}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"link" ~loc:`Path ~style:`Simple ~explode:false)
           ":link" /? nil)
   
   (** <p>Retrieves the file link with the given ID.</p>
@@ -4365,7 +4365,7 @@ module Paths' = struct
     Routes.(s "v1" / s "file_links"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"link" ~op:"/v1/file_links/{link}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"link" ~loc:`Path ~style:`Simple ~explode:false)
           ":link" /? nil)
   
   (** <p>Initiates a refund on a Reader</p>
@@ -4376,7 +4376,7 @@ module Paths' = struct
     Routes.(s "v1" / s "terminal" / s "readers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"reader" ~op:"/v1/terminal/readers/{reader}/refund_payment" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"reader" ~loc:`Path ~style:`Simple ~explode:false)
           ":reader" / s "refund_payment" /? nil)
   
   (** <p>Retrieves the details of an Financial Connections <code>Account</code>.</p>
@@ -4387,7 +4387,7 @@ module Paths' = struct
     Routes.(s "v1" / s "financial_connections" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/financial_connections/accounts/{account}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" /? nil)
   
   (** <p>Manually reconcile the remaining amount for a <code>customer_balance</code> PaymentIntent.</p>
@@ -4398,7 +4398,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_intents"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"intent" ~op:"/v1/payment_intents/{intent}/apply_customer_balance" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"intent" ~loc:`Path ~style:`Simple ~explode:false)
           ":intent" / s "apply_customer_balance" /? nil)
   
   (** <p>Capture the payment of an existing, uncaptured charge that was created with the <code>capture</code> option set to false.</p>
@@ -4413,7 +4413,7 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/capture" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "capture" /? nil)
   
   (** <p>Transitions a test mode created OutboundTransfer to the <code>failed</code> status. The OutboundTransfer must already be in the <code>processing</code> state.</p>
@@ -4424,7 +4424,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "outbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"outbound_transfer" ~op:"/v1/test_helpers/treasury/outbound_transfers/{outbound_transfer}/fail" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"outbound_transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":outbound_transfer" / s "fail" /? nil)
   
   (** <p>Cancels a subscription schedule and its associated subscription immediately (if the subscription schedule has an active subscription). A subscription schedule can only be canceled if its status is <code>not_started</code> or <code>active</code>.</p>
@@ -4435,7 +4435,7 @@ module Paths' = struct
     Routes.(s "v1" / s "subscription_schedules"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"schedule" ~op:"/v1/subscription_schedules/{schedule}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"schedule" ~loc:`Path ~style:`Simple ~explode:false)
           ":schedule" / s "cancel" /? nil)
   
   (** <p>Returns a list of transactions that modified the customer’s <a href="/docs/payments/customer-balance">cash balance</a>.</p>
@@ -4446,7 +4446,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cash_balance_transactions" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cash_balance_transactions" /? nil)
   
   (** <p>Mark a finalized invoice as void. This cannot be undone. Voiding an invoice is similar to <a href="#delete_invoice">deletion</a>, however it only applies to finalized invoices and maintains a papertrail where the invoice can still be found.</p>
@@ -4459,7 +4459,7 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}/void" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" / s "void" /? nil)
   
   (** <p>Closing the dispute for a charge indicates that you do not have any evidence to submit and are essentially dismissing the dispute, acknowledging it as lost.</p>
@@ -4472,7 +4472,7 @@ module Paths' = struct
     Routes.(s "v1" / s "disputes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"dispute" ~op:"/v1/disputes/{dispute}/close" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"dispute" ~loc:`Path ~style:`Simple ~explode:false)
           ":dispute" / s "close" /? nil)
   
   (** <p>Updates the specified Issuing <code>Settlement</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -4483,7 +4483,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "settlements"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"settlement" ~op:"/v1/issuing/settlements/{settlement}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"settlement" ~loc:`Path ~style:`Simple ~explode:false)
           ":settlement" /? nil)
   
   (** <p>Retrieves an Issuing <code>Settlement</code> object.</p>
@@ -4494,7 +4494,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "settlements"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"settlement" ~op:"/v1/issuing/settlements/{settlement}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"settlement" ~loc:`Path ~style:`Simple ~explode:false)
           ":settlement" /? nil)
   
   (** <p>Retrieves the balance transaction with the given ID.</p>
@@ -4507,7 +4507,7 @@ module Paths' = struct
     Routes.(s "v1" / s "balance" / s "history"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/balance/history/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Attaches a PaymentMethod object to a Customer.</p>
@@ -4530,7 +4530,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_methods"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method" ~op:"/v1/payment_methods/{payment_method}/attach" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method" / s "attach" /? nil)
   
   (** <p>Retrieves a Climate supplier object.</p>
@@ -4541,7 +4541,7 @@ module Paths' = struct
     Routes.(s "v1" / s "climate" / s "suppliers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"supplier" ~op:"/v1/climate/suppliers/{supplier}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"supplier" ~loc:`Path ~style:`Simple ~explode:false)
           ":supplier" /? nil)
   
   (** <p>A VerificationSession object can be canceled when it is in <code>requires_input</code> <a href="/docs/identity/how-sessions-work">status</a>.</p>
@@ -4554,7 +4554,7 @@ module Paths' = struct
     Routes.(s "v1" / s "identity" / s "verification_sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/identity/verification_sessions/{session}/cancel" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" / s "cancel" /? nil)
   
   (** <p>When retrieving a quote, there is an includable <strong>line_items</strong> property containing the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.</p>
@@ -4565,7 +4565,7 @@ module Paths' = struct
     Routes.(s "v1" / s "quotes"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"quote" ~op:"/v1/quotes/{quote}/line_items" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"quote" ~loc:`Path ~style:`Simple ~explode:false)
           ":quote" / s "line_items" /? nil)
   
   (** <p>Retrieves the details of an event. Supply the unique identifier of the event, which you might have received in a webhook.</p>
@@ -4576,7 +4576,7 @@ module Paths' = struct
     Routes.(s "v1" / s "events"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/events/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>When retrieving a payment link, there is an includable <strong>line_items</strong> property containing the first handful of those items. There is also a URL where you can retrieve the full (paginated) list of line items.</p>
@@ -4587,7 +4587,7 @@ module Paths' = struct
     Routes.(s "v1" / s "payment_links"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_link" ~op:"/v1/payment_links/{payment_link}/line_items" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_link" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_link" / s "line_items" /? nil)
   
   (** <p>Transitions a test mode created InboundTransfer to the <code>failed</code> status. The InboundTransfer must already be in the <code>processing</code> state.</p>
@@ -4598,7 +4598,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "treasury" / s "inbound_transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/test_helpers/treasury/inbound_transfers/{id}/fail" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "fail" /? nil)
   
   (** <p>Updates the specified Issuing <code>Card</code> object by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -4609,7 +4609,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"card" ~op:"/v1/issuing/cards/{card}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"card" ~loc:`Path ~style:`Simple ~explode:false)
           ":card" /? nil)
   
   (** <p>Retrieves an Issuing <code>Card</code> object.</p>
@@ -4620,7 +4620,7 @@ module Paths' = struct
     Routes.(s "v1" / s "issuing" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"card" ~op:"/v1/issuing/cards/{card}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"card" ~loc:`Path ~style:`Simple ~explode:false)
           ":card" /? nil)
   
   (** <p>Retrieve a list of billing meter event summaries.</p>
@@ -4631,7 +4631,7 @@ module Paths' = struct
     Routes.(s "v1" / s "billing" / s "meters"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/billing/meters/{id}/event_summaries" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "event_summaries" /? nil)
   
   (** <p>Updates the metadata of a top-up. Other top-up details are not editable by design.</p>
@@ -4642,7 +4642,7 @@ module Paths' = struct
     Routes.(s "v1" / s "topups"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"topup" ~op:"/v1/topups/{topup}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"topup" ~loc:`Path ~style:`Simple ~explode:false)
           ":topup" /? nil)
   
   (** <p>Retrieves the details of a top-up that has previously been created. Supply the unique top-up ID that was returned from your previous request, and Stripe will return the corresponding top-up information.</p>
@@ -4653,7 +4653,7 @@ module Paths' = struct
     Routes.(s "v1" / s "topups"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"topup" ~op:"/v1/topups/{topup}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"topup" ~loc:`Path ~style:`Simple ~explode:false)
           ":topup" /? nil)
   
   (** <p>Creates an immutable transaction that updates the customer’s credit <a href="/docs/billing/customer/balance">balance</a>.</p>
@@ -4664,7 +4664,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/balance_transactions" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "balance_transactions" /? nil)
   
   (** <p>Returns a list of transactions that updated the customer’s <a href="/docs/billing/customer/balance">balances</a>.</p>
@@ -4675,7 +4675,7 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/balance_transactions" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "balance_transactions" /? nil)
   
   (** <p>Retrieves the line items of a persisted tax calculation as a collection.</p>
@@ -4686,7 +4686,7 @@ module Paths' = struct
     Routes.(s "v1" / s "tax" / s "calculations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"calculation" ~op:"/v1/tax/calculations/{calculation}/line_items" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"calculation" ~loc:`Path ~style:`Simple ~explode:false)
           ":calculation" / s "line_items" /? nil)
   
   (** <p>Retrieves the details of an application fee that your account has collected. The same information is returned when refunding the application fee.</p>
@@ -4697,7 +4697,7 @@ module Paths' = struct
     Routes.(s "v1" / s "application_fees"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/application_fees/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Reverse a test-mode Authorization.</p>
@@ -4708,7 +4708,7 @@ module Paths' = struct
     Routes.(s "v1" / s "test_helpers" / s "issuing" / s "authorizations"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"authorization" ~op:"/v1/test_helpers/issuing/authorizations/{authorization}/reverse" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"authorization" ~loc:`Path ~style:`Simple ~explode:false)
           ":authorization" / s "reverse" /? nil)
   
   (** <p>Retrieves a <code>Review</code> object.</p>
@@ -4719,7 +4719,7 @@ module Paths' = struct
     Routes.(s "v1" / s "reviews"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"review" ~op:"/v1/reviews/{review}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"review" ~loc:`Path ~style:`Simple ~explode:false)
           ":review" /? nil)
   
   (** <p>A Session can be expired when it is in one of these statuses: <code>open</code> </p>
@@ -4732,7 +4732,7 @@ module Paths' = struct
     Routes.(s "v1" / s "checkout" / s "sessions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"session" ~op:"/v1/checkout/sessions/{session}/expire" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"session" ~loc:`Path ~style:`Simple ~explode:false)
           ":session" / s "expire" /? nil)
   
   (** <p>Retrieves the details of an Financial Connections <code>Account</code>.</p>
@@ -4743,7 +4743,7 @@ module Paths' = struct
     Routes.(s "v1" / s "linked_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/linked_accounts/{account}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" /? nil)
   
   (** <p>Delete a specified source for a given customer.</p>
@@ -4755,11 +4755,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/sources/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/sources/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Update a specified source for a given customer.</p>
@@ -4771,11 +4771,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/sources/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/sources/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieve a specified source for a given customer.</p>
@@ -4787,11 +4787,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/sources/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/sources/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates the specified application fee refund by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -4805,11 +4805,11 @@ module Paths' = struct
     Routes.(s "v1" / s "application_fees"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"fee" ~op:"/v1/application_fees/{fee}/refunds/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"fee" ~loc:`Path ~style:`Simple ~explode:false)
           ":fee" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/application_fees/{fee}/refunds/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>By default, you can see the 10 most recent refunds stored directly on the application fee object, but you can also retrieve details about a specific refund stored on the application fee.</p>
@@ -4821,11 +4821,11 @@ module Paths' = struct
     Routes.(s "v1" / s "application_fees"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"fee" ~op:"/v1/application_fees/{fee}/refunds/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"fee" ~loc:`Path ~style:`Simple ~explode:false)
           ":fee" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/application_fees/{fee}/refunds/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Deletes the feature attachment to a product</p>
@@ -4837,11 +4837,11 @@ module Paths' = struct
     Routes.(s "v1" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"product" ~op:"/v1/products/{product}/features/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"product" ~loc:`Path ~style:`Simple ~explode:false)
           ":product" / s "features"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/products/{product}/features/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves a product_feature, which represents a feature attachment to a product</p>
@@ -4853,11 +4853,11 @@ module Paths' = struct
     Routes.(s "v1" / s "products"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"product" ~op:"/v1/products/{product}/features/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"product" ~loc:`Path ~style:`Simple ~explode:false)
           ":product" / s "features"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/products/{product}/features/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Removes the currently applied discount on a customer.</p>
@@ -4869,11 +4869,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}/discount" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}/discount" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" / s "discount" /? nil)
   
   (** @param customer customer
@@ -4883,11 +4883,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}/discount" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}/discount" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" / s "discount" /? nil)
   
   (** <p>Updates an existing Account Capability. Request or remove a capability by updating its <code>requested</code> parameter.</p>
@@ -4899,11 +4899,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/capabilities/{capability}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "capabilities"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"capability" ~op:"/v1/accounts/{account}/capabilities/{capability}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"capability" ~loc:`Path ~style:`Simple ~explode:false)
           ":capability" /? nil)
   
   (** <p>Retrieves information about the specified Account Capability.</p>
@@ -4915,11 +4915,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/capabilities/{capability}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "capabilities"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"capability" ~op:"/v1/accounts/{account}/capabilities/{capability}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"capability" ~loc:`Path ~style:`Simple ~explode:false)
           ":capability" /? nil)
   
   (** <p>Delete a specified source for a given customer.</p>
@@ -4931,11 +4931,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "bank_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Update a specified source for a given customer.</p>
@@ -4947,11 +4947,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "bank_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>By default, you can see the 10 most recent sources stored on a Customer directly on the object, but you can also retrieve details about a specific bank account stored on the Stripe account.</p>
@@ -4963,11 +4963,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "bank_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves a PaymentMethod object for a given Customer.</p>
@@ -4979,11 +4979,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/payment_methods/{payment_method}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "payment_methods"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"payment_method" ~op:"/v1/customers/{customer}/payment_methods/{payment_method}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"payment_method" ~loc:`Path ~style:`Simple ~explode:false)
           ":payment_method" /? nil)
   
   (** <p>Deletes an existing <code>tax_id</code> object.</p>
@@ -4995,11 +4995,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/tax_ids/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "tax_ids"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/tax_ids/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves the <code>tax_id</code> object with the given identifier.</p>
@@ -5011,11 +5011,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/tax_ids/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "tax_ids"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/tax_ids/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Delete a specified external account for a given account.</p>
@@ -5027,11 +5027,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "bank_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/accounts/{account}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates the metadata, account holder name, account holder type of a bank account belonging to
@@ -5050,11 +5050,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "bank_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/accounts/{account}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieve a specified external account for a given account.</p>
@@ -5066,11 +5066,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "bank_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/accounts/{account}/bank_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates the specified reversal by setting the values of the parameters passed. Any parameters not provided will be left unchanged.</p>
@@ -5084,11 +5084,11 @@ module Paths' = struct
     Routes.(s "v1" / s "transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transfer" ~op:"/v1/transfers/{transfer}/reversals/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":transfer" / s "reversals"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/transfers/{transfer}/reversals/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>By default, you can see the 10 most recent reversals stored directly on the transfer object, but you can also retrieve details about a specific reversal stored on the transfer.</p>
@@ -5100,11 +5100,11 @@ module Paths' = struct
     Routes.(s "v1" / s "transfers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transfer" ~op:"/v1/transfers/{transfer}/reversals/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transfer" ~loc:`Path ~style:`Simple ~explode:false)
           ":transfer" / s "reversals"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/transfers/{transfer}/reversals/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Update a specified refund.</p>
@@ -5116,11 +5116,11 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/refunds/{refund}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"refund" ~op:"/v1/charges/{charge}/refunds/{refund}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"refund" ~loc:`Path ~style:`Simple ~explode:false)
           ":refund" /? nil)
   
   (** <p>Retrieves the details of an existing refund.</p>
@@ -5132,11 +5132,11 @@ module Paths' = struct
     Routes.(s "v1" / s "charges"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"charge" ~op:"/v1/charges/{charge}/refunds/{refund}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"charge" ~loc:`Path ~style:`Simple ~explode:false)
           ":charge" / s "refunds"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"refund" ~op:"/v1/charges/{charge}/refunds/{refund}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"refund" ~loc:`Path ~style:`Simple ~explode:false)
           ":refund" /? nil)
   
   (** <p>Delete a specified external account for a given account.</p>
@@ -5148,11 +5148,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/external_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "external_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/accounts/{account}/external_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Updates the metadata, account holder name, account holder type of a bank account belonging to
@@ -5171,11 +5171,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/external_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "external_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/accounts/{account}/external_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieve a specified external account for a given account.</p>
@@ -5187,11 +5187,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/external_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "external_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/accounts/{account}/external_accounts/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Retrieves a specific cash balance transaction, which updated the customer’s <a href="/docs/payments/customer-balance">cash balance</a>.</p>
@@ -5203,11 +5203,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cash_balance_transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cash_balance_transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/customers/{customer}/cash_balance_transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" /? nil)
   
   (** <p>Most credit balance transaction fields are immutable, but you may update its <code>description</code> and <code>metadata</code>.</p>
@@ -5219,11 +5219,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/balance_transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "balance_transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/customers/{customer}/balance_transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" /? nil)
   
   (** <p>Retrieves a specific customer balance transaction that updated the customer’s <a href="/docs/billing/customer/balance">balances</a>.</p>
@@ -5235,11 +5235,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/balance_transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "balance_transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"transaction" ~op:"/v1/customers/{customer}/balance_transactions/{transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":transaction" /? nil)
   
   (** <p>Retrieves a new Source MandateNotification.</p>
@@ -5251,11 +5251,11 @@ module Paths' = struct
     Routes.(s "v1" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"source" ~op:"/v1/sources/{source}/mandate_notifications/{mandate_notification}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"source" ~loc:`Path ~style:`Simple ~explode:false)
           ":source" / s "mandate_notifications"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"mandate_notification" ~op:"/v1/sources/{source}/mandate_notifications/{mandate_notification}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"mandate_notification" ~loc:`Path ~style:`Simple ~explode:false)
           ":mandate_notification" /? nil)
   
   (** <p>Delete a specified source for a given customer.</p>
@@ -5267,11 +5267,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cards/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/cards/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Update a specified source for a given customer.</p>
@@ -5283,11 +5283,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cards/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/cards/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>You can always see the 10 most recent cards directly on a customer; this method lets you retrieve details about a specific card stored on the customer.</p>
@@ -5299,11 +5299,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/cards/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "cards"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/cards/{id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" /? nil)
   
   (** <p>Cancels a customer’s subscription. If you set the <code>at_period_end</code> parameter to <code>true</code>, the subscription will remain active until the end of the period, at which point it will be canceled and not renewed. Otherwise, with the default <code>false</code> value, the subscription is terminated immediately. In either case, the customer will not be charged again for the subscription.</p>
@@ -5319,11 +5319,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" /? nil)
   
   (** <p>Updates an existing subscription on a customer to match the specified parameters. When changing plans or quantities, we will optionally prorate the price we charge next month to make up for any price changes. To preview how the proration will be calculated, use the <a href="#upcoming_invoice">upcoming invoice</a> endpoint.</p>
@@ -5335,11 +5335,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" /? nil)
   
   (** <p>Retrieves the subscription with the given ID.</p>
@@ -5351,11 +5351,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "subscriptions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"subscription_exposed_id" ~op:"/v1/customers/{customer}/subscriptions/{subscription_exposed_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"subscription_exposed_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":subscription_exposed_id" /? nil)
   
   (** <p>Deletes an existing person’s relationship to the account’s legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the <code>account_opener</code>. If your integration is using the <code>executive</code> parameter, you cannot delete the only verified <code>executive</code> on file.</p>
@@ -5367,11 +5367,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/persons/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "persons"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"person" ~op:"/v1/accounts/{account}/persons/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"person" ~loc:`Path ~style:`Simple ~explode:false)
           ":person" /? nil)
   
   (** <p>Updates an existing person.</p>
@@ -5383,11 +5383,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/persons/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "persons"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"person" ~op:"/v1/accounts/{account}/persons/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"person" ~loc:`Path ~style:`Simple ~explode:false)
           ":person" /? nil)
   
   (** <p>Retrieves an existing person.</p>
@@ -5399,11 +5399,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/persons/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "persons"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"person" ~op:"/v1/accounts/{account}/persons/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"person" ~loc:`Path ~style:`Simple ~explode:false)
           ":person" /? nil)
   
   (** <p>Updates an invoice’s line item. Some fields, such as <code>tax_amounts</code>, only live on the invoice line item,
@@ -5418,11 +5418,11 @@ module Paths' = struct
     Routes.(s "v1" / s "invoices"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"invoice" ~op:"/v1/invoices/{invoice}/lines/{line_item_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"invoice" ~loc:`Path ~style:`Simple ~explode:false)
           ":invoice" / s "lines"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"line_item_id" ~op:"/v1/invoices/{invoice}/lines/{line_item_id}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"line_item_id" ~loc:`Path ~style:`Simple ~explode:false)
           ":line_item_id" /? nil)
   
   (** <p>Verify a specified bank account for a given customer.</p>
@@ -5434,11 +5434,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/bank_accounts/{id}/verify" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "bank_accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/bank_accounts/{id}/verify" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "verify" /? nil)
   
   (** <p>Deletes an existing person’s relationship to the account’s legal entity. Any person with a relationship for an account can be deleted through the API, except if the person is the <code>account_opener</code>. If your integration is using the <code>executive</code> parameter, you cannot delete the only verified <code>executive</code> on file.</p>
@@ -5450,11 +5450,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/people/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "people"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"person" ~op:"/v1/accounts/{account}/people/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"person" ~loc:`Path ~style:`Simple ~explode:false)
           ":person" /? nil)
   
   (** <p>Updates an existing person.</p>
@@ -5466,11 +5466,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/people/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "people"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"person" ~op:"/v1/accounts/{account}/people/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"person" ~loc:`Path ~style:`Simple ~explode:false)
           ":person" /? nil)
   
   (** <p>Retrieves an existing person.</p>
@@ -5482,11 +5482,11 @@ module Paths' = struct
     Routes.(s "v1" / s "accounts"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"account" ~op:"/v1/accounts/{account}/people/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"account" ~loc:`Path ~style:`Simple ~explode:false)
           ":account" / s "people"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"person" ~op:"/v1/accounts/{account}/people/{person}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"person" ~loc:`Path ~style:`Simple ~explode:false)
           ":person" /? nil)
   
   (** <p>Verify a specified bank account for a given customer.</p>
@@ -5498,11 +5498,11 @@ module Paths' = struct
     Routes.(s "v1" / s "customers"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"customer" ~op:"/v1/customers/{customer}/sources/{id}/verify" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"customer" ~loc:`Path ~style:`Simple ~explode:false)
           ":customer" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"id" ~op:"/v1/customers/{customer}/sources/{id}/verify" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"id" ~loc:`Path ~style:`Simple ~explode:false)
           ":id" / s "verify" /? nil)
   
   (** <p>Retrieve an existing source transaction object. Supply the unique source ID from a source creation request and the source transaction ID and Stripe will return the corresponding up-to-date source object information.</p>
@@ -5514,11 +5514,11 @@ module Paths' = struct
     Routes.(s "v1" / s "sources"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"source" ~op:"/v1/sources/{source}/source_transactions/{source_transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"source" ~loc:`Path ~style:`Simple ~explode:false)
           ":source" / s "source_transactions"
       / Routes.pattern
           (ParamSerDe'.string_of_p_String_ ~p:"source_transaction" ~op:"/v1/sources/{source}/source_transactions/{source_transaction}" ~loc:`Path ~style:`Simple ~explode:false)
-          (ParamSerDe'.string_to_p_String_ ~loc:`Path ~style:`Simple ~explode:false)
+          (ParamSerDe'.string_to_p_String_ ~p:"source_transaction" ~loc:`Path ~style:`Simple ~explode:false)
           ":source_transaction" /? nil)
   
 end

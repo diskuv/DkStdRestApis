@@ -6,6 +6,8 @@ module ParamSerDe' = struct
   open StripeEncdrs
   
   let _loosen_spec_enable_deepobject_array = true
+  exception Invalid_parameter of string
+  
   let _jfield_to_s kind ~n = match kind with
     | `ObjectN okinds -> begin
       match List.assoc_opt n okinds with
@@ -43,32 +45,34 @@ module ParamSerDe' = struct
         | `Path, `Matrix, true, `O o -> String.concat "" (List.map (fun (n, v) -> ";" ^ n ^ "=" ^ jfield_to_s ~n v) o)
         | `Path, `Matrix, _, _ -> ";" ^ p ^ "=" ^ j_to_s j
         | `Path, `Label, _, `A a -> String.concat "" (List.mapi (fun idx ai -> "." ^ jitem_to_s idx ai) a)
-        | `Path, `Label, false, `O o -> String.concat "." (List.map (fun (n, v) -> n ^ "." ^ jfield_to_s ~n v) o)
+        | `Path, `Label, false, `O o -> String.concat "" (List.map (fun (n, v) -> "." ^ n ^ "." ^ jfield_to_s ~n v) o)
         | `Path, `Label, true, `O o -> String.concat "" (List.map (fun (n, v) -> "." ^ n ^ "=" ^ jfield_to_s ~n v) o)
         | `Path, `Label, _, _ -> j_to_s j
         | `Path, `Simple, _, `A a -> String.concat "," (List.mapi jitem_to_s a)
         | `Path, `Simple, false, `O o -> String.concat "," (List.map (fun (n, v) -> n ^ "," ^ jfield_to_s ~n v) o)
         | `Path, `Simple, true, `O o -> String.concat "," (List.map (fun (n, v) -> n ^ "=" ^ jfield_to_s ~n v) o)
         | `Path, `Simple, _, _ -> j_to_s j
-        (* | _ -> raise (Invalid_argument m) *)
+        (* | _ -> raise (Invalid_parameter m) *)
   
-  let _string_to ~kind ~dtr =
-    let s_to_j = EncBase'.string_to_json kind in
+  (* For [Path] *)
+  let _string_to ~kind ~dtr ~p =
+    let s_to_j = EncBase'.string_to_json ~p kind in
     fun ~(loc:[`Path]) ~(style:[`Label | `Matrix | `Simple]) ~explode s ->
       let jopt =
         match (loc, style, explode) with
-        | `Path, `Matrix, false -> s_to_j ~sep:';' ~inner_sep:',' ~leading:true s
-        | `Path, `Matrix, true -> s_to_j ~sep:';' ~inner_sep:'=' ~leading:true s
-        | `Path, `Label, false -> s_to_j ~sep:'.' ~inner_sep:'.' ~leading:true s
-        | `Path, `Simple, false -> s_to_j ~sep:',' ~inner_sep:',' ~leading:false s
-        | `Path, `Label, true -> s_to_j ~sep:'.' ~inner_sep:'=' ~leading:true s
-        | `Path, `Simple, true -> s_to_j ~sep:',' ~inner_sep:'=' ~leading:false s
+        | `Path, `Matrix, false -> s_to_j ~sep:';' ~inner_sep:'=' ~value_sep:(Some ',') ~leading:true s
+        | `Path, `Matrix, true -> s_to_j ~sep:';' ~inner_sep:'=' ~value_sep:None ~leading:true s
+        | `Path, `Label, false -> s_to_j ~sep:'.' ~inner_sep:'.' ~value_sep:None ~leading:true s
+        | `Path, `Label, true -> s_to_j ~sep:'.' ~inner_sep:'=' ~value_sep:None ~leading:true s
+        | `Path, `Simple, false -> s_to_j ~sep:',' ~inner_sep:',' ~value_sep:None ~leading:false s
+        | `Path, `Simple, true -> s_to_j ~sep:',' ~inner_sep:'=' ~value_sep:None ~leading:false s
       in
       match jopt with
       | None, _ -> None
       | Some j, _ -> (
           try Some (dtr j) with Json_encoding.Cannot_destruct _ -> None)
   
+  (* For [Query], [Cookie] and [Header] *)
   let _namevalues_of ~kind ~ctr =
     let j_to_s = EncBase'.json_to_string kind in
     let jfield_to_s = _jfield_to_s kind in
@@ -101,8 +105,28 @@ module ParamSerDe' = struct
         | `Query,`DeepObject,true,`O o -> List.map (fun (n,v) -> (p ^ "[" ^ n ^ "]", jfield_to_s ~n v)) o
         | `Query,`DeepObject,true,`A a ->
           if _loosen_spec_enable_deepobject_array then List.mapi (fun idx ai -> (p ^ "[]", jitem_to_s idx ai)) a
-          else raise (Invalid_argument m)
-        | _ -> raise (Invalid_argument m)
+          else raise (Invalid_parameter m)
+        | _ -> raise (Invalid_parameter m)
+  
+  (* For [Query], [Cookie] and [Header]. *)
+  let _namevalues_to ~kind ~p =
+    let nvs_to_j = EncBase'.nvs_to_json ~kind ~p:(`Shallow p) in
+    fun ~dtr ~loc ~style ~explode nvs ->
+      let jopt =
+        match (loc, style, explode) with
+        | (`Query|`Cookie), `Form, false -> nvs_to_j ~sep:',' ~inner_sep:',' ~value_sep:None ~leading:false nvs
+        | (`Query|`Cookie), `Form, true -> EncBase'.nvs_to_json ~kind ~p:`None ~sep:'&' ~inner_sep:'=' ~value_sep:None ~leading:false nvs
+        | `Header, `Simple, false -> nvs_to_j ~sep:',' ~inner_sep:','  ~value_sep:None ~leading:false nvs
+        | `Header, `Simple, true -> nvs_to_j ~sep:',' ~inner_sep:'=' ~value_sep:None ~leading:false nvs
+        | `Query, `SpaceDelimited, false -> nvs_to_j ~sep:' ' ~inner_sep:' ' ~value_sep:None ~leading:false nvs
+        | `Query, `PipeDelimited, false -> nvs_to_j ~sep:'|' ~inner_sep:'|' ~value_sep:None ~leading:false nvs
+        | `Query, `DeepObject, true -> EncBase'.nvs_to_json ~kind ~p:(`Deep p) ~sep:'&' ~inner_sep:'=' ~value_sep:None ~leading:false nvs
+        | _ -> None
+      in
+      match jopt with
+      | None -> None
+      | Some j -> (
+          try Some (dtr j) with Json_encoding.Cannot_destruct _ -> None)
   
   
   
@@ -112,9 +136,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct (Json_encoding.list Json_encoding.string))
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_p_StringList ~loc ~style ~explode (_x : string) =
+  let string_to_p_StringList ~p ~loc ~style ~explode (_x : string) =
     let dtr = (Json_encoding.destruct
-                 (Json_encoding.list Json_encoding.string)) in _string_to
+                 (Json_encoding.list Json_encoding.string)) in _string_to ~p
       ~kind:(`Array [(`List (`String))]) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_p_StringList ~p ~op ~loc ~style ~explode
@@ -123,6 +147,13 @@ module ParamSerDe' = struct
       `Array ((List.map (fun (_x : string) -> `Singleton (`String)) _x)))
       ~ctr:(Json_encoding.construct (Json_encoding.list Json_encoding.string))
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_p_StringList ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct
+                 (Json_encoding.list Json_encoding.string)) in
+      _namevalues_to ~p ~kind:(`Array [(`List (`String))])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_ab8d71cc96 ~p ~op ~loc ~style ~explode
     (_x : t_ab8d71cc96) =
@@ -143,18 +174,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ab8d71cc96)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ab8d71cc96 ~loc ~style ~explode (_x : string) =
+  let string_to_t_ab8d71cc96 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_6aa55531fa) in
         Option.map (fun _y : t_ab8d71cc96 -> T_6aa55531fa _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_ab8d71cc96 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_ab8d71cc96 ~p ~op ~loc ~style ~explode
     (_x : t_ab8d71cc96) =
@@ -175,13 +206,27 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ab8d71cc96)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_ab8d71cc96 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6aa55531fa) in
+        Option.map (fun _y : t_ab8d71cc96 -> T_6aa55531fa _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_ab8d71cc96 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_p_String_ ~p ~op ~loc ~style ~explode (_x : string) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Json_encoding.string)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_p_String_ ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Json_encoding.string) in _string_to
+  let string_to_p_String_ ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Json_encoding.string) in _string_to ~p
       ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_p_String_ ~p ~op ~loc ~style ~explode (_x : string) =
@@ -189,13 +234,18 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Json_encoding.string)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_p_String_ ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Json_encoding.string) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_p_Int ~p ~op ~loc ~style ~explode (_x : int) =
     _string_of ~kind:( `Integer)
       ~ctr:(Json_encoding.construct Json_encoding.int)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_p_Int ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Json_encoding.int) in _string_to
+  let string_to_p_Int ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Json_encoding.int) in _string_to ~p
       ~kind:(`Integer) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_p_Int ~p ~op ~loc ~style ~explode (_x : int) =
@@ -203,21 +253,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Json_encoding.int)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_p_Int ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Json_encoding.int) in _namevalues_to ~p
+      ~kind:(`Integer) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_4e604540e7 ~p ~op ~loc ~style ~explode
     (_x : t_4e604540e7) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_4e604540e7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4e604540e7 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4e604540e7) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_4e604540e7 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4e604540e7) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_4e604540e7 ~p ~op ~loc ~style ~explode
     (_x : t_4e604540e7) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_4e604540e7)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_4e604540e7 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4e604540e7) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_8dfdeac1ad ~p ~op ~loc ~style ~explode
     (_x : t_8dfdeac1ad) =
@@ -237,8 +297,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_8dfdeac1ad)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8dfdeac1ad ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_8dfdeac1ad) in _string_to
+  let string_to_t_8dfdeac1ad ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_8dfdeac1ad) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("director", `Boolean); ("executive", `Boolean);
                 ("legal_guardian", `Boolean); ("owner", `Boolean);
@@ -262,6 +323,15 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_8dfdeac1ad)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_8dfdeac1ad ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_8dfdeac1ad) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("director", `Boolean); ("executive", `Boolean);
+                ("legal_guardian", `Boolean); ("owner", `Boolean);
+                ("representative", `Boolean)]) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_52a890434c ~p ~op ~loc ~style ~explode
     (_x : t_52a890434c) =
     _string_of ~kind:(
@@ -280,8 +350,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_52a890434c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_52a890434c ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_52a890434c) in _string_to
+  let string_to_t_52a890434c ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_52a890434c) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("director", `Boolean); ("executive", `Boolean);
                 ("legal_guardian", `Boolean); ("owner", `Boolean);
@@ -305,6 +376,15 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_52a890434c)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_52a890434c ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_52a890434c) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("director", `Boolean); ("executive", `Boolean);
+                ("legal_guardian", `Boolean); ("owner", `Boolean);
+                ("representative", `Boolean)]) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_9d68bdd713 ~p ~op ~loc ~style ~explode
     (_x : t_9d68bdd713) =
     _string_of ~kind:(
@@ -324,18 +404,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_9d68bdd713)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9d68bdd713 ~loc ~style ~explode (_x : string) =
+  let string_to_t_9d68bdd713 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_6705dd5948) in
         Option.map (fun _y : t_9d68bdd713 -> T_6705dd5948 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_9d68bdd713 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_9d68bdd713 ~p ~op ~loc ~style ~explode
     (_x : t_9d68bdd713) =
@@ -356,6 +436,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_9d68bdd713)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_9d68bdd713 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6705dd5948) in
+        Option.map (fun _y : t_9d68bdd713 -> T_6705dd5948 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_9d68bdd713 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_4a4b8daa1f ~p ~op ~loc ~style ~explode
     (_x : t_4a4b8daa1f) =
     _string_of ~kind:(
@@ -366,8 +460,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_4a4b8daa1f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4a4b8daa1f ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4a4b8daa1f) in _string_to
+  let string_to_t_4a4b8daa1f ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4a4b8daa1f) in
+      _string_to ~p
       ~kind:(`ObjectN [("", `Any); ("type", `String); ("user", `String)])
       ~dtr ~loc ~style ~explode _x
   
@@ -381,6 +476,13 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_4a4b8daa1f)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_4a4b8daa1f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4a4b8daa1f) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN [("", `Any); ("type", `String); ("user", `String)])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_4ce91395e3 ~p ~op ~loc ~style ~explode
     (_x : t_4ce91395e3) =
     _string_of ~kind:(
@@ -391,8 +493,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_4ce91395e3)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4ce91395e3 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4ce91395e3) in _string_to
+  let string_to_t_4ce91395e3 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4ce91395e3) in
+      _string_to ~p
       ~kind:(`ObjectN [("", `Any); ("type", `String); ("user", `String)])
       ~dtr ~loc ~style ~explode _x
   
@@ -405,6 +508,13 @@ module ParamSerDe' = struct
           `String end)])
       ~ctr:(Json_encoding.construct Encoders'.t_4ce91395e3)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_4ce91395e3 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4ce91395e3) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN [("", `Any); ("type", `String); ("user", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_01b97bcd1e ~p ~op ~loc ~style ~explode
     (_x : t_01b97bcd1e) =
@@ -425,18 +535,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_01b97bcd1e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_01b97bcd1e ~loc ~style ~explode (_x : string) =
+  let string_to_t_01b97bcd1e ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_51dd3dd546) in
         Option.map (fun _y : t_01b97bcd1e -> T_51dd3dd546 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_01b97bcd1e -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_01b97bcd1e ~p ~op ~loc ~style ~explode
     (_x : t_01b97bcd1e) =
@@ -457,6 +567,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_01b97bcd1e)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_01b97bcd1e ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_51dd3dd546) in
+        Option.map (fun _y : t_01b97bcd1e -> T_51dd3dd546 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_01b97bcd1e -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_e84cc44f8f ~p ~op ~loc ~style ~explode
     (_x : t_e84cc44f8f) =
     _string_of ~kind:(
@@ -476,18 +600,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_e84cc44f8f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e84cc44f8f ~loc ~style ~explode (_x : string) =
+  let string_to_t_e84cc44f8f ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_b5ed09371b) in
         Option.map (fun _y : t_e84cc44f8f -> T_b5ed09371b _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_e84cc44f8f -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_e84cc44f8f ~p ~op ~loc ~style ~explode
     (_x : t_e84cc44f8f) =
@@ -508,15 +632,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_e84cc44f8f)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_e84cc44f8f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_b5ed09371b) in
+        Option.map (fun _y : t_e84cc44f8f -> T_b5ed09371b _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_e84cc44f8f -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_b478178155 ~p ~op ~loc ~style ~explode
     (_x : t_b478178155) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_b478178155)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b478178155 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b478178155) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_b478178155 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b478178155) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_b478178155 ~p ~op ~loc ~style ~explode
     (_x : t_b478178155) =
@@ -524,19 +662,29 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_b478178155)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_b478178155 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b478178155) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_p_Ptime_t ~p ~op ~loc ~style ~explode (_x : Ptime.t) =
     _string_of ~kind:( `Integer)
       ~ctr:(Json_encoding.construct EncBase'.vendor_unix_time)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_p_Ptime_t ~loc ~style ~explode (_x : string) =
+  let string_to_p_Ptime_t ~p ~loc ~style ~explode (_x : string) =
     let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
-      _string_to ~kind:(`Integer) ~dtr ~loc ~style ~explode _x
+      _string_to ~p ~kind:(`Integer) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_p_Ptime_t ~p ~op ~loc ~style ~explode (_x : Ptime.t) =
     _namevalues_of ~kind:( `Integer)
       ~ctr:(Json_encoding.construct EncBase'.vendor_unix_time)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_p_Ptime_t ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
+      _namevalues_to ~p ~kind:(`Integer) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_2ef034b1cb ~p ~op ~loc ~style ~explode
     (_x : t_2ef034b1cb) =
@@ -544,9 +692,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_2ef034b1cb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2ef034b1cb ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_2ef034b1cb) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_2ef034b1cb ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2ef034b1cb) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_2ef034b1cb ~p ~op ~loc ~style ~explode
     (_x : t_2ef034b1cb) =
@@ -554,19 +702,29 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_2ef034b1cb)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_2ef034b1cb ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2ef034b1cb) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_p_Bool ~p ~op ~loc ~style ~explode (_x : bool) =
     _string_of ~kind:( `Boolean)
       ~ctr:(Json_encoding.construct Json_encoding.bool)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_p_Bool ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Json_encoding.bool) in _string_to
+  let string_to_p_Bool ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Json_encoding.bool) in _string_to ~p
       ~kind:(`Boolean) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_p_Bool ~p ~op ~loc ~style ~explode (_x : bool) =
     _namevalues_of ~kind:( `Boolean)
       ~ctr:(Json_encoding.construct Json_encoding.bool)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_p_Bool ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Json_encoding.bool) in
+      _namevalues_to ~p ~kind:(`Boolean) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_9b9d8d63ef ~p ~op ~loc ~style ~explode
     (_x : t_9b9d8d63ef) =
@@ -587,18 +745,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_9b9d8d63ef)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9b9d8d63ef ~loc ~style ~explode (_x : string) =
+  let string_to_t_9b9d8d63ef ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_143678df45) in
         Option.map (fun _y : t_9b9d8d63ef -> T_143678df45 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_9b9d8d63ef -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_9b9d8d63ef ~p ~op ~loc ~style ~explode
     (_x : t_9b9d8d63ef) =
@@ -619,6 +777,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_9b9d8d63ef)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_9b9d8d63ef ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_143678df45) in
+        Option.map (fun _y : t_9b9d8d63ef -> T_143678df45 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_9b9d8d63ef -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_0b0b7bdb7e ~p ~op ~loc ~style ~explode
     (_x : t_0b0b7bdb7e) =
     _string_of ~kind:(
@@ -638,18 +810,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_0b0b7bdb7e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0b0b7bdb7e ~loc ~style ~explode (_x : string) =
+  let string_to_t_0b0b7bdb7e ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_7da3863d89) in
         Option.map (fun _y : t_0b0b7bdb7e -> T_7da3863d89 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_0b0b7bdb7e -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_0b0b7bdb7e ~p ~op ~loc ~style ~explode
     (_x : t_0b0b7bdb7e) =
@@ -670,6 +842,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_0b0b7bdb7e)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_0b0b7bdb7e ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_7da3863d89) in
+        Option.map (fun _y : t_0b0b7bdb7e -> T_7da3863d89 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_0b0b7bdb7e -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_12bf81c281 ~p ~op ~loc ~style ~explode
     (_x : t_12bf81c281) =
     _string_of ~kind:(
@@ -677,9 +863,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_12bf81c281)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_12bf81c281 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_12bf81c281) in _string_to
-      ~kind:(`ObjectN [("", `Any); ("email", `String)])
+  let string_to_t_12bf81c281 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_12bf81c281) in
+      _string_to ~p ~kind:(`ObjectN [("", `Any); ("email", `String)])
       ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_12bf81c281 ~p ~op ~loc ~style ~explode
@@ -689,21 +875,32 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_12bf81c281)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_12bf81c281 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_12bf81c281) in
+      _namevalues_to ~p ~kind:(`ObjectN [("", `Any); ("email", `String)])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_976c399de7 ~p ~op ~loc ~style ~explode
     (_x : t_976c399de7) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_976c399de7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_976c399de7 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_976c399de7) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_976c399de7 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_976c399de7) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_976c399de7 ~p ~op ~loc ~style ~explode
     (_x : t_976c399de7) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_976c399de7)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_976c399de7 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_976c399de7) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_8efa015a15 ~p ~op ~loc ~style ~explode
     (_x : t_8efa015a15) =
@@ -724,18 +921,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8efa015a15)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8efa015a15 ~loc ~style ~explode (_x : string) =
+  let string_to_t_8efa015a15 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_13e89791f1) in
         Option.map (fun _y : t_8efa015a15 -> T_13e89791f1 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_8efa015a15 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_8efa015a15 ~p ~op ~loc ~style ~explode
     (_x : t_8efa015a15) =
@@ -756,6 +953,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8efa015a15)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_8efa015a15 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_13e89791f1) in
+        Option.map (fun _y : t_8efa015a15 -> T_13e89791f1 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_8efa015a15 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_d1452a2e6d ~p ~op ~loc ~style ~explode
     (_x : t_d1452a2e6d) =
     _string_of ~kind:(
@@ -775,18 +986,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_d1452a2e6d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d1452a2e6d ~loc ~style ~explode (_x : string) =
+  let string_to_t_d1452a2e6d ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_753b9f6893) in
         Option.map (fun _y : t_d1452a2e6d -> T_753b9f6893 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_d1452a2e6d -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_d1452a2e6d ~p ~op ~loc ~style ~explode
     (_x : t_d1452a2e6d) =
@@ -807,6 +1018,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_d1452a2e6d)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_d1452a2e6d ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_753b9f6893) in
+        Option.map (fun _y : t_d1452a2e6d -> T_753b9f6893 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_d1452a2e6d -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_c4284eadfd ~p ~op ~loc ~style ~explode
     (_x : t_c4284eadfd) =
     _string_of ~kind:(
@@ -817,9 +1042,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_c4284eadfd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c4284eadfd ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_c4284eadfd) in _string_to
-      ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
+  let string_to_t_c4284eadfd ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c4284eadfd) in
+      _string_to ~p ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
       ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_c4284eadfd ~p ~op ~loc ~style ~explode
@@ -831,6 +1056,13 @@ module ParamSerDe' = struct
           | Some _x -> `String end)])
       ~ctr:(Json_encoding.construct Encoders'.t_c4284eadfd)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_c4284eadfd ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c4284eadfd) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_c086813c51 ~p ~op ~loc ~style ~explode
     (_x : t_c086813c51) =
@@ -875,8 +1107,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_c086813c51)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c086813c51 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_c086813c51) in _string_to
+  let string_to_t_c086813c51 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c086813c51) in
+      _string_to ~p
       ~kind:(`Array
                [(`List
                    (`ObjectN
@@ -937,15 +1170,37 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_c086813c51)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_c086813c51 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c086813c51) in
+      _namevalues_to ~p
+      ~kind:(`Array
+               [(`List
+                   (`ObjectN
+                      [("", `Any); ("amount", `Integer);
+                       ("description", `String);
+                       ("invoice_line_item", `String);
+                       ("quantity", `Integer);
+                       ("tax_amounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("type", `String); ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_fa0c590277 ~p ~op ~loc ~style ~explode
     (_x : t_fa0c590277) =
     _string_of ~kind:( `ObjectN [("", `String)])
       ~ctr:(Json_encoding.construct Encoders'.t_fa0c590277)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fa0c590277 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_fa0c590277) in _string_to
-      ~kind:(`ObjectN [("", `String)]) ~dtr ~loc ~style ~explode _x
+  let string_to_t_fa0c590277 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_fa0c590277) in
+      _string_to ~p ~kind:(`ObjectN [("", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_fa0c590277 ~p ~op ~loc ~style ~explode
     (_x : t_fa0c590277) =
@@ -953,15 +1208,21 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_fa0c590277)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_fa0c590277 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_fa0c590277) in
+      _namevalues_to ~p ~kind:(`ObjectN [("", `String)])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_935a453a3f ~p ~op ~loc ~style ~explode
     (_x : t_935a453a3f) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_935a453a3f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_935a453a3f ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_935a453a3f) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_935a453a3f ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_935a453a3f) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_935a453a3f ~p ~op ~loc ~style ~explode
     (_x : t_935a453a3f) =
@@ -969,21 +1230,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_935a453a3f)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_935a453a3f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_935a453a3f) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_5780adc875 ~p ~op ~loc ~style ~explode
     (_x : t_5780adc875) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_5780adc875)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_5780adc875 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_5780adc875) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_5780adc875 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_5780adc875) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_5780adc875 ~p ~op ~loc ~style ~explode
     (_x : t_5780adc875) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_5780adc875)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_5780adc875 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_5780adc875) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_7d4b84944c ~p ~op ~loc ~style ~explode
     (_x : t_7d4b84944c) =
@@ -995,9 +1266,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_7d4b84944c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_7d4b84944c ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_7d4b84944c) in _string_to
-      ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
+  let string_to_t_7d4b84944c ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7d4b84944c) in
+      _string_to ~p ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
       ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_7d4b84944c ~p ~op ~loc ~style ~explode
@@ -1009,6 +1280,13 @@ module ParamSerDe' = struct
           | Some _x -> `String end)])
       ~ctr:(Json_encoding.construct Encoders'.t_7d4b84944c)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_7d4b84944c ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7d4b84944c) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN [("", `Any); ("shipping_rate", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_3acf43dc3b ~p ~op ~loc ~style ~explode
     (_x : t_3acf43dc3b) =
@@ -1053,8 +1331,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_3acf43dc3b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_3acf43dc3b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_3acf43dc3b) in _string_to
+  let string_to_t_3acf43dc3b ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3acf43dc3b) in
+      _string_to ~p
       ~kind:(`Array
                [(`List
                    (`ObjectN
@@ -1115,21 +1394,49 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_3acf43dc3b)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_3acf43dc3b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3acf43dc3b) in
+      _namevalues_to ~p
+      ~kind:(`Array
+               [(`List
+                   (`ObjectN
+                      [("", `Any); ("amount", `Integer);
+                       ("description", `String);
+                       ("invoice_line_item", `String);
+                       ("quantity", `Integer);
+                       ("tax_amounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("type", `String); ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_2551b208c1 ~p ~op ~loc ~style ~explode
     (_x : t_2551b208c1) =
     _string_of ~kind:( `ObjectN [("", `String)])
       ~ctr:(Json_encoding.construct Encoders'.t_2551b208c1)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2551b208c1 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_2551b208c1) in _string_to
-      ~kind:(`ObjectN [("", `String)]) ~dtr ~loc ~style ~explode _x
+  let string_to_t_2551b208c1 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2551b208c1) in
+      _string_to ~p ~kind:(`ObjectN [("", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_2551b208c1 ~p ~op ~loc ~style ~explode
     (_x : t_2551b208c1) =
     _namevalues_of ~kind:( `ObjectN [("", `String)])
       ~ctr:(Json_encoding.construct Encoders'.t_2551b208c1)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_2551b208c1 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2551b208c1) in
+      _namevalues_to ~p ~kind:(`ObjectN [("", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_8cd3871a8a ~p ~op ~loc ~style ~explode
     (_x : t_8cd3871a8a) =
@@ -1150,18 +1457,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8cd3871a8a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8cd3871a8a ~loc ~style ~explode (_x : string) =
+  let string_to_t_8cd3871a8a ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_29c5820fae) in
         Option.map (fun _y : t_8cd3871a8a -> T_29c5820fae _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_8cd3871a8a -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_8cd3871a8a ~p ~op ~loc ~style ~explode
     (_x : t_8cd3871a8a) =
@@ -1182,15 +1489,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8cd3871a8a)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_8cd3871a8a ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_29c5820fae) in
+        Option.map (fun _y : t_8cd3871a8a -> T_29c5820fae _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_8cd3871a8a -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_4f49500d45 ~p ~op ~loc ~style ~explode
     (_x : t_4f49500d45) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_4f49500d45)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4f49500d45 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4f49500d45) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_4f49500d45 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4f49500d45) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_4f49500d45 ~p ~op ~loc ~style ~explode
     (_x : t_4f49500d45) =
@@ -1198,21 +1519,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_4f49500d45)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_4f49500d45 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4f49500d45) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_e03d9a444b ~p ~op ~loc ~style ~explode
     (_x : t_e03d9a444b) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e03d9a444b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e03d9a444b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e03d9a444b) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_e03d9a444b ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e03d9a444b) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_e03d9a444b ~p ~op ~loc ~style ~explode
     (_x : t_e03d9a444b) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e03d9a444b)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_e03d9a444b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e03d9a444b) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_d8f80ab533 ~p ~op ~loc ~style ~explode
     (_x : t_d8f80ab533) =
@@ -1233,18 +1564,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_d8f80ab533)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d8f80ab533 ~loc ~style ~explode (_x : string) =
+  let string_to_t_d8f80ab533 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_05166771dc) in
         Option.map (fun _y : t_d8f80ab533 -> T_05166771dc _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_d8f80ab533 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_d8f80ab533 ~p ~op ~loc ~style ~explode
     (_x : t_d8f80ab533) =
@@ -1265,6 +1596,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_d8f80ab533)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_d8f80ab533 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_05166771dc) in
+        Option.map (fun _y : t_d8f80ab533 -> T_05166771dc _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_d8f80ab533 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_194d7f2624 ~p ~op ~loc ~style ~explode
     (_x : t_194d7f2624) =
     _string_of ~kind:(
@@ -1284,18 +1629,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_194d7f2624)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_194d7f2624 ~loc ~style ~explode (_x : string) =
+  let string_to_t_194d7f2624 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_4a62a84b9e) in
         Option.map (fun _y : t_194d7f2624 -> T_4a62a84b9e _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_194d7f2624 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_194d7f2624 ~p ~op ~loc ~style ~explode
     (_x : t_194d7f2624) =
@@ -1316,6 +1661,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_194d7f2624)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_194d7f2624 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_4a62a84b9e) in
+        Option.map (fun _y : t_194d7f2624 -> T_4a62a84b9e _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_194d7f2624 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_76bf2704bf ~p ~op ~loc ~style ~explode
     (_x : t_76bf2704bf) =
     _string_of ~kind:(
@@ -1335,18 +1694,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_76bf2704bf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_76bf2704bf ~loc ~style ~explode (_x : string) =
+  let string_to_t_76bf2704bf ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_019e891337) in
         Option.map (fun _y : t_76bf2704bf -> T_019e891337 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_76bf2704bf -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_76bf2704bf ~p ~op ~loc ~style ~explode
     (_x : t_76bf2704bf) =
@@ -1367,6 +1726,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_76bf2704bf)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_76bf2704bf ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_019e891337) in
+        Option.map (fun _y : t_76bf2704bf -> T_019e891337 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_76bf2704bf -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_2657bcad54 ~p ~op ~loc ~style ~explode
     (_x : t_2657bcad54) =
     _string_of ~kind:(
@@ -1386,18 +1759,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_2657bcad54)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2657bcad54 ~loc ~style ~explode (_x : string) =
+  let string_to_t_2657bcad54 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_872f5780fe) in
         Option.map (fun _y : t_2657bcad54 -> T_872f5780fe _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_2657bcad54 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_2657bcad54 ~p ~op ~loc ~style ~explode
     (_x : t_2657bcad54) =
@@ -1418,21 +1791,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_2657bcad54)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_2657bcad54 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_872f5780fe) in
+        Option.map (fun _y : t_2657bcad54 -> T_872f5780fe _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_2657bcad54 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_512e4129fd ~p ~op ~loc ~style ~explode
     (_x : t_512e4129fd) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_512e4129fd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_512e4129fd ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_512e4129fd) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_512e4129fd ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_512e4129fd) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_512e4129fd ~p ~op ~loc ~style ~explode
     (_x : t_512e4129fd) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_512e4129fd)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_512e4129fd ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_512e4129fd) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_32de9e954f ~p ~op ~loc ~style ~explode
     (_x : t_32de9e954f) =
@@ -1446,8 +1838,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_32de9e954f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_32de9e954f ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_32de9e954f) in _string_to
+  let string_to_t_32de9e954f ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_32de9e954f) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("account", `String); ("customer", `String)])
       ~dtr ~loc ~style ~explode _x
@@ -1463,6 +1856,14 @@ module ParamSerDe' = struct
           | Some _x -> `String end)])
       ~ctr:(Json_encoding.construct Encoders'.t_32de9e954f)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_32de9e954f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_32de9e954f) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("account", `String); ("customer", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_656d49aac0 ~p ~op ~loc ~style ~explode
     (_x : t_656d49aac0) =
@@ -1483,18 +1884,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_656d49aac0)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_656d49aac0 ~loc ~style ~explode (_x : string) =
+  let string_to_t_656d49aac0 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_3a94416575) in
         Option.map (fun _y : t_656d49aac0 -> T_3a94416575 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_656d49aac0 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_656d49aac0 ~p ~op ~loc ~style ~explode
     (_x : t_656d49aac0) =
@@ -1515,6 +1916,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_656d49aac0)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_656d49aac0 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_3a94416575) in
+        Option.map (fun _y : t_656d49aac0 -> T_3a94416575 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_656d49aac0 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_83d5590180 ~p ~op ~loc ~style ~explode
     (_x : t_83d5590180) =
     _string_of ~kind:(
@@ -1522,9 +1937,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_83d5590180)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_83d5590180 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_83d5590180) in _string_to
-      ~kind:(`ObjectN [("", `Any); ("after", `String)])
+  let string_to_t_83d5590180 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_83d5590180) in
+      _string_to ~p ~kind:(`ObjectN [("", `Any); ("after", `String)])
       ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_83d5590180 ~p ~op ~loc ~style ~explode
@@ -1533,6 +1948,12 @@ module ParamSerDe' = struct
       `ObjectN [("", `Any); ("after", let _x = _x.after in `String)])
       ~ctr:(Json_encoding.construct Encoders'.t_83d5590180)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_83d5590180 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_83d5590180) in
+      _namevalues_to ~p ~kind:(`ObjectN [("", `Any); ("after", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_a63e6bd7de ~p ~op ~loc ~style ~explode
     (_x : t_a63e6bd7de) =
@@ -1550,8 +1971,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_a63e6bd7de)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a63e6bd7de ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_a63e6bd7de) in _string_to
+  let string_to_t_a63e6bd7de ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a63e6bd7de) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("gt", `Integer); ("gte", `Integer);
                 ("lt", `Integer); ("lte", `Integer)])
@@ -1573,6 +1995,15 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_a63e6bd7de)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_a63e6bd7de ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a63e6bd7de) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                ("lt", `Integer); ("lte", `Integer)])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_b566f1b6bc ~p ~op ~loc ~style ~explode
     (_x : t_b566f1b6bc) =
     _string_of ~kind:(
@@ -1592,18 +2023,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_b566f1b6bc)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b566f1b6bc ~loc ~style ~explode (_x : string) =
+  let string_to_t_b566f1b6bc ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_862da605ac) in
         Option.map (fun _y : t_b566f1b6bc -> T_862da605ac _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_b566f1b6bc -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_b566f1b6bc ~p ~op ~loc ~style ~explode
     (_x : t_b566f1b6bc) =
@@ -1624,21 +2055,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_b566f1b6bc)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_b566f1b6bc ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_862da605ac) in
+        Option.map (fun _y : t_b566f1b6bc -> T_862da605ac _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_b566f1b6bc -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_53be0c51ff ~p ~op ~loc ~style ~explode
     (_x : t_53be0c51ff) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_53be0c51ff)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_53be0c51ff ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_53be0c51ff) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_53be0c51ff ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_53be0c51ff) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_53be0c51ff ~p ~op ~loc ~style ~explode
     (_x : t_53be0c51ff) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_53be0c51ff)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_53be0c51ff ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_53be0c51ff) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_8333ac0d50 ~p ~op ~loc ~style ~explode
     (_x : t_8333ac0d50) =
@@ -1659,18 +2109,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8333ac0d50)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8333ac0d50 ~loc ~style ~explode (_x : string) =
+  let string_to_t_8333ac0d50 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_da2453d199) in
         Option.map (fun _y : t_8333ac0d50 -> T_da2453d199 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_8333ac0d50 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_8333ac0d50 ~p ~op ~loc ~style ~explode
     (_x : t_8333ac0d50) =
@@ -1691,21 +2141,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8333ac0d50)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_8333ac0d50 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_da2453d199) in
+        Option.map (fun _y : t_8333ac0d50 -> T_da2453d199 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_8333ac0d50 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_060ea1562f ~p ~op ~loc ~style ~explode
     (_x : t_060ea1562f) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_060ea1562f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_060ea1562f ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_060ea1562f) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_060ea1562f ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_060ea1562f) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_060ea1562f ~p ~op ~loc ~style ~explode
     (_x : t_060ea1562f) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_060ea1562f)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_060ea1562f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_060ea1562f) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_7181394bbb ~p ~op ~loc ~style ~explode
     (_x : t_7181394bbb) =
@@ -1726,18 +2195,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_7181394bbb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_7181394bbb ~loc ~style ~explode (_x : string) =
+  let string_to_t_7181394bbb ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_6c4276e1a4) in
         Option.map (fun _y : t_7181394bbb -> T_6c4276e1a4 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_7181394bbb -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_7181394bbb ~p ~op ~loc ~style ~explode
     (_x : t_7181394bbb) =
@@ -1758,21 +2227,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_7181394bbb)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_7181394bbb ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6c4276e1a4) in
+        Option.map (fun _y : t_7181394bbb -> T_6c4276e1a4 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_7181394bbb -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_3d308e0087 ~p ~op ~loc ~style ~explode
     (_x : t_3d308e0087) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_3d308e0087)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_3d308e0087 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_3d308e0087) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_3d308e0087 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3d308e0087) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_3d308e0087 ~p ~op ~loc ~style ~explode
     (_x : t_3d308e0087) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_3d308e0087)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_3d308e0087 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3d308e0087) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_5fae893ff7 ~p ~op ~loc ~style ~explode
     (_x : t_5fae893ff7) =
@@ -1793,18 +2281,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_5fae893ff7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_5fae893ff7 ~loc ~style ~explode (_x : string) =
+  let string_to_t_5fae893ff7 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_eb52c2c010) in
         Option.map (fun _y : t_5fae893ff7 -> T_eb52c2c010 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_5fae893ff7 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_5fae893ff7 ~p ~op ~loc ~style ~explode
     (_x : t_5fae893ff7) =
@@ -1825,6 +2313,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_5fae893ff7)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_5fae893ff7 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_eb52c2c010) in
+        Option.map (fun _y : t_5fae893ff7 -> T_eb52c2c010 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_5fae893ff7 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_e8ff8d2aa0 ~p ~op ~loc ~style ~explode
     (_x : t_e8ff8d2aa0) =
     _string_of ~kind:(
@@ -1844,18 +2346,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_e8ff8d2aa0)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e8ff8d2aa0 ~loc ~style ~explode (_x : string) =
+  let string_to_t_e8ff8d2aa0 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_4c63ae17d6) in
         Option.map (fun _y : t_e8ff8d2aa0 -> T_4c63ae17d6 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_e8ff8d2aa0 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_e8ff8d2aa0 ~p ~op ~loc ~style ~explode
     (_x : t_e8ff8d2aa0) =
@@ -1876,21 +2378,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_e8ff8d2aa0)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_e8ff8d2aa0 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_4c63ae17d6) in
+        Option.map (fun _y : t_e8ff8d2aa0 -> T_4c63ae17d6 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_e8ff8d2aa0 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_2e0259263b ~p ~op ~loc ~style ~explode
     (_x : t_2e0259263b) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_2e0259263b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2e0259263b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_2e0259263b) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_2e0259263b ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2e0259263b) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_2e0259263b ~p ~op ~loc ~style ~explode
     (_x : t_2e0259263b) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_2e0259263b)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_2e0259263b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_2e0259263b) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_a51466ec35 ~p ~op ~loc ~style ~explode
     (_x : t_a51466ec35) =
@@ -1907,8 +2428,9 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_a51466ec35)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a51466ec35 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_a51466ec35) in _string_to
+  let string_to_t_a51466ec35 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a51466ec35) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("enabled", `Boolean);
                 ("liability",
@@ -1931,21 +2453,37 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_a51466ec35)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_a51466ec35 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a51466ec35) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("enabled", `Boolean);
+                ("liability",
+                 `ObjectN
+                   [("", `Any); ("account", `String); ("type", `String)])])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_50aa3198c9 ~p ~op ~loc ~style ~explode
     (_x : t_50aa3198c9) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_50aa3198c9)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_50aa3198c9 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_50aa3198c9) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_50aa3198c9 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_50aa3198c9) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_50aa3198c9 ~p ~op ~loc ~style ~explode
     (_x : t_50aa3198c9) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_50aa3198c9)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_50aa3198c9 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_50aa3198c9) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_c4767cb749 ~p ~op ~loc ~style ~explode
     (_x : t_c4767cb749) =
@@ -2078,8 +2616,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_c4767cb749)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c4767cb749 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_c4767cb749) in _string_to
+  let string_to_t_c4767cb749 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c4767cb749) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("end_behavior", `String);
                 ("phases",
@@ -2259,6 +2798,58 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_c4767cb749)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_c4767cb749 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c4767cb749) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("end_behavior", `String);
+                ("phases",
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("add_invoice_items", `Array [(`List (`Null))]);
+                           ("application_fee_percent", `Number);
+                           ("automatic_tax",
+                            `ObjectN
+                              [("", `Null); ("enabled", `Null);
+                               ("liability", `Null)]);
+                           ("billing_cycle_anchor", `String);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("collection_method", `String);
+                           ("coupon", `String);
+                           ("default_payment_method", `String);
+                           ("default_tax_rates", `Choice
+                                                 [`Null; `Null]);
+                           ("description", `Choice
+                                           [`Null; `Null]);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("end_date", `Choice
+                                        [`Null; `Null]);
+                           ("invoice_settings",
+                            `ObjectN
+                              [("", `Null); ("account_tax_ids", `Null);
+                               ("days_until_due", `Null); ("issuer", `Null)]);
+                           ("items", `Array [(`List (`Null))]);
+                           ("iterations", `Integer);
+                           ("metadata", `ObjectN [("", `Null)]);
+                           ("on_behalf_of", `String);
+                           ("proration_behavior", `String);
+                           ("start_date", `Choice
+                                          [`Null; `Null]);
+                           ("transfer_data",
+                            `ObjectN
+                              [("", `Null); ("amount_percent", `Null);
+                               ("destination", `Null)]);
+                           ("trial", `Boolean);
+                           ("trial_end", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String)]) ~dtr ~loc ~style ~explode
+      _x
+  
   let string_of_t_312ad6306f ~p ~op ~loc ~style ~explode
     (_x : t_312ad6306f) =
     _string_of ~kind:(
@@ -2268,16 +2859,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_312ad6306f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_312ad6306f ~loc ~style ~explode (_x : string) =
+  let string_to_t_312ad6306f ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_13d6b80cc4) in
         Option.map (fun _y : t_312ad6306f -> T_13d6b80cc4 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
         Option.map (fun _y : t_312ad6306f -> Ptime_t _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_312ad6306f ~p ~op ~loc ~style ~explode
     (_x : t_312ad6306f) =
@@ -2288,6 +2879,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_312ad6306f)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_312ad6306f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_13d6b80cc4) in
+        Option.map (fun _y : t_312ad6306f -> T_13d6b80cc4 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
+        Option.map (fun _y : t_312ad6306f -> Ptime_t _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_b9ba448b2f ~p ~op ~loc ~style ~explode
     (_x : t_b9ba448b2f) =
     _string_of ~kind:(
@@ -2297,16 +2900,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_b9ba448b2f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b9ba448b2f ~loc ~style ~explode (_x : string) =
+  let string_to_t_b9ba448b2f ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
         Option.map (fun _y : t_b9ba448b2f -> Ptime_t _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_97816224ba) in
         Option.map (fun _y : t_b9ba448b2f -> T_97816224ba _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_b9ba448b2f ~p ~op ~loc ~style ~explode
     (_x : t_b9ba448b2f) =
@@ -2316,6 +2919,18 @@ module ParamSerDe' = struct
       | T_97816224ba _x -> `String
       end) ~ctr:(Json_encoding.construct Encoders'.t_b9ba448b2f)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_b9ba448b2f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `Integer in
+        let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
+        Option.map (fun _y : t_b9ba448b2f -> Ptime_t _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_97816224ba) in
+        Option.map (fun _y : t_b9ba448b2f -> T_97816224ba _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_0178e1face ~p ~op ~loc ~style ~explode
     (_x : t_0178e1face) =
@@ -2327,17 +2942,17 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_0178e1face)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_0178e1face ~loc ~style ~explode (_x : string) =
+  let string_to_t_0178e1face ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `Array [(`List (`String))] in
         let dtr = (Json_encoding.destruct
                      (Json_encoding.list Json_encoding.string)) in
         Option.map (fun _y : t_0178e1face -> StringList _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_177b598972) in
         Option.map (fun _y : t_0178e1face -> T_177b598972 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_0178e1face ~p ~op ~loc ~style ~explode
     (_x : t_0178e1face) =
@@ -2348,6 +2963,19 @@ module ParamSerDe' = struct
       | T_177b598972 _x -> `String
       end) ~ctr:(Json_encoding.construct Encoders'.t_0178e1face)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_0178e1face ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `Array [(`List (`String))] in
+        let dtr = (Json_encoding.destruct
+                     (Json_encoding.list Json_encoding.string)) in
+        Option.map (fun _y : t_0178e1face -> StringList _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_177b598972) in
+        Option.map (fun _y : t_0178e1face -> T_177b598972 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_baccbfb036 ~p ~op ~loc ~style ~explode
     (_x : t_baccbfb036) =
@@ -2451,8 +3079,9 @@ module ParamSerDe' = struct
           end end)]) ~ctr:(Json_encoding.construct Encoders'.t_baccbfb036)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_baccbfb036 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_baccbfb036) in _string_to
+  let string_to_t_baccbfb036 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_baccbfb036) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any);
                 ("billing_cycle_anchor", `Choice
@@ -2596,6 +3225,51 @@ module ParamSerDe' = struct
           end end)]) ~ctr:(Json_encoding.construct Encoders'.t_baccbfb036)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_baccbfb036 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_baccbfb036) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any);
+                ("billing_cycle_anchor", `Choice
+                                         [`String; `Integer]);
+                ("cancel_at", `Choice
+                              [`Integer; `String]);
+                ("cancel_at_period_end", `Boolean); ("cancel_now", `Boolean);
+                ("default_tax_rates",
+                 `Choice
+                 [`Array [(`List (`String))]; `String]);
+                ("items",
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("clear_usage", `Boolean); ("deleted", `Boolean);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("id", `String);
+                           ("metadata", `Choice
+                                        [`Null; `Null]);
+                           ("price", `String);
+                           ("price_data",
+                            `ObjectN
+                              [("", `Null); ("currency", `Null);
+                               ("product", `Null); ("recurring", `Null);
+                               ("tax_behavior", `Null);
+                               ("unit_amount", `Null);
+                               ("unit_amount_decimal", `Null)]);
+                           ("quantity", `Integer);
+                           ("tax_rates", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String);
+                ("proration_date", `Integer); ("resume_at", `String);
+                ("start_date", `Integer);
+                ("trial_end", `Choice
+                              [`String; `Integer])])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_671de99c34 ~p ~op ~loc ~style ~explode
     (_x : t_671de99c34) =
     _string_of ~kind:(
@@ -2672,8 +3346,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_671de99c34)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_671de99c34 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_671de99c34) in _string_to
+  let string_to_t_671de99c34 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_671de99c34) in
+      _string_to ~p
       ~kind:(`Array
                [(`List
                    (`ObjectN
@@ -2784,15 +3459,53 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_671de99c34)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_671de99c34 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_671de99c34) in
+      _namevalues_to ~p
+      ~kind:(`Array
+               [(`List
+                   (`ObjectN
+                      [("", `Any);
+                       ("billing_thresholds",
+                        `Choice
+                        [`ObjectN [("", `Null); ("usage_gte", `Null)];
+                         `String]);
+                       ("clear_usage", `Boolean); ("deleted", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("id", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
+                       ("price", `String);
+                       ("price_data",
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String);
+                           ("recurring",
+                            `ObjectN
+                              [("", `Null); ("interval", `Null);
+                               ("interval_count", `Null)]);
+                           ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String])]))])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_6dff880c24 ~p ~op ~loc ~style ~explode
     (_x : t_6dff880c24) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_6dff880c24)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_6dff880c24 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_6dff880c24) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_6dff880c24 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6dff880c24) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_6dff880c24 ~p ~op ~loc ~style ~explode
     (_x : t_6dff880c24) =
@@ -2800,21 +3513,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_6dff880c24)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_6dff880c24 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6dff880c24) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_50e9f09abe ~p ~op ~loc ~style ~explode
     (_x : t_50e9f09abe) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_50e9f09abe)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_50e9f09abe ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_50e9f09abe) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_50e9f09abe ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_50e9f09abe) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_50e9f09abe ~p ~op ~loc ~style ~explode
     (_x : t_50e9f09abe) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_50e9f09abe)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_50e9f09abe ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_50e9f09abe) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_30748e2d12 ~p ~op ~loc ~style ~explode
     (_x : t_30748e2d12) =
@@ -2825,16 +3548,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_30748e2d12)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_30748e2d12 ~loc ~style ~explode (_x : string) =
+  let string_to_t_30748e2d12 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_e18674598e) in
         Option.map (fun _y : t_30748e2d12 -> T_e18674598e _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
         Option.map (fun _y : t_30748e2d12 -> Ptime_t _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_30748e2d12 ~p ~op ~loc ~style ~explode
     (_x : t_30748e2d12) =
@@ -2844,6 +3567,18 @@ module ParamSerDe' = struct
       | Ptime_t _x -> `Integer
       end) ~ctr:(Json_encoding.construct Encoders'.t_30748e2d12)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_30748e2d12 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_e18674598e) in
+        Option.map (fun _y : t_30748e2d12 -> T_e18674598e _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
+        Option.map (fun _y : t_30748e2d12 -> Ptime_t _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_c87881fc5c ~p ~op ~loc ~style ~explode
     (_x : t_c87881fc5c) =
@@ -2917,8 +3652,9 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_c87881fc5c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c87881fc5c ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_c87881fc5c) in _string_to
+  let string_to_t_c87881fc5c ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c87881fc5c) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any);
                 ("address",
@@ -3023,6 +3759,42 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_c87881fc5c)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_c87881fc5c ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_c87881fc5c) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any);
+                ("address",
+                 `Choice
+                 [`ObjectN
+                    [("", `Any); ("city", `String); ("country", `String);
+                     ("line1", `String); ("line2", `String);
+                     ("postal_code", `String); ("state", `String)];
+                  `String]);
+                ("shipping",
+                 `Choice
+                 [`ObjectN
+                    [("", `Any);
+                     ("address",
+                      `ObjectN
+                        [("", `Any); ("city", `String); ("country", `String);
+                         ("line1", `String); ("line2", `String);
+                         ("postal_code", `String); ("state", `String)]);
+                     ("name", `String); ("phone", `String)];
+                  `String]);
+                ("tax",
+                 `ObjectN
+                   [("", `Any); ("ip_address", `Choice
+                                               [`String; `String])]);
+                ("tax_exempt", `String);
+                ("tax_ids",
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any); ("type", `String); ("value", `String)]))])])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_873409613d ~p ~op ~loc ~style ~explode
     (_x : t_873409613d) =
     _string_of ~kind:(
@@ -3043,7 +3815,7 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_873409613d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_873409613d ~loc ~style ~explode (_x : string) =
+  let string_to_t_873409613d ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `Array
                    [(`List
                        (`ObjectN
@@ -3052,12 +3824,12 @@ module ParamSerDe' = struct
                            ("promotion_code", `String)]))] in
         let dtr = (Json_encoding.destruct Encoders'.t_31c19e5e08) in
         Option.map (fun _y : t_873409613d -> T_31c19e5e08 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_e023a69498) in
         Option.map (fun _y : t_873409613d -> T_e023a69498 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_873409613d ~p ~op ~loc ~style ~explode
     (_x : t_873409613d) =
@@ -3078,6 +3850,23 @@ module ParamSerDe' = struct
       | T_e023a69498 _x -> `String
       end) ~ctr:(Json_encoding.construct Encoders'.t_873409613d)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_873409613d ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any); ("coupon", `String);
+                           ("discount", `String);
+                           ("promotion_code", `String)]))] in
+        let dtr = (Json_encoding.destruct Encoders'.t_31c19e5e08) in
+        Option.map (fun _y : t_873409613d -> T_31c19e5e08 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_e023a69498) in
+        Option.map (fun _y : t_873409613d -> T_e023a69498 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_96382fbbc2 ~p ~op ~loc ~style ~explode
     (_x : t_96382fbbc2) =
@@ -3161,8 +3950,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_96382fbbc2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_96382fbbc2 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_96382fbbc2) in _string_to
+  let string_to_t_96382fbbc2 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_96382fbbc2) in
+      _string_to ~p
       ~kind:(`Array
                [(`List
                    (`ObjectN
@@ -3279,6 +4069,44 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_96382fbbc2)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_96382fbbc2 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_96382fbbc2) in
+      _namevalues_to ~p
+      ~kind:(`Array
+               [(`List
+                   (`ObjectN
+                      [("", `Any); ("amount", `Integer);
+                       ("currency", `String); ("description", `String);
+                       ("discountable", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("invoiceitem", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
+                       ("period",
+                        `ObjectN
+                          [("", `Any); ("end", `Integer);
+                           ("start", `Integer)]);
+                       ("price", `String);
+                       ("price_data",
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String); ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer); ("tax_behavior", `String);
+                       ("tax_code", `Choice
+                                    [`String; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_266682ce3a ~p ~op ~loc ~style ~explode
     (_x : t_266682ce3a) =
     _string_of ~kind:(
@@ -3290,8 +4118,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_266682ce3a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_266682ce3a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_266682ce3a) in _string_to
+  let string_to_t_266682ce3a ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_266682ce3a) in
+      _string_to ~p
       ~kind:(`ObjectN [("", `Any); ("account", `String); ("type", `String)])
       ~dtr ~loc ~style ~explode _x
   
@@ -3306,6 +4135,13 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_266682ce3a)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_266682ce3a ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_266682ce3a) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN [("", `Any); ("account", `String); ("type", `String)])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_9aa5bd9e73 ~p ~op ~loc ~style ~explode
     (_x : t_9aa5bd9e73) =
     _string_of ~kind:(
@@ -3315,16 +4151,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_9aa5bd9e73)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9aa5bd9e73 ~loc ~style ~explode (_x : string) =
+  let string_to_t_9aa5bd9e73 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Json_encoding.string) in
         Option.map (fun _y : t_9aa5bd9e73 -> String_ _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_037795d400) in
         Option.map (fun _y : t_9aa5bd9e73 -> T_037795d400 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_9aa5bd9e73 ~p ~op ~loc ~style ~explode
     (_x : t_9aa5bd9e73) =
@@ -3334,6 +4170,18 @@ module ParamSerDe' = struct
       | T_037795d400 _x -> `String
       end) ~ctr:(Json_encoding.construct Encoders'.t_9aa5bd9e73)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_9aa5bd9e73 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `String in
+        let dtr = (Json_encoding.destruct Json_encoding.string) in
+        Option.map (fun _y : t_9aa5bd9e73 -> String_ _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_037795d400) in
+        Option.map (fun _y : t_9aa5bd9e73 -> T_037795d400 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_25cc6e6754 ~p ~op ~loc ~style ~explode
     (_x : t_25cc6e6754) =
@@ -3350,8 +4198,9 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_25cc6e6754)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_25cc6e6754 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_25cc6e6754) in _string_to
+  let string_to_t_25cc6e6754 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_25cc6e6754) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("enabled", `Boolean);
                 ("liability",
@@ -3374,6 +4223,17 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_25cc6e6754)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_25cc6e6754 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_25cc6e6754) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("enabled", `Boolean);
+                ("liability",
+                 `ObjectN
+                   [("", `Any); ("account", `String); ("type", `String)])])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_d3294049d8 ~p ~op ~loc ~style ~explode
     (_x : t_d3294049d8) =
     _string_of ~kind:(
@@ -3383,16 +4243,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_d3294049d8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d3294049d8 ~loc ~style ~explode (_x : string) =
+  let string_to_t_d3294049d8 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Json_encoding.string) in
         Option.map (fun _y : t_d3294049d8 -> String_ _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_bf81051835) in
         Option.map (fun _y : t_d3294049d8 -> T_bf81051835 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_d3294049d8 ~p ~op ~loc ~style ~explode
     (_x : t_d3294049d8) =
@@ -3403,21 +4263,38 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_d3294049d8)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_d3294049d8 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `String in
+        let dtr = (Json_encoding.destruct Json_encoding.string) in
+        Option.map (fun _y : t_d3294049d8 -> String_ _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_bf81051835) in
+        Option.map (fun _y : t_d3294049d8 -> T_bf81051835 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_f90350482b ~p ~op ~loc ~style ~explode
     (_x : t_f90350482b) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_f90350482b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f90350482b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f90350482b) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_f90350482b ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f90350482b) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_f90350482b ~p ~op ~loc ~style ~explode
     (_x : t_f90350482b) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_f90350482b)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_f90350482b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f90350482b) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_4592f6749b ~p ~op ~loc ~style ~explode
     (_x : t_4592f6749b) =
@@ -3550,8 +4427,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_4592f6749b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4592f6749b ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4592f6749b) in _string_to
+  let string_to_t_4592f6749b ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4592f6749b) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("end_behavior", `String);
                 ("phases",
@@ -3731,6 +4609,58 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_4592f6749b)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_4592f6749b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4592f6749b) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("end_behavior", `String);
+                ("phases",
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("add_invoice_items", `Array [(`List (`Null))]);
+                           ("application_fee_percent", `Number);
+                           ("automatic_tax",
+                            `ObjectN
+                              [("", `Null); ("enabled", `Null);
+                               ("liability", `Null)]);
+                           ("billing_cycle_anchor", `String);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("collection_method", `String);
+                           ("coupon", `String);
+                           ("default_payment_method", `String);
+                           ("default_tax_rates", `Choice
+                                                 [`Null; `Null]);
+                           ("description", `Choice
+                                           [`Null; `Null]);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("end_date", `Choice
+                                        [`Null; `Null]);
+                           ("invoice_settings",
+                            `ObjectN
+                              [("", `Null); ("account_tax_ids", `Null);
+                               ("days_until_due", `Null); ("issuer", `Null)]);
+                           ("items", `Array [(`List (`Null))]);
+                           ("iterations", `Integer);
+                           ("metadata", `ObjectN [("", `Null)]);
+                           ("on_behalf_of", `String);
+                           ("proration_behavior", `String);
+                           ("start_date", `Choice
+                                          [`Null; `Null]);
+                           ("transfer_data",
+                            `ObjectN
+                              [("", `Null); ("amount_percent", `Null);
+                               ("destination", `Null)]);
+                           ("trial", `Boolean);
+                           ("trial_end", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String)]) ~dtr ~loc ~style ~explode
+      _x
+  
   let string_of_t_ed69666899 ~p ~op ~loc ~style ~explode
     (_x : t_ed69666899) =
     _string_of ~kind:(
@@ -3740,16 +4670,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ed69666899)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ed69666899 ~loc ~style ~explode (_x : string) =
+  let string_to_t_ed69666899 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_055dff077f) in
         Option.map (fun _y : t_ed69666899 -> T_055dff077f _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
         Option.map (fun _y : t_ed69666899 -> Ptime_t _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_ed69666899 ~p ~op ~loc ~style ~explode
     (_x : t_ed69666899) =
@@ -3760,6 +4690,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ed69666899)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_ed69666899 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_055dff077f) in
+        Option.map (fun _y : t_ed69666899 -> T_055dff077f _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
+        Option.map (fun _y : t_ed69666899 -> Ptime_t _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_1d44572454 ~p ~op ~loc ~style ~explode
     (_x : t_1d44572454) =
     _string_of ~kind:(
@@ -3769,16 +4711,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_1d44572454)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1d44572454 ~loc ~style ~explode (_x : string) =
+  let string_to_t_1d44572454 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
         Option.map (fun _y : t_1d44572454 -> Ptime_t _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_0c25334bd1) in
         Option.map (fun _y : t_1d44572454 -> T_0c25334bd1 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_1d44572454 ~p ~op ~loc ~style ~explode
     (_x : t_1d44572454) =
@@ -3788,6 +4730,18 @@ module ParamSerDe' = struct
       | T_0c25334bd1 _x -> `String
       end) ~ctr:(Json_encoding.construct Encoders'.t_1d44572454)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_1d44572454 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `Integer in
+        let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
+        Option.map (fun _y : t_1d44572454 -> Ptime_t _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_0c25334bd1) in
+        Option.map (fun _y : t_1d44572454 -> T_0c25334bd1 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_8f5fa696e4 ~p ~op ~loc ~style ~explode
     (_x : t_8f5fa696e4) =
@@ -3799,17 +4753,17 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8f5fa696e4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8f5fa696e4 ~loc ~style ~explode (_x : string) =
+  let string_to_t_8f5fa696e4 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `Array [(`List (`String))] in
         let dtr = (Json_encoding.destruct
                      (Json_encoding.list Json_encoding.string)) in
         Option.map (fun _y : t_8f5fa696e4 -> StringList _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_124a01eb97) in
         Option.map (fun _y : t_8f5fa696e4 -> T_124a01eb97 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_8f5fa696e4 ~p ~op ~loc ~style ~explode
     (_x : t_8f5fa696e4) =
@@ -3820,6 +4774,19 @@ module ParamSerDe' = struct
       | T_124a01eb97 _x -> `String
       end) ~ctr:(Json_encoding.construct Encoders'.t_8f5fa696e4)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_8f5fa696e4 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `Array [(`List (`String))] in
+        let dtr = (Json_encoding.destruct
+                     (Json_encoding.list Json_encoding.string)) in
+        Option.map (fun _y : t_8f5fa696e4 -> StringList _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_124a01eb97) in
+        Option.map (fun _y : t_8f5fa696e4 -> T_124a01eb97 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_7cca4f7dbf ~p ~op ~loc ~style ~explode
     (_x : t_7cca4f7dbf) =
@@ -3923,8 +4890,9 @@ module ParamSerDe' = struct
           end end)]) ~ctr:(Json_encoding.construct Encoders'.t_7cca4f7dbf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_7cca4f7dbf ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_7cca4f7dbf) in _string_to
+  let string_to_t_7cca4f7dbf ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7cca4f7dbf) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any);
                 ("billing_cycle_anchor", `Choice
@@ -4068,6 +5036,51 @@ module ParamSerDe' = struct
           end end)]) ~ctr:(Json_encoding.construct Encoders'.t_7cca4f7dbf)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_7cca4f7dbf ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7cca4f7dbf) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any);
+                ("billing_cycle_anchor", `Choice
+                                         [`String; `Integer]);
+                ("cancel_at", `Choice
+                              [`Integer; `String]);
+                ("cancel_at_period_end", `Boolean); ("cancel_now", `Boolean);
+                ("default_tax_rates",
+                 `Choice
+                 [`Array [(`List (`String))]; `String]);
+                ("items",
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any);
+                           ("billing_thresholds", `Choice
+                                                  [`Null; `Null]);
+                           ("clear_usage", `Boolean); ("deleted", `Boolean);
+                           ("discounts", `Choice
+                                         [`Null; `Null]);
+                           ("id", `String);
+                           ("metadata", `Choice
+                                        [`Null; `Null]);
+                           ("price", `String);
+                           ("price_data",
+                            `ObjectN
+                              [("", `Null); ("currency", `Null);
+                               ("product", `Null); ("recurring", `Null);
+                               ("tax_behavior", `Null);
+                               ("unit_amount", `Null);
+                               ("unit_amount_decimal", `Null)]);
+                           ("quantity", `Integer);
+                           ("tax_rates", `Choice
+                                         [`Null; `Null])]))]);
+                ("proration_behavior", `String);
+                ("proration_date", `Integer); ("resume_at", `String);
+                ("start_date", `Integer);
+                ("trial_end", `Choice
+                              [`String; `Integer])])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_1d8dcb799a ~p ~op ~loc ~style ~explode
     (_x : t_1d8dcb799a) =
     _string_of ~kind:(
@@ -4144,8 +5157,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_1d8dcb799a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1d8dcb799a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_1d8dcb799a) in _string_to
+  let string_to_t_1d8dcb799a ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_1d8dcb799a) in
+      _string_to ~p
       ~kind:(`Array
                [(`List
                    (`ObjectN
@@ -4256,15 +5270,53 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_1d8dcb799a)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_1d8dcb799a ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_1d8dcb799a) in
+      _namevalues_to ~p
+      ~kind:(`Array
+               [(`List
+                   (`ObjectN
+                      [("", `Any);
+                       ("billing_thresholds",
+                        `Choice
+                        [`ObjectN [("", `Null); ("usage_gte", `Null)];
+                         `String]);
+                       ("clear_usage", `Boolean); ("deleted", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("id", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
+                       ("price", `String);
+                       ("price_data",
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String);
+                           ("recurring",
+                            `ObjectN
+                              [("", `Null); ("interval", `Null);
+                               ("interval_count", `Null)]);
+                           ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String])]))])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_b3cdff625a ~p ~op ~loc ~style ~explode
     (_x : t_b3cdff625a) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_b3cdff625a)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b3cdff625a ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b3cdff625a) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_b3cdff625a ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b3cdff625a) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_b3cdff625a ~p ~op ~loc ~style ~explode
     (_x : t_b3cdff625a) =
@@ -4272,21 +5324,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_b3cdff625a)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_b3cdff625a ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b3cdff625a) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_f0d6f3faa7 ~p ~op ~loc ~style ~explode
     (_x : t_f0d6f3faa7) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_f0d6f3faa7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f0d6f3faa7 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f0d6f3faa7) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_f0d6f3faa7 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f0d6f3faa7) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_f0d6f3faa7 ~p ~op ~loc ~style ~explode
     (_x : t_f0d6f3faa7) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_f0d6f3faa7)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_f0d6f3faa7 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f0d6f3faa7) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_8a9e68982d ~p ~op ~loc ~style ~explode
     (_x : t_8a9e68982d) =
@@ -4297,16 +5359,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8a9e68982d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8a9e68982d ~loc ~style ~explode (_x : string) =
+  let string_to_t_8a9e68982d ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_b12bfcf7b3) in
         Option.map (fun _y : t_8a9e68982d -> T_b12bfcf7b3 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
         Option.map (fun _y : t_8a9e68982d -> Ptime_t _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_8a9e68982d ~p ~op ~loc ~style ~explode
     (_x : t_8a9e68982d) =
@@ -4316,6 +5378,18 @@ module ParamSerDe' = struct
       | Ptime_t _x -> `Integer
       end) ~ctr:(Json_encoding.construct Encoders'.t_8a9e68982d)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_8a9e68982d ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_b12bfcf7b3) in
+        Option.map (fun _y : t_8a9e68982d -> T_b12bfcf7b3 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct EncBase'.vendor_unix_time) in
+        Option.map (fun _y : t_8a9e68982d -> Ptime_t _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_428991b112 ~p ~op ~loc ~style ~explode
     (_x : t_428991b112) =
@@ -4389,8 +5463,9 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_428991b112)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_428991b112 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_428991b112) in _string_to
+  let string_to_t_428991b112 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_428991b112) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any);
                 ("address",
@@ -4495,6 +5570,42 @@ module ParamSerDe' = struct
           end)]) ~ctr:(Json_encoding.construct Encoders'.t_428991b112)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_428991b112 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_428991b112) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any);
+                ("address",
+                 `Choice
+                 [`ObjectN
+                    [("", `Any); ("city", `String); ("country", `String);
+                     ("line1", `String); ("line2", `String);
+                     ("postal_code", `String); ("state", `String)];
+                  `String]);
+                ("shipping",
+                 `Choice
+                 [`ObjectN
+                    [("", `Any);
+                     ("address",
+                      `ObjectN
+                        [("", `Any); ("city", `String); ("country", `String);
+                         ("line1", `String); ("line2", `String);
+                         ("postal_code", `String); ("state", `String)]);
+                     ("name", `String); ("phone", `String)];
+                  `String]);
+                ("tax",
+                 `ObjectN
+                   [("", `Any); ("ip_address", `Choice
+                                               [`String; `String])]);
+                ("tax_exempt", `String);
+                ("tax_ids",
+                 `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any); ("type", `String); ("value", `String)]))])])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_ec12d0adc5 ~p ~op ~loc ~style ~explode
     (_x : t_ec12d0adc5) =
     _string_of ~kind:(
@@ -4515,7 +5626,7 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ec12d0adc5)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ec12d0adc5 ~loc ~style ~explode (_x : string) =
+  let string_to_t_ec12d0adc5 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `Array
                    [(`List
                        (`ObjectN
@@ -4524,12 +5635,12 @@ module ParamSerDe' = struct
                            ("promotion_code", `String)]))] in
         let dtr = (Json_encoding.destruct Encoders'.t_ce45932982) in
         Option.map (fun _y : t_ec12d0adc5 -> T_ce45932982 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_4884e1ec72) in
         Option.map (fun _y : t_ec12d0adc5 -> T_4884e1ec72 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_ec12d0adc5 ~p ~op ~loc ~style ~explode
     (_x : t_ec12d0adc5) =
@@ -4550,6 +5661,23 @@ module ParamSerDe' = struct
       | T_4884e1ec72 _x -> `String
       end) ~ctr:(Json_encoding.construct Encoders'.t_ec12d0adc5)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_ec12d0adc5 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `Array
+                   [(`List
+                       (`ObjectN
+                          [("", `Any); ("coupon", `String);
+                           ("discount", `String);
+                           ("promotion_code", `String)]))] in
+        let dtr = (Json_encoding.destruct Encoders'.t_ce45932982) in
+        Option.map (fun _y : t_ec12d0adc5 -> T_ce45932982 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_4884e1ec72) in
+        Option.map (fun _y : t_ec12d0adc5 -> T_4884e1ec72 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let string_of_t_6de1e50279 ~p ~op ~loc ~style ~explode
     (_x : t_6de1e50279) =
@@ -4633,8 +5761,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_6de1e50279)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_6de1e50279 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_6de1e50279) in _string_to
+  let string_to_t_6de1e50279 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6de1e50279) in
+      _string_to ~p
       ~kind:(`Array
                [(`List
                    (`ObjectN
@@ -4751,6 +5880,44 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_6de1e50279)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_6de1e50279 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6de1e50279) in
+      _namevalues_to ~p
+      ~kind:(`Array
+               [(`List
+                   (`ObjectN
+                      [("", `Any); ("amount", `Integer);
+                       ("currency", `String); ("description", `String);
+                       ("discountable", `Boolean);
+                       ("discounts",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("invoiceitem", `String);
+                       ("metadata",
+                        `Choice
+                        [`ObjectN [("", `Null)]; `String]);
+                       ("period",
+                        `ObjectN
+                          [("", `Any); ("end", `Integer);
+                           ("start", `Integer)]);
+                       ("price", `String);
+                       ("price_data",
+                        `ObjectN
+                          [("", `Any); ("currency", `String);
+                           ("product", `String); ("tax_behavior", `String);
+                           ("unit_amount", `Integer);
+                           ("unit_amount_decimal", `String)]);
+                       ("quantity", `Integer); ("tax_behavior", `String);
+                       ("tax_code", `Choice
+                                    [`String; `String]);
+                       ("tax_rates",
+                        `Choice
+                        [`Array [(`List (`Null))]; `String]);
+                       ("unit_amount", `Integer);
+                       ("unit_amount_decimal", `String)]))])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_f2803c8215 ~p ~op ~loc ~style ~explode
     (_x : t_f2803c8215) =
     _string_of ~kind:(
@@ -4762,8 +5929,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_f2803c8215)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_f2803c8215 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_f2803c8215) in _string_to
+  let string_to_t_f2803c8215 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f2803c8215) in
+      _string_to ~p
       ~kind:(`ObjectN [("", `Any); ("account", `String); ("type", `String)])
       ~dtr ~loc ~style ~explode _x
   
@@ -4777,6 +5945,13 @@ module ParamSerDe' = struct
          ("type", let _x = _x.type_ in `String)])
       ~ctr:(Json_encoding.construct Encoders'.t_f2803c8215)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_f2803c8215 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_f2803c8215) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN [("", `Any); ("account", `String); ("type", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_28b874eafa ~p ~op ~loc ~style ~explode
     (_x : t_28b874eafa) =
@@ -4797,18 +5972,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_28b874eafa)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_28b874eafa ~loc ~style ~explode (_x : string) =
+  let string_to_t_28b874eafa ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_aa2791e997) in
         Option.map (fun _y : t_28b874eafa -> T_aa2791e997 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_28b874eafa -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_28b874eafa ~p ~op ~loc ~style ~explode
     (_x : t_28b874eafa) =
@@ -4829,21 +6004,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_28b874eafa)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_28b874eafa ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_aa2791e997) in
+        Option.map (fun _y : t_28b874eafa -> T_aa2791e997 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_28b874eafa -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_e7c047a717 ~p ~op ~loc ~style ~explode
     (_x : t_e7c047a717) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e7c047a717)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e7c047a717 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e7c047a717) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_e7c047a717 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e7c047a717) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_e7c047a717 ~p ~op ~loc ~style ~explode
     (_x : t_e7c047a717) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e7c047a717)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_e7c047a717 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e7c047a717) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_5e23dd8315 ~p ~op ~loc ~style ~explode
     (_x : t_5e23dd8315) =
@@ -4864,18 +6058,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_5e23dd8315)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_5e23dd8315 ~loc ~style ~explode (_x : string) =
+  let string_to_t_5e23dd8315 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_6da4b6eaaf) in
         Option.map (fun _y : t_5e23dd8315 -> T_6da4b6eaaf _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_5e23dd8315 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_5e23dd8315 ~p ~op ~loc ~style ~explode
     (_x : t_5e23dd8315) =
@@ -4896,15 +6090,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_5e23dd8315)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_5e23dd8315 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6da4b6eaaf) in
+        Option.map (fun _y : t_5e23dd8315 -> T_6da4b6eaaf _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_5e23dd8315 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_d05018810d ~p ~op ~loc ~style ~explode
     (_x : t_d05018810d) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_d05018810d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d05018810d ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_d05018810d) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_d05018810d ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_d05018810d) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_d05018810d ~p ~op ~loc ~style ~explode
     (_x : t_d05018810d) =
@@ -4912,21 +6120,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_d05018810d)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_d05018810d ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_d05018810d) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_9b139b4e87 ~p ~op ~loc ~style ~explode
     (_x : t_9b139b4e87) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_9b139b4e87)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9b139b4e87 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_9b139b4e87) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_9b139b4e87 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_9b139b4e87) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_9b139b4e87 ~p ~op ~loc ~style ~explode
     (_x : t_9b139b4e87) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_9b139b4e87)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_9b139b4e87 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_9b139b4e87) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_fd32e6450f ~p ~op ~loc ~style ~explode
     (_x : t_fd32e6450f) =
@@ -4947,18 +6165,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_fd32e6450f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fd32e6450f ~loc ~style ~explode (_x : string) =
+  let string_to_t_fd32e6450f ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_c2905ff31f) in
         Option.map (fun _y : t_fd32e6450f -> T_c2905ff31f _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_fd32e6450f -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_fd32e6450f ~p ~op ~loc ~style ~explode
     (_x : t_fd32e6450f) =
@@ -4979,15 +6197,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_fd32e6450f)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_fd32e6450f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_c2905ff31f) in
+        Option.map (fun _y : t_fd32e6450f -> T_c2905ff31f _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_fd32e6450f -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_e2b1b56eac ~p ~op ~loc ~style ~explode
     (_x : t_e2b1b56eac) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e2b1b56eac)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e2b1b56eac ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e2b1b56eac) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_e2b1b56eac ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e2b1b56eac) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_e2b1b56eac ~p ~op ~loc ~style ~explode
     (_x : t_e2b1b56eac) =
@@ -4995,21 +6227,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_e2b1b56eac)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_e2b1b56eac ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e2b1b56eac) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_e42a3414c1 ~p ~op ~loc ~style ~explode
     (_x : t_e42a3414c1) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e42a3414c1)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e42a3414c1 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e42a3414c1) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_e42a3414c1 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e42a3414c1) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_e42a3414c1 ~p ~op ~loc ~style ~explode
     (_x : t_e42a3414c1) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e42a3414c1)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_e42a3414c1 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e42a3414c1) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_be86c12b19 ~p ~op ~loc ~style ~explode
     (_x : t_be86c12b19) =
@@ -5030,18 +6272,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_be86c12b19)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_be86c12b19 ~loc ~style ~explode (_x : string) =
+  let string_to_t_be86c12b19 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_acdb658c9d) in
         Option.map (fun _y : t_be86c12b19 -> T_acdb658c9d _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_be86c12b19 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_be86c12b19 ~p ~op ~loc ~style ~explode
     (_x : t_be86c12b19) =
@@ -5062,21 +6304,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_be86c12b19)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_be86c12b19 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_acdb658c9d) in
+        Option.map (fun _y : t_be86c12b19 -> T_acdb658c9d _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_be86c12b19 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_4b1fd7d313 ~p ~op ~loc ~style ~explode
     (_x : t_4b1fd7d313) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_4b1fd7d313)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_4b1fd7d313 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_4b1fd7d313) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_4b1fd7d313 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4b1fd7d313) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_4b1fd7d313 ~p ~op ~loc ~style ~explode
     (_x : t_4b1fd7d313) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_4b1fd7d313)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_4b1fd7d313 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_4b1fd7d313) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_6565ec2878 ~p ~op ~loc ~style ~explode
     (_x : t_6565ec2878) =
@@ -5090,8 +6351,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_6565ec2878)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_6565ec2878 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_6565ec2878) in _string_to
+  let string_to_t_6565ec2878 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6565ec2878) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("is_default", `Boolean);
                 ("is_platform_default", `Boolean)]) ~dtr ~loc ~style ~explode
@@ -5109,15 +6371,24 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_6565ec2878)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_6565ec2878 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6565ec2878) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("is_default", `Boolean);
+                ("is_platform_default", `Boolean)]) ~dtr ~loc ~style ~explode
+      _x
+  
   let string_of_t_386a8a09fc ~p ~op ~loc ~style ~explode
     (_x : t_386a8a09fc) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_386a8a09fc)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_386a8a09fc ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_386a8a09fc) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_386a8a09fc ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_386a8a09fc) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_386a8a09fc ~p ~op ~loc ~style ~explode
     (_x : t_386a8a09fc) =
@@ -5125,15 +6396,20 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_386a8a09fc)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_386a8a09fc ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_386a8a09fc) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_3d82a38285 ~p ~op ~loc ~style ~explode
     (_x : t_3d82a38285) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_3d82a38285)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_3d82a38285 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_3d82a38285) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_3d82a38285 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3d82a38285) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_3d82a38285 ~p ~op ~loc ~style ~explode
     (_x : t_3d82a38285) =
@@ -5141,21 +6417,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_3d82a38285)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_3d82a38285 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_3d82a38285) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_00d4956c80 ~p ~op ~loc ~style ~explode
     (_x : t_00d4956c80) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_00d4956c80)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_00d4956c80 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_00d4956c80) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_00d4956c80 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_00d4956c80) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_00d4956c80 ~p ~op ~loc ~style ~explode
     (_x : t_00d4956c80) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_00d4956c80)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_00d4956c80 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_00d4956c80) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_a985a64df2 ~p ~op ~loc ~style ~explode
     (_x : t_a985a64df2) =
@@ -5176,18 +6462,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_a985a64df2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a985a64df2 ~loc ~style ~explode (_x : string) =
+  let string_to_t_a985a64df2 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_b6181859f2) in
         Option.map (fun _y : t_a985a64df2 -> T_b6181859f2 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_a985a64df2 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_a985a64df2 ~p ~op ~loc ~style ~explode
     (_x : t_a985a64df2) =
@@ -5208,21 +6494,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_a985a64df2)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_a985a64df2 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_b6181859f2) in
+        Option.map (fun _y : t_a985a64df2 -> T_b6181859f2 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_a985a64df2 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_9463e4703f ~p ~op ~loc ~style ~explode
     (_x : t_9463e4703f) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_9463e4703f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9463e4703f ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_9463e4703f) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_9463e4703f ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_9463e4703f) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_9463e4703f ~p ~op ~loc ~style ~explode
     (_x : t_9463e4703f) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_9463e4703f)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_9463e4703f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_9463e4703f) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_a6ed41322f ~p ~op ~loc ~style ~explode
     (_x : t_a6ed41322f) =
@@ -5243,18 +6548,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_a6ed41322f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a6ed41322f ~loc ~style ~explode (_x : string) =
+  let string_to_t_a6ed41322f ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_0bcc6214c1) in
         Option.map (fun _y : t_a6ed41322f -> T_0bcc6214c1 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_a6ed41322f -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_a6ed41322f ~p ~op ~loc ~style ~explode
     (_x : t_a6ed41322f) =
@@ -5275,21 +6580,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_a6ed41322f)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_a6ed41322f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_0bcc6214c1) in
+        Option.map (fun _y : t_a6ed41322f -> T_0bcc6214c1 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_a6ed41322f -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_a13fab6ce7 ~p ~op ~loc ~style ~explode
     (_x : t_a13fab6ce7) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_a13fab6ce7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a13fab6ce7 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_a13fab6ce7) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_a13fab6ce7 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a13fab6ce7) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_a13fab6ce7 ~p ~op ~loc ~style ~explode
     (_x : t_a13fab6ce7) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_a13fab6ce7)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_a13fab6ce7 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a13fab6ce7) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_89676accde ~p ~op ~loc ~style ~explode
     (_x : t_89676accde) =
@@ -5303,8 +6627,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_89676accde)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_89676accde ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_89676accde) in _string_to
+  let string_to_t_89676accde ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_89676accde) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("account", `String); ("customer", `String)])
       ~dtr ~loc ~style ~explode _x
@@ -5320,6 +6645,14 @@ module ParamSerDe' = struct
           | Some _x -> `String end)])
       ~ctr:(Json_encoding.construct Encoders'.t_89676accde)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_89676accde ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_89676accde) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("account", `String); ("customer", `String)])
+      ~dtr ~loc ~style ~explode _x
   
   let string_of_t_94e066c621 ~p ~op ~loc ~style ~explode
     (_x : t_94e066c621) =
@@ -5340,18 +6673,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_94e066c621)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_94e066c621 ~loc ~style ~explode (_x : string) =
+  let string_to_t_94e066c621 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_92de2c55be) in
         Option.map (fun _y : t_94e066c621 -> T_92de2c55be _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_94e066c621 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_94e066c621 ~p ~op ~loc ~style ~explode
     (_x : t_94e066c621) =
@@ -5372,6 +6705,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_94e066c621)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_94e066c621 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_92de2c55be) in
+        Option.map (fun _y : t_94e066c621 -> T_92de2c55be _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_94e066c621 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_41b2207b76 ~p ~op ~loc ~style ~explode
     (_x : t_41b2207b76) =
     _string_of ~kind:(
@@ -5381,16 +6728,16 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_41b2207b76)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_41b2207b76 ~loc ~style ~explode (_x : string) =
+  let string_to_t_41b2207b76 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `String in
         let dtr = (Json_encoding.destruct Json_encoding.string) in
         Option.map (fun _y : t_41b2207b76 -> String_ _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `String in
         let dtr = (Json_encoding.destruct Encoders'.t_15b592bd4c) in
         Option.map (fun _y : t_41b2207b76 -> T_15b592bd4c _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_41b2207b76 ~p ~op ~loc ~style ~explode
     (_x : t_41b2207b76) =
@@ -5401,21 +6748,38 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_41b2207b76)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_41b2207b76 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `String in
+        let dtr = (Json_encoding.destruct Json_encoding.string) in
+        Option.map (fun _y : t_41b2207b76 -> String_ _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `String in
+        let dtr = (Json_encoding.destruct Encoders'.t_15b592bd4c) in
+        Option.map (fun _y : t_41b2207b76 -> T_15b592bd4c _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_735ee27343 ~p ~op ~loc ~style ~explode
     (_x : t_735ee27343) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_735ee27343)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_735ee27343 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_735ee27343) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_735ee27343 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_735ee27343) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_735ee27343 ~p ~op ~loc ~style ~explode
     (_x : t_735ee27343) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_735ee27343)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_735ee27343 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_735ee27343) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_dfda23638e ~p ~op ~loc ~style ~explode
     (_x : t_dfda23638e) =
@@ -5436,18 +6800,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_dfda23638e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_dfda23638e ~loc ~style ~explode (_x : string) =
+  let string_to_t_dfda23638e ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_f942927e0c) in
         Option.map (fun _y : t_dfda23638e -> T_f942927e0c _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_dfda23638e -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_dfda23638e ~p ~op ~loc ~style ~explode
     (_x : t_dfda23638e) =
@@ -5468,6 +6832,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_dfda23638e)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_dfda23638e ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f942927e0c) in
+        Option.map (fun _y : t_dfda23638e -> T_f942927e0c _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_dfda23638e -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_78f6837d46 ~p ~op ~loc ~style ~explode
     (_x : t_78f6837d46) =
     _string_of ~kind:(
@@ -5487,18 +6865,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_78f6837d46)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_78f6837d46 ~loc ~style ~explode (_x : string) =
+  let string_to_t_78f6837d46 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_fb7e928310) in
         Option.map (fun _y : t_78f6837d46 -> T_fb7e928310 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_78f6837d46 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_78f6837d46 ~p ~op ~loc ~style ~explode
     (_x : t_78f6837d46) =
@@ -5519,6 +6897,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_78f6837d46)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_78f6837d46 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_fb7e928310) in
+        Option.map (fun _y : t_78f6837d46 -> T_fb7e928310 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_78f6837d46 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_c85fb118c6 ~p ~op ~loc ~style ~explode
     (_x : t_c85fb118c6) =
     _string_of ~kind:(
@@ -5538,18 +6930,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c85fb118c6)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c85fb118c6 ~loc ~style ~explode (_x : string) =
+  let string_to_t_c85fb118c6 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_918279e85e) in
         Option.map (fun _y : t_c85fb118c6 -> T_918279e85e _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_c85fb118c6 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_c85fb118c6 ~p ~op ~loc ~style ~explode
     (_x : t_c85fb118c6) =
@@ -5570,6 +6962,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c85fb118c6)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_c85fb118c6 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_918279e85e) in
+        Option.map (fun _y : t_c85fb118c6 -> T_918279e85e _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_c85fb118c6 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_5c423aae2d ~p ~op ~loc ~style ~explode
     (_x : t_5c423aae2d) =
     _string_of ~kind:(
@@ -5589,18 +6995,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_5c423aae2d)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_5c423aae2d ~loc ~style ~explode (_x : string) =
+  let string_to_t_5c423aae2d ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_156f1957fc) in
         Option.map (fun _y : t_5c423aae2d -> T_156f1957fc _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_5c423aae2d -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_5c423aae2d ~p ~op ~loc ~style ~explode
     (_x : t_5c423aae2d) =
@@ -5621,21 +7027,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_5c423aae2d)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_5c423aae2d ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_156f1957fc) in
+        Option.map (fun _y : t_5c423aae2d -> T_156f1957fc _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_5c423aae2d -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_806c738ca8 ~p ~op ~loc ~style ~explode
     (_x : t_806c738ca8) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_806c738ca8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_806c738ca8 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_806c738ca8) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_806c738ca8 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_806c738ca8) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_806c738ca8 ~p ~op ~loc ~style ~explode
     (_x : t_806c738ca8) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_806c738ca8)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_806c738ca8 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_806c738ca8) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_54d3503cdb ~p ~op ~loc ~style ~explode
     (_x : t_54d3503cdb) =
@@ -5651,8 +7076,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_54d3503cdb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_54d3503cdb ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_54d3503cdb) in _string_to
+  let string_to_t_54d3503cdb ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_54d3503cdb) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("interval", `String); ("meter", `String);
                 ("usage_type", `String)]) ~dtr ~loc ~style ~explode _x
@@ -5670,6 +7096,14 @@ module ParamSerDe' = struct
           | Some _x -> `String end)])
       ~ctr:(Json_encoding.construct Encoders'.t_54d3503cdb)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_54d3503cdb ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_54d3503cdb) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("interval", `String); ("meter", `String);
+                ("usage_type", `String)]) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_c04b129744 ~p ~op ~loc ~style ~explode
     (_x : t_c04b129744) =
@@ -5690,18 +7124,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c04b129744)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c04b129744 ~loc ~style ~explode (_x : string) =
+  let string_to_t_c04b129744 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_818f6dfe63) in
         Option.map (fun _y : t_c04b129744 -> T_818f6dfe63 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_c04b129744 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_c04b129744 ~p ~op ~loc ~style ~explode
     (_x : t_c04b129744) =
@@ -5722,6 +7156,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c04b129744)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_c04b129744 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_818f6dfe63) in
+        Option.map (fun _y : t_c04b129744 -> T_818f6dfe63 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_c04b129744 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_1d3358b59f ~p ~op ~loc ~style ~explode
     (_x : t_1d3358b59f) =
     _string_of ~kind:(
@@ -5741,18 +7189,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_1d3358b59f)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1d3358b59f ~loc ~style ~explode (_x : string) =
+  let string_to_t_1d3358b59f ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_5a93111bd9) in
         Option.map (fun _y : t_1d3358b59f -> T_5a93111bd9 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_1d3358b59f -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_1d3358b59f ~p ~op ~loc ~style ~explode
     (_x : t_1d3358b59f) =
@@ -5773,21 +7221,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_1d3358b59f)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_1d3358b59f ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_5a93111bd9) in
+        Option.map (fun _y : t_1d3358b59f -> T_5a93111bd9 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_1d3358b59f -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_b2c88d22a6 ~p ~op ~loc ~style ~explode
     (_x : t_b2c88d22a6) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_b2c88d22a6)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b2c88d22a6 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b2c88d22a6) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_b2c88d22a6 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b2c88d22a6) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_b2c88d22a6 ~p ~op ~loc ~style ~explode
     (_x : t_b2c88d22a6) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_b2c88d22a6)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_b2c88d22a6 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b2c88d22a6) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_902cd52d55 ~p ~op ~loc ~style ~explode
     (_x : t_902cd52d55) =
@@ -5808,18 +7275,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_902cd52d55)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_902cd52d55 ~loc ~style ~explode (_x : string) =
+  let string_to_t_902cd52d55 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_0942bf866d) in
         Option.map (fun _y : t_902cd52d55 -> T_0942bf866d _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_902cd52d55 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_902cd52d55 ~p ~op ~loc ~style ~explode
     (_x : t_902cd52d55) =
@@ -5840,6 +7307,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_902cd52d55)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_902cd52d55 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_0942bf866d) in
+        Option.map (fun _y : t_902cd52d55 -> T_0942bf866d _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_902cd52d55 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_438f8e3e47 ~p ~op ~loc ~style ~explode
     (_x : t_438f8e3e47) =
     _string_of ~kind:(
@@ -5859,18 +7340,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_438f8e3e47)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_438f8e3e47 ~loc ~style ~explode (_x : string) =
+  let string_to_t_438f8e3e47 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_6c02505772) in
         Option.map (fun _y : t_438f8e3e47 -> T_6c02505772 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_438f8e3e47 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_438f8e3e47 ~p ~op ~loc ~style ~explode
     (_x : t_438f8e3e47) =
@@ -5891,6 +7372,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_438f8e3e47)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_438f8e3e47 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_6c02505772) in
+        Option.map (fun _y : t_438f8e3e47 -> T_6c02505772 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_438f8e3e47 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_b205fb898b ~p ~op ~loc ~style ~explode
     (_x : t_b205fb898b) =
     _string_of ~kind:(
@@ -5910,18 +7405,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_b205fb898b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b205fb898b ~loc ~style ~explode (_x : string) =
+  let string_to_t_b205fb898b ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_f99ca180bb) in
         Option.map (fun _y : t_b205fb898b -> T_f99ca180bb _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_b205fb898b -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_b205fb898b ~p ~op ~loc ~style ~explode
     (_x : t_b205fb898b) =
@@ -5942,6 +7437,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_b205fb898b)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_b205fb898b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f99ca180bb) in
+        Option.map (fun _y : t_b205fb898b -> T_f99ca180bb _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_b205fb898b -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_c862988285 ~p ~op ~loc ~style ~explode
     (_x : t_c862988285) =
     _string_of ~kind:(
@@ -5961,18 +7470,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c862988285)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c862988285 ~loc ~style ~explode (_x : string) =
+  let string_to_t_c862988285 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_a7f5f95f2b) in
         Option.map (fun _y : t_c862988285 -> T_a7f5f95f2b _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_c862988285 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_c862988285 ~p ~op ~loc ~style ~explode
     (_x : t_c862988285) =
@@ -5993,6 +7502,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c862988285)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_c862988285 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_a7f5f95f2b) in
+        Option.map (fun _y : t_c862988285 -> T_a7f5f95f2b _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_c862988285 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_95b7b73ff8 ~p ~op ~loc ~style ~explode
     (_x : t_95b7b73ff8) =
     _string_of ~kind:(
@@ -6012,18 +7535,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_95b7b73ff8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_95b7b73ff8 ~loc ~style ~explode (_x : string) =
+  let string_to_t_95b7b73ff8 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_3e044be4e2) in
         Option.map (fun _y : t_95b7b73ff8 -> T_3e044be4e2 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_95b7b73ff8 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_95b7b73ff8 ~p ~op ~loc ~style ~explode
     (_x : t_95b7b73ff8) =
@@ -6044,6 +7567,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_95b7b73ff8)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_95b7b73ff8 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_3e044be4e2) in
+        Option.map (fun _y : t_95b7b73ff8 -> T_3e044be4e2 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_95b7b73ff8 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_91991d11ce ~p ~op ~loc ~style ~explode
     (_x : t_91991d11ce) =
     _string_of ~kind:(
@@ -6063,18 +7600,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_91991d11ce)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_91991d11ce ~loc ~style ~explode (_x : string) =
+  let string_to_t_91991d11ce ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_d267e559df) in
         Option.map (fun _y : t_91991d11ce -> T_d267e559df _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_91991d11ce -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_91991d11ce ~p ~op ~loc ~style ~explode
     (_x : t_91991d11ce) =
@@ -6095,6 +7632,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_91991d11ce)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_91991d11ce ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_d267e559df) in
+        Option.map (fun _y : t_91991d11ce -> T_d267e559df _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_91991d11ce -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_62ebe57aa0 ~p ~op ~loc ~style ~explode
     (_x : t_62ebe57aa0) =
     _string_of ~kind:(
@@ -6114,18 +7665,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_62ebe57aa0)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_62ebe57aa0 ~loc ~style ~explode (_x : string) =
+  let string_to_t_62ebe57aa0 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_c8869a1e90) in
         Option.map (fun _y : t_62ebe57aa0 -> T_c8869a1e90 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_62ebe57aa0 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_62ebe57aa0 ~p ~op ~loc ~style ~explode
     (_x : t_62ebe57aa0) =
@@ -6146,6 +7697,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_62ebe57aa0)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_62ebe57aa0 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_c8869a1e90) in
+        Option.map (fun _y : t_62ebe57aa0 -> T_c8869a1e90 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_62ebe57aa0 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_47dcc46a23 ~p ~op ~loc ~style ~explode
     (_x : t_47dcc46a23) =
     _string_of ~kind:(
@@ -6165,18 +7730,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_47dcc46a23)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_47dcc46a23 ~loc ~style ~explode (_x : string) =
+  let string_to_t_47dcc46a23 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_0a007f4c7b) in
         Option.map (fun _y : t_47dcc46a23 -> T_0a007f4c7b _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_47dcc46a23 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_47dcc46a23 ~p ~op ~loc ~style ~explode
     (_x : t_47dcc46a23) =
@@ -6197,6 +7762,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_47dcc46a23)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_47dcc46a23 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_0a007f4c7b) in
+        Option.map (fun _y : t_47dcc46a23 -> T_0a007f4c7b _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_47dcc46a23 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_3115fde6ed ~p ~op ~loc ~style ~explode
     (_x : t_3115fde6ed) =
     _string_of ~kind:(
@@ -6216,18 +7795,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_3115fde6ed)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_3115fde6ed ~loc ~style ~explode (_x : string) =
+  let string_to_t_3115fde6ed ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_8e372f4d99) in
         Option.map (fun _y : t_3115fde6ed -> T_8e372f4d99 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_3115fde6ed -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_3115fde6ed ~p ~op ~loc ~style ~explode
     (_x : t_3115fde6ed) =
@@ -6248,6 +7827,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_3115fde6ed)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_3115fde6ed ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8e372f4d99) in
+        Option.map (fun _y : t_3115fde6ed -> T_8e372f4d99 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_3115fde6ed -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_edb9c04aba ~p ~op ~loc ~style ~explode
     (_x : t_edb9c04aba) =
     _string_of ~kind:(
@@ -6267,18 +7860,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_edb9c04aba)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_edb9c04aba ~loc ~style ~explode (_x : string) =
+  let string_to_t_edb9c04aba ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_8dfd931249) in
         Option.map (fun _y : t_edb9c04aba -> T_8dfd931249 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_edb9c04aba -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_edb9c04aba ~p ~op ~loc ~style ~explode
     (_x : t_edb9c04aba) =
@@ -6299,6 +7892,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_edb9c04aba)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_edb9c04aba ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8dfd931249) in
+        Option.map (fun _y : t_edb9c04aba -> T_8dfd931249 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_edb9c04aba -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_b053f4a10e ~p ~op ~loc ~style ~explode
     (_x : t_b053f4a10e) =
     _string_of ~kind:(
@@ -6318,18 +7925,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_b053f4a10e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b053f4a10e ~loc ~style ~explode (_x : string) =
+  let string_to_t_b053f4a10e ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_7e5129cd97) in
         Option.map (fun _y : t_b053f4a10e -> T_7e5129cd97 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_b053f4a10e -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_b053f4a10e ~p ~op ~loc ~style ~explode
     (_x : t_b053f4a10e) =
@@ -6350,6 +7957,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_b053f4a10e)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_b053f4a10e ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_7e5129cd97) in
+        Option.map (fun _y : t_b053f4a10e -> T_7e5129cd97 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_b053f4a10e -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_8dd946adeb ~p ~op ~loc ~style ~explode
     (_x : t_8dd946adeb) =
     _string_of ~kind:(
@@ -6369,18 +7990,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8dd946adeb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_8dd946adeb ~loc ~style ~explode (_x : string) =
+  let string_to_t_8dd946adeb ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_704964c184) in
         Option.map (fun _y : t_8dd946adeb -> T_704964c184 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_8dd946adeb -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_8dd946adeb ~p ~op ~loc ~style ~explode
     (_x : t_8dd946adeb) =
@@ -6401,6 +8022,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_8dd946adeb)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_8dd946adeb ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_704964c184) in
+        Option.map (fun _y : t_8dd946adeb -> T_704964c184 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_8dd946adeb -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_e65a202262 ~p ~op ~loc ~style ~explode
     (_x : t_e65a202262) =
     _string_of ~kind:(
@@ -6420,18 +8055,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_e65a202262)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e65a202262 ~loc ~style ~explode (_x : string) =
+  let string_to_t_e65a202262 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_153437e623) in
         Option.map (fun _y : t_e65a202262 -> T_153437e623 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_e65a202262 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_e65a202262 ~p ~op ~loc ~style ~explode
     (_x : t_e65a202262) =
@@ -6452,6 +8087,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_e65a202262)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_e65a202262 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_153437e623) in
+        Option.map (fun _y : t_e65a202262 -> T_153437e623 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_e65a202262 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_b1188f80a4 ~p ~op ~loc ~style ~explode
     (_x : t_b1188f80a4) =
     _string_of ~kind:(
@@ -6459,9 +8108,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_b1188f80a4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b1188f80a4 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b1188f80a4) in _string_to
-      ~kind:(`ObjectN [("", `Any); ("enabled", `Boolean)])
+  let string_to_t_b1188f80a4 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b1188f80a4) in
+      _string_to ~p ~kind:(`ObjectN [("", `Any); ("enabled", `Boolean)])
       ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_b1188f80a4 ~p ~op ~loc ~style ~explode
@@ -6471,15 +8120,21 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_b1188f80a4)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_b1188f80a4 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b1188f80a4) in
+      _namevalues_to ~p ~kind:(`ObjectN [("", `Any); ("enabled", `Boolean)])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_d2098cac25 ~p ~op ~loc ~style ~explode
     (_x : t_d2098cac25) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_d2098cac25)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_d2098cac25 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_d2098cac25) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_d2098cac25 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_d2098cac25) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_d2098cac25 ~p ~op ~loc ~style ~explode
     (_x : t_d2098cac25) =
@@ -6487,21 +8142,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_d2098cac25)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_d2098cac25 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_d2098cac25) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_a6b80cd539 ~p ~op ~loc ~style ~explode
     (_x : t_a6b80cd539) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_a6b80cd539)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_a6b80cd539 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_a6b80cd539) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_a6b80cd539 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a6b80cd539) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_a6b80cd539 ~p ~op ~loc ~style ~explode
     (_x : t_a6b80cd539) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_a6b80cd539)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_a6b80cd539 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_a6b80cd539) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_900f55e0e4 ~p ~op ~loc ~style ~explode
     (_x : t_900f55e0e4) =
@@ -6522,18 +8187,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_900f55e0e4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_900f55e0e4 ~loc ~style ~explode (_x : string) =
+  let string_to_t_900f55e0e4 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_c53ac2a9cd) in
         Option.map (fun _y : t_900f55e0e4 -> T_c53ac2a9cd _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_900f55e0e4 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_900f55e0e4 ~p ~op ~loc ~style ~explode
     (_x : t_900f55e0e4) =
@@ -6554,6 +8219,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_900f55e0e4)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_900f55e0e4 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_c53ac2a9cd) in
+        Option.map (fun _y : t_900f55e0e4 -> T_c53ac2a9cd _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_900f55e0e4 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_dad4a4ac5b ~p ~op ~loc ~style ~explode
     (_x : t_dad4a4ac5b) =
     _string_of ~kind:(
@@ -6573,18 +8252,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_dad4a4ac5b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_dad4a4ac5b ~loc ~style ~explode (_x : string) =
+  let string_to_t_dad4a4ac5b ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_d1eb4a98f5) in
         Option.map (fun _y : t_dad4a4ac5b -> T_d1eb4a98f5 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_dad4a4ac5b -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_dad4a4ac5b ~p ~op ~loc ~style ~explode
     (_x : t_dad4a4ac5b) =
@@ -6605,6 +8284,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_dad4a4ac5b)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_dad4a4ac5b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_d1eb4a98f5) in
+        Option.map (fun _y : t_dad4a4ac5b -> T_d1eb4a98f5 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_dad4a4ac5b -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_dce85b0bb2 ~p ~op ~loc ~style ~explode
     (_x : t_dce85b0bb2) =
     _string_of ~kind:(
@@ -6624,18 +8317,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_dce85b0bb2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_dce85b0bb2 ~loc ~style ~explode (_x : string) =
+  let string_to_t_dce85b0bb2 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_f89b48aae9) in
         Option.map (fun _y : t_dce85b0bb2 -> T_f89b48aae9 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_dce85b0bb2 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_dce85b0bb2 ~p ~op ~loc ~style ~explode
     (_x : t_dce85b0bb2) =
@@ -6656,21 +8349,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_dce85b0bb2)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_dce85b0bb2 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f89b48aae9) in
+        Option.map (fun _y : t_dce85b0bb2 -> T_f89b48aae9 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_dce85b0bb2 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_66eb6371e3 ~p ~op ~loc ~style ~explode
     (_x : t_66eb6371e3) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_66eb6371e3)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_66eb6371e3 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_66eb6371e3) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_66eb6371e3 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_66eb6371e3) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_66eb6371e3 ~p ~op ~loc ~style ~explode
     (_x : t_66eb6371e3) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_66eb6371e3)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_66eb6371e3 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_66eb6371e3) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_17690afaaf ~p ~op ~loc ~style ~explode
     (_x : t_17690afaaf) =
@@ -6685,8 +8397,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_17690afaaf)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_17690afaaf ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_17690afaaf) in _string_to
+  let string_to_t_17690afaaf ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_17690afaaf) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any); ("account", `String); ("customer", `String);
                 ("type", `String)]) ~dtr ~loc ~style ~explode _x
@@ -6703,6 +8416,14 @@ module ParamSerDe' = struct
          ("type", let _x = _x.type_ in `String)])
       ~ctr:(Json_encoding.construct Encoders'.t_17690afaaf)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_17690afaaf ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_17690afaaf) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any); ("account", `String); ("customer", `String);
+                ("type", `String)]) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_ef1df523db ~p ~op ~loc ~style ~explode
     (_x : t_ef1df523db) =
@@ -6723,18 +8444,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ef1df523db)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ef1df523db ~loc ~style ~explode (_x : string) =
+  let string_to_t_ef1df523db ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_81c4215133) in
         Option.map (fun _y : t_ef1df523db -> T_81c4215133 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_ef1df523db -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_ef1df523db ~p ~op ~loc ~style ~explode
     (_x : t_ef1df523db) =
@@ -6755,15 +8476,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ef1df523db)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_ef1df523db ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_81c4215133) in
+        Option.map (fun _y : t_ef1df523db -> T_81c4215133 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_ef1df523db -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_477c159e47 ~p ~op ~loc ~style ~explode
     (_x : t_477c159e47) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_477c159e47)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_477c159e47 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_477c159e47) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_477c159e47 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_477c159e47) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_477c159e47 ~p ~op ~loc ~style ~explode
     (_x : t_477c159e47) =
@@ -6771,21 +8506,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_477c159e47)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_477c159e47 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_477c159e47) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_76a6cf8994 ~p ~op ~loc ~style ~explode
     (_x : t_76a6cf8994) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_76a6cf8994)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_76a6cf8994 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_76a6cf8994) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_76a6cf8994 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_76a6cf8994) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_76a6cf8994 ~p ~op ~loc ~style ~explode
     (_x : t_76a6cf8994) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_76a6cf8994)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_76a6cf8994 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_76a6cf8994) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_6684cf5aa7 ~p ~op ~loc ~style ~explode
     (_x : t_6684cf5aa7) =
@@ -6806,18 +8551,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_6684cf5aa7)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_6684cf5aa7 ~loc ~style ~explode (_x : string) =
+  let string_to_t_6684cf5aa7 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_1149c5a72c) in
         Option.map (fun _y : t_6684cf5aa7 -> T_1149c5a72c _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_6684cf5aa7 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_6684cf5aa7 ~p ~op ~loc ~style ~explode
     (_x : t_6684cf5aa7) =
@@ -6838,6 +8583,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_6684cf5aa7)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_6684cf5aa7 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_1149c5a72c) in
+        Option.map (fun _y : t_6684cf5aa7 -> T_1149c5a72c _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_6684cf5aa7 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_ca787dca43 ~p ~op ~loc ~style ~explode
     (_x : t_ca787dca43) =
     _string_of ~kind:(
@@ -6857,18 +8616,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ca787dca43)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ca787dca43 ~loc ~style ~explode (_x : string) =
+  let string_to_t_ca787dca43 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_5a45966f13) in
         Option.map (fun _y : t_ca787dca43 -> T_5a45966f13 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_ca787dca43 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_ca787dca43 ~p ~op ~loc ~style ~explode
     (_x : t_ca787dca43) =
@@ -6889,21 +8648,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_ca787dca43)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_ca787dca43 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_5a45966f13) in
+        Option.map (fun _y : t_ca787dca43 -> T_5a45966f13 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_ca787dca43 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_ce1d711154 ~p ~op ~loc ~style ~explode
     (_x : t_ce1d711154) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_ce1d711154)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ce1d711154 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_ce1d711154) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_ce1d711154 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ce1d711154) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_ce1d711154 ~p ~op ~loc ~style ~explode
     (_x : t_ce1d711154) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_ce1d711154)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_ce1d711154 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ce1d711154) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_c5c22bba1c ~p ~op ~loc ~style ~explode
     (_x : t_c5c22bba1c) =
@@ -6924,18 +8702,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c5c22bba1c)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_c5c22bba1c ~loc ~style ~explode (_x : string) =
+  let string_to_t_c5c22bba1c ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_5b06d5fa4f) in
         Option.map (fun _y : t_c5c22bba1c -> T_5b06d5fa4f _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_c5c22bba1c -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_c5c22bba1c ~p ~op ~loc ~style ~explode
     (_x : t_c5c22bba1c) =
@@ -6956,15 +8734,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_c5c22bba1c)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_c5c22bba1c ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_5b06d5fa4f) in
+        Option.map (fun _y : t_c5c22bba1c -> T_5b06d5fa4f _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_c5c22bba1c -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_de06274f51 ~p ~op ~loc ~style ~explode
     (_x : t_de06274f51) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_de06274f51)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_de06274f51 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_de06274f51) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_de06274f51 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_de06274f51) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_de06274f51 ~p ~op ~loc ~style ~explode
     (_x : t_de06274f51) =
@@ -6972,15 +8764,20 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_de06274f51)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_de06274f51 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_de06274f51) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_ed1d428d1e ~p ~op ~loc ~style ~explode
     (_x : t_ed1d428d1e) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_ed1d428d1e)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ed1d428d1e ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_ed1d428d1e) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_ed1d428d1e ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ed1d428d1e) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_ed1d428d1e ~p ~op ~loc ~style ~explode
     (_x : t_ed1d428d1e) =
@@ -6988,21 +8785,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_ed1d428d1e)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_ed1d428d1e ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ed1d428d1e) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_e27a5a13e2 ~p ~op ~loc ~style ~explode
     (_x : t_e27a5a13e2) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e27a5a13e2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e27a5a13e2 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e27a5a13e2) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_e27a5a13e2 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e27a5a13e2) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_e27a5a13e2 ~p ~op ~loc ~style ~explode
     (_x : t_e27a5a13e2) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e27a5a13e2)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_e27a5a13e2 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e27a5a13e2) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_9096085c5b ~p ~op ~loc ~style ~explode
     (_x : t_9096085c5b) =
@@ -7023,18 +8830,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_9096085c5b)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_9096085c5b ~loc ~style ~explode (_x : string) =
+  let string_to_t_9096085c5b ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_8bc900449d) in
         Option.map (fun _y : t_9096085c5b -> T_8bc900449d _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_9096085c5b -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_9096085c5b ~p ~op ~loc ~style ~explode
     (_x : t_9096085c5b) =
@@ -7055,21 +8862,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_9096085c5b)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_9096085c5b ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8bc900449d) in
+        Option.map (fun _y : t_9096085c5b -> T_8bc900449d _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_9096085c5b -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_bda61eb198 ~p ~op ~loc ~style ~explode
     (_x : t_bda61eb198) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_bda61eb198)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_bda61eb198 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_bda61eb198) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_bda61eb198 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_bda61eb198) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_bda61eb198 ~p ~op ~loc ~style ~explode
     (_x : t_bda61eb198) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_bda61eb198)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_bda61eb198 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_bda61eb198) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_fd0b444db8 ~p ~op ~loc ~style ~explode
     (_x : t_fd0b444db8) =
@@ -7090,18 +8916,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_fd0b444db8)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fd0b444db8 ~loc ~style ~explode (_x : string) =
+  let string_to_t_fd0b444db8 ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_34d236a9e5) in
         Option.map (fun _y : t_fd0b444db8 -> T_34d236a9e5 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_fd0b444db8 -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_fd0b444db8 ~p ~op ~loc ~style ~explode
     (_x : t_fd0b444db8) =
@@ -7122,15 +8948,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_fd0b444db8)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_fd0b444db8 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_34d236a9e5) in
+        Option.map (fun _y : t_fd0b444db8 -> T_34d236a9e5 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_fd0b444db8 -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_e134f021a2 ~p ~op ~loc ~style ~explode
     (_x : t_e134f021a2) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_e134f021a2)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_e134f021a2 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_e134f021a2) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_e134f021a2 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e134f021a2) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_e134f021a2 ~p ~op ~loc ~style ~explode
     (_x : t_e134f021a2) =
@@ -7138,21 +8978,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_e134f021a2)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_e134f021a2 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_e134f021a2) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_7e023d3347 ~p ~op ~loc ~style ~explode
     (_x : t_7e023d3347) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_7e023d3347)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_7e023d3347 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_7e023d3347) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_7e023d3347 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7e023d3347) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_7e023d3347 ~p ~op ~loc ~style ~explode
     (_x : t_7e023d3347) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_7e023d3347)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_7e023d3347 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_7e023d3347) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_99ae8c4576 ~p ~op ~loc ~style ~explode
     (_x : t_99ae8c4576) =
@@ -7163,8 +9013,9 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_99ae8c4576)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_99ae8c4576 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_99ae8c4576) in _string_to
+  let string_to_t_99ae8c4576 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_99ae8c4576) in
+      _string_to ~p
       ~kind:(`ObjectN [("", `Any); ("source_flow_type", `String)])
       ~dtr ~loc ~style ~explode _x
   
@@ -7177,15 +9028,22 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_99ae8c4576)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_99ae8c4576 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_99ae8c4576) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN [("", `Any); ("source_flow_type", `String)])
+      ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_ae96c50be4 ~p ~op ~loc ~style ~explode
     (_x : t_ae96c50be4) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_ae96c50be4)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_ae96c50be4 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_ae96c50be4) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_ae96c50be4 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ae96c50be4) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_ae96c50be4 ~p ~op ~loc ~style ~explode
     (_x : t_ae96c50be4) =
@@ -7193,21 +9051,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_ae96c50be4)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_ae96c50be4 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_ae96c50be4) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_fe86a832fb ~p ~op ~loc ~style ~explode
     (_x : t_fe86a832fb) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_fe86a832fb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fe86a832fb ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_fe86a832fb) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_fe86a832fb ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_fe86a832fb) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_fe86a832fb ~p ~op ~loc ~style ~explode
     (_x : t_fe86a832fb) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_fe86a832fb)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_fe86a832fb ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_fe86a832fb) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_01243047ea ~p ~op ~loc ~style ~explode
     (_x : t_01243047ea) =
@@ -7228,18 +9096,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_01243047ea)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_01243047ea ~loc ~style ~explode (_x : string) =
+  let string_to_t_01243047ea ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_8a5740cf7a) in
         Option.map (fun _y : t_01243047ea -> T_8a5740cf7a _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_01243047ea -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_01243047ea ~p ~op ~loc ~style ~explode
     (_x : t_01243047ea) =
@@ -7260,6 +9128,20 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_01243047ea)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_01243047ea ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_8a5740cf7a) in
+        Option.map (fun _y : t_01243047ea -> T_8a5740cf7a _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_01243047ea -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_fa33b5a2bd ~p ~op ~loc ~style ~explode
     (_x : t_fa33b5a2bd) =
     _string_of ~kind:(
@@ -7279,18 +9161,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_fa33b5a2bd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_fa33b5a2bd ~loc ~style ~explode (_x : string) =
+  let string_to_t_fa33b5a2bd ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_99d78357ad) in
         Option.map (fun _y : t_fa33b5a2bd -> T_99d78357ad _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_fa33b5a2bd -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_fa33b5a2bd ~p ~op ~loc ~style ~explode
     (_x : t_fa33b5a2bd) =
@@ -7311,21 +9193,40 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_fa33b5a2bd)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_fa33b5a2bd ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_99d78357ad) in
+        Option.map (fun _y : t_fa33b5a2bd -> T_99d78357ad _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_fa33b5a2bd -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_1f08681071 ~p ~op ~loc ~style ~explode
     (_x : t_1f08681071) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_1f08681071)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_1f08681071 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_1f08681071) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_1f08681071 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_1f08681071) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_1f08681071 ~p ~op ~loc ~style ~explode
     (_x : t_1f08681071) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_1f08681071)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_1f08681071 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_1f08681071) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_2bb01eccbd ~p ~op ~loc ~style ~explode
     (_x : t_2bb01eccbd) =
@@ -7346,18 +9247,18 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_2bb01eccbd)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_2bb01eccbd ~loc ~style ~explode (_x : string) =
+  let string_to_t_2bb01eccbd ~p ~loc ~style ~explode (_x : string) =
     [(let kind = `ObjectN
                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
                     ("lt", `Integer); ("lte", `Integer)] in
         let dtr = (Json_encoding.destruct Encoders'.t_f34b1e7619) in
         Option.map (fun _y : t_2bb01eccbd -> T_f34b1e7619 _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x));
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x));
      (let kind = `Integer in
         let dtr = (Json_encoding.destruct Json_encoding.int) in
         Option.map (fun _y : t_2bb01eccbd -> Int _y)
-          (_string_to ~kind ~dtr ~loc ~style ~explode _x))]
-      |> List.find_opt Option.is_some
+          (_string_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
   
   let namevalues_of_t_2bb01eccbd ~p ~op ~loc ~style ~explode
     (_x : t_2bb01eccbd) =
@@ -7378,15 +9279,29 @@ module ParamSerDe' = struct
       end) ~ctr:(Json_encoding.construct Encoders'.t_2bb01eccbd)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_2bb01eccbd ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    [(let kind = `ObjectN
+                   [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                    ("lt", `Integer); ("lte", `Integer)] in
+        let dtr = (Json_encoding.destruct Encoders'.t_f34b1e7619) in
+        Option.map (fun _y : t_2bb01eccbd -> T_f34b1e7619 _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x));
+     (let kind = `Integer in
+        let dtr = (Json_encoding.destruct Json_encoding.int) in
+        Option.map (fun _y : t_2bb01eccbd -> Int _y)
+          (_namevalues_to ~p ~kind ~dtr ~loc ~style ~explode _x))]
+      |> List.find_map Fun.id
+  
   let string_of_t_65e58eb6da ~p ~op ~loc ~style ~explode
     (_x : t_65e58eb6da) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_65e58eb6da)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_65e58eb6da ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_65e58eb6da) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_65e58eb6da ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_65e58eb6da) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_65e58eb6da ~p ~op ~loc ~style ~explode
     (_x : t_65e58eb6da) =
@@ -7394,21 +9309,31 @@ module ParamSerDe' = struct
       ~ctr:(Json_encoding.construct Encoders'.t_65e58eb6da)
       ~p ~op ~loc ~style ~explode _x
   
+  let namevalues_to_t_65e58eb6da ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_65e58eb6da) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  
   let string_of_t_6f04380d09 ~p ~op ~loc ~style ~explode
     (_x : t_6f04380d09) =
     _string_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_6f04380d09)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_6f04380d09 ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_6f04380d09) in _string_to
-      ~kind:(`String) ~dtr ~loc ~style ~explode _x
+  let string_to_t_6f04380d09 ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6f04380d09) in
+      _string_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let namevalues_of_t_6f04380d09 ~p ~op ~loc ~style ~explode
     (_x : t_6f04380d09) =
     _namevalues_of ~kind:( `String)
       ~ctr:(Json_encoding.construct Encoders'.t_6f04380d09)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_6f04380d09 ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_6f04380d09) in
+      _namevalues_to ~p ~kind:(`String) ~dtr ~loc ~style ~explode _x
   
   let string_of_t_b458f1b6fb ~p ~op ~loc ~style ~explode
     (_x : t_b458f1b6fb) =
@@ -7433,8 +9358,9 @@ module ParamSerDe' = struct
           end end)]) ~ctr:(Json_encoding.construct Encoders'.t_b458f1b6fb)
       ~p ~op ~loc ~style ~explode _x
   
-  let string_to_t_b458f1b6fb ~loc ~style ~explode (_x : string) =
-    let dtr = (Json_encoding.destruct Encoders'.t_b458f1b6fb) in _string_to
+  let string_to_t_b458f1b6fb ~p ~loc ~style ~explode (_x : string) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b458f1b6fb) in
+      _string_to ~p
       ~kind:(`ObjectN
                [("", `Any);
                 ("posted_at",
@@ -7466,6 +9392,19 @@ module ParamSerDe' = struct
           | Int _x -> `Integer
           end end)]) ~ctr:(Json_encoding.construct Encoders'.t_b458f1b6fb)
       ~p ~op ~loc ~style ~explode _x
+  
+  let namevalues_to_t_b458f1b6fb ~p ~loc ~style ~explode
+    (_x : (string*string) list) =
+    let dtr = (Json_encoding.destruct Encoders'.t_b458f1b6fb) in
+      _namevalues_to ~p
+      ~kind:(`ObjectN
+               [("", `Any);
+                ("posted_at",
+                 `Choice
+                 [`ObjectN
+                    [("", `Any); ("gt", `Integer); ("gte", `Integer);
+                     ("lt", `Integer); ("lte", `Integer)];
+                  `Integer])]) ~dtr ~loc ~style ~explode _x
   
   
 end
