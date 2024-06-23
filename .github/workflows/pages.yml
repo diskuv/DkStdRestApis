@@ -13,7 +13,8 @@ jobs:
     #   **************************************************************
     #
     #   Error: The operation was canceled.
-    runs-on: macos-latest
+    # runs-on: macos-latest
+    runs-on: ubuntu-22.04
     permissions:
       # Needed for peaceiris/actions-gh-pages@v3
       contents: write
