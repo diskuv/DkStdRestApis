@@ -66164,19 +66164,50 @@ module BaseHandlers (Defaults : DEFAULTS) : HANDLERS = struct
     Ok (`CH_Default (501, Defaults.error, []))
 end
 
-module Routes' (H : HANDLERS) = struct
-  type _resp = code:int -> headers:(string * string) list -> string -> unit
+(** Maker of REST servers.
+
+    A server backend is a low-level actor that receives web
+    requests and sends responses on your behalf.
+
+    You provide an [Backend] module as the functor parameter.
+    The [Backend] module must be able to receive web requests
+    in [Backend.receive], and interfaces to the web backend's
+    concurrency and notification model in [Backend.bind] and
+    [Backend.return].
+
+    An [Backend] is available that uses the cohttp curl web client.
+
+    Regardless of which [Backend] you use, when you receive
+    a web request from a server backend you can response with a
+    [Error (`Nonconforming_request ("error message", Some loc))]
+    when the request does not match its OpenAPI specification.
+    For example, the [not] composition operator can not be handled
+    by the OCaml type system, and is best handled at runtime during
+    the web request.
+    [Some loc] should be the JSON pointer location in the OpenAPI
+    specification of the Schema Object that could not be matched.
+    If the JSON pointer is not known then [None] can be used. *)
+module Server
+    (Handlers : HANDLERS)
+    (Backend : sig
+      type response
+    end)
+ =
+struct
+
   open StripePaths
   open StripeBodies
   open StripeEncdrs
   open StripeParams
+  type respond =
+    code:int -> headers:(string * string) list -> string -> Backend.response
   
   (** <p>A webhook endpoint must have a <code>url</code> and a list of <code>enabled_events</code>. You may optionally specify the Boolean <code>connect</code> parameter. If set to true, then a Connect webhook endpoint that notifies the specified <code>url</code> about events from all connected accounts is created; otherwise an account webhook endpoint that notifies the specified <code>url</code> only about events from your account is created. You can also create webhook endpoints in the <a href="https://dashboard.stripe.com/account/webhooks">webhooks settings</a> section of the Dashboard.</p>
       
       @see "openapi/spec3.json" /v1/webhook_endpoints *)
   let postWebhookEndpoints = let _op = "PostWebhookEndpoints" in
     Routes.route (Paths'.postWebhookEndpoints ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66190,7 +66221,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostWebhookEndpoints'")
            | _, None -> None in
-         match H.postWebhookEndpoints _req
+         match Handlers.postWebhookEndpoints _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_webhook_endpoint ~op:_op ~ctype:_resp_ctype content in
@@ -66210,7 +66241,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/webhook_endpoints *)
   let getWebhookEndpoints = let _op = "GetWebhookEndpoints" in
     Routes.route (Paths'.getWebhookEndpoints ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66239,7 +66270,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetWebhookEndpoints'")
            | _, None -> None in 
-         match H.getWebhookEndpoints ?ending_before ?expand ?limit
+         match Handlers.getWebhookEndpoints ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -66260,7 +66291,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/treasury/transactions *)
   let getTreasuryTransactions = let _op = "GetTreasuryTransactions" in
     Routes.route (Paths'.getTreasuryTransactions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66314,9 +66345,9 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryTransactions'")
          in 
-         match H.getTreasuryTransactions ?created ?ending_before ?expand
-           ~financial_account ?limit ?order_by ?starting_after ?status
-           ?status_transitions _req
+         match Handlers.getTreasuryTransactions ?created ?ending_before
+           ?expand ~financial_account ?limit ?order_by ?starting_after
+           ?status ?status_transitions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_7daf65bc51 ~op:_op ~ctype:_resp_ctype content in
@@ -66337,7 +66368,7 @@ module Routes' (H : HANDLERS) = struct
   let postTreasuryInboundTransfers = let _op = "PostTreasuryInboundTransfers"
     in
     Routes.route (Paths'.postTreasuryInboundTransfers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66351,7 +66382,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryInboundTransfers'")
            | _, None -> None in
-         match H.postTreasuryInboundTransfers _req
+         match Handlers.postTreasuryInboundTransfers _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_inbound_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -66372,7 +66403,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryInboundTransfers = let _op = "GetTreasuryInboundTransfers"
     in
     Routes.route (Paths'.getTreasuryInboundTransfers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66414,7 +66445,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryInboundTransfers'")
          in 
-         match H.getTreasuryInboundTransfers ?ending_before ?expand
+         match Handlers.getTreasuryInboundTransfers ?ending_before ?expand
            ~financial_account ?limit ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -66435,7 +66466,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/treasury/debit_reversals *)
   let postTreasuryDebitReversals = let _op = "PostTreasuryDebitReversals" in
     Routes.route (Paths'.postTreasuryDebitReversals ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66449,7 +66480,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryDebitReversals'")
            | _, None -> None in
-         match H.postTreasuryDebitReversals _req
+         match Handlers.postTreasuryDebitReversals _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_debit_reversal ~op:_op ~ctype:_resp_ctype content in
@@ -66469,7 +66500,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/treasury/debit_reversals *)
   let getTreasuryDebitReversals = let _op = "GetTreasuryDebitReversals" in
     Routes.route (Paths'.getTreasuryDebitReversals ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66519,7 +66550,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryDebitReversals'")
          in 
-         match H.getTreasuryDebitReversals ?ending_before ?expand
+         match Handlers.getTreasuryDebitReversals ?ending_before ?expand
            ~financial_account ?limit ?received_debit ?resolution
            ?starting_after ?status _req
          with
@@ -66543,7 +66574,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingTransactionsCreateForceCapture ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66557,7 +66588,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingTransactionsCreateForceCapture'")
            | _, None -> None in
-         match H.postTestHelpersIssuingTransactionsCreateForceCapture _req
+         match Handlers.postTestHelpersIssuingTransactionsCreateForceCapture
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -66577,7 +66609,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/reviews *)
   let getReviews = let _op = "GetReviews" in
     Routes.route (Paths'.getReviews ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66610,7 +66642,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetReviews'")
            | _, None -> None in 
-         match H.getReviews ?created ?ending_before ?expand ?limit
+         match Handlers.getReviews ?created ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -66631,7 +66663,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/prices *)
   let postPrices = let _op = "PostPrices" in
     Routes.route (Paths'.postPrices ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66645,7 +66677,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPrices'")
            | _, None -> None in
-         match H.postPrices _req
+         match Handlers.postPrices _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_price ~op:_op ~ctype:_resp_ctype content in
@@ -66665,7 +66697,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/prices *)
   let getPrices = let _op = "GetPrices" in
     Routes.route (Paths'.getPrices ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66722,9 +66754,9 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPrices'")
            | _, None -> None in 
-         match H.getPrices ?active ?created ?currency ?ending_before ?expand
-           ?limit ?lookup_keys ?product ?recurring ?starting_after ?type_
-           _req
+         match Handlers.getPrices ?active ?created ?currency ?ending_before
+           ?expand ?limit ?lookup_keys ?product ?recurring ?starting_after
+           ?type_ _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_74158d6312 ~op:_op ~ctype:_resp_ctype content in
@@ -66744,7 +66776,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/exchange_rates *)
   let getExchangeRates = let _op = "GetExchangeRates" in
     Routes.route (Paths'.getExchangeRates ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66773,7 +66805,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetExchangeRates'")
            | _, None -> None in 
-         match H.getExchangeRates ?ending_before ?expand ?limit
+         match Handlers.getExchangeRates ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -66794,7 +66826,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/checkout/sessions *)
   let postCheckoutSessions = let _op = "PostCheckoutSessions" in
     Routes.route (Paths'.postCheckoutSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66808,7 +66840,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCheckoutSessions'")
            | _, None -> None in
-         match H.postCheckoutSessions _req
+         match Handlers.postCheckoutSessions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_checkout_session ~op:_op ~ctype:_resp_ctype content in
@@ -66828,7 +66860,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/checkout/sessions *)
   let getCheckoutSessions = let _op = "GetCheckoutSessions" in
     Routes.route (Paths'.getCheckoutSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66885,9 +66917,9 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCheckoutSessions'")
            | _, None -> None in 
-         match H.getCheckoutSessions ?created ?customer ?customer_details
-           ?ending_before ?expand ?limit ?payment_intent ?payment_link
-           ?starting_after ?status ?subscription _req
+         match Handlers.getCheckoutSessions ?created ?customer
+           ?customer_details ?ending_before ?expand ?limit ?payment_intent
+           ?payment_link ?starting_after ?status ?subscription _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_be210268f2 ~op:_op ~ctype:_resp_ctype content in
@@ -66908,7 +66940,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingPersonalizationDesigns = let _op = "PostIssuingPersonalizationDesigns"
     in
     Routes.route (Paths'.postIssuingPersonalizationDesigns ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66922,7 +66954,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingPersonalizationDesigns'")
            | _, None -> None in
-         match H.postIssuingPersonalizationDesigns _req
+         match Handlers.postIssuingPersonalizationDesigns _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_personalization_design ~op:_op ~ctype:_resp_ctype content in
@@ -66943,7 +66975,7 @@ module Routes' (H : HANDLERS) = struct
   let getIssuingPersonalizationDesigns = let _op = "GetIssuingPersonalizationDesigns"
     in
     Routes.route (Paths'.getIssuingPersonalizationDesigns ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -66984,8 +67016,9 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingPersonalizationDesigns'")
            | _, None -> None in 
-         match H.getIssuingPersonalizationDesigns ?ending_before ?expand
-           ?limit ?lookup_keys ?preferences ?starting_after ?status _req
+         match Handlers.getIssuingPersonalizationDesigns ?ending_before
+           ?expand ?limit ?lookup_keys ?preferences ?starting_after ?status
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_a6474a2d5e ~op:_op ~ctype:_resp_ctype content in
@@ -67005,7 +67038,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoiceitems *)
   let postInvoiceitems = let _op = "PostInvoiceitems" in
     Routes.route (Paths'.postInvoiceitems ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67019,7 +67052,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoiceitems'")
            | _, None -> None in
-         match H.postInvoiceitems _req
+         match Handlers.postInvoiceitems _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoiceitem ~op:_op ~ctype:_resp_ctype content in
@@ -67039,7 +67072,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoiceitems *)
   let getInvoiceitems = let _op = "GetInvoiceitems" in
     Routes.route (Paths'.getInvoiceitems ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67084,8 +67117,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetInvoiceitems'")
            | _, None -> None in 
-         match H.getInvoiceitems ?created ?customer ?ending_before ?expand
-           ?invoice ?limit ?pending ?starting_after _req
+         match Handlers.getInvoiceitems ?created ?customer ?ending_before
+           ?expand ?invoice ?limit ?pending ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_fc9322fc50 ~op:_op ~ctype:_resp_ctype content in
@@ -67105,7 +67138,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/account *)
   let getAccount = let _op = "GetAccount" in
     Routes.route (Paths'.getAccount ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67122,7 +67155,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccount'")
            | _, None -> None in
-         match H.getAccount ?expand _req
+         match Handlers.getAccount ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_account ~op:_op ~ctype:_resp_ctype content in
@@ -67142,7 +67175,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/ephemeral_keys *)
   let postEphemeralKeys = let _op = "PostEphemeralKeys" in
     Routes.route (Paths'.postEphemeralKeys ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67156,7 +67189,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostEphemeralKeys'")
            | _, None -> None in
-         match H.postEphemeralKeys _req
+         match Handlers.postEphemeralKeys _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_ephemeral_key ~op:_op ~ctype:_resp_ctype content in
@@ -67179,7 +67212,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers/search *)
   let getCustomersSearch = let _op = "GetCustomersSearch" in
     Routes.route (Paths'.getCustomersSearch ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67213,7 +67246,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'query' is required by operation 'GetCustomersSearch'")
          in
-         match H.getCustomersSearch ?expand ?limit ?page ~query _req
+         match Handlers.getCustomersSearch ?expand ?limit ?page ~query _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_ada489b57e ~op:_op ~ctype:_resp_ctype content in
@@ -67234,7 +67267,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/balance *)
   let getBalance = let _op = "GetBalance" in
     Routes.route (Paths'.getBalance ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67251,7 +67284,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBalance'")
            | _, None -> None in
-         match H.getBalance ?expand _req
+         match Handlers.getBalance ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_balance ~op:_op ~ctype:_resp_ctype content in
@@ -67272,7 +67305,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryReceivedCredits = let _op = "PostTestHelpersTreasuryReceivedCredits"
     in
     Routes.route (Paths'.postTestHelpersTreasuryReceivedCredits ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67286,7 +67319,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryReceivedCredits'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryReceivedCredits _req
+         match Handlers.postTestHelpersTreasuryReceivedCredits _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_received_credit ~op:_op ~ctype:_resp_ctype content in
@@ -67309,7 +67342,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscriptions/search *)
   let getSubscriptionsSearch = let _op = "GetSubscriptionsSearch" in
     Routes.route (Paths'.getSubscriptionsSearch ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67343,7 +67376,8 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'query' is required by operation 'GetSubscriptionsSearch'")
          in
-         match H.getSubscriptionsSearch ?expand ?limit ?page ~query _req
+         match Handlers.getSubscriptionsSearch ?expand ?limit ?page ~query
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_511c6be270 ~op:_op ~ctype:_resp_ctype content in
@@ -67373,7 +67407,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/refunds *)
   let postRefunds = let _op = "PostRefunds" in
     Routes.route (Paths'.postRefunds ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67387,7 +67421,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostRefunds'")
            | _, None -> None in
-         match H.postRefunds _req
+         match Handlers.postRefunds _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -67407,7 +67441,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/refunds *)
   let getRefunds = let _op = "GetRefunds" in
     Routes.route (Paths'.getRefunds ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67448,8 +67482,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetRefunds'")
            | _, None -> None in 
-         match H.getRefunds ?charge ?created ?ending_before ?expand ?limit
-           ?payment_intent ?starting_after _req
+         match Handlers.getRefunds ?charge ?created ?ending_before ?expand
+           ?limit ?payment_intent ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_84023f4c8c ~op:_op ~ctype:_resp_ctype content in
@@ -67469,7 +67503,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/apps/secrets *)
   let postAppsSecrets = let _op = "PostAppsSecrets" in
     Routes.route (Paths'.postAppsSecrets ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67483,7 +67517,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAppsSecrets'")
            | _, None -> None in
-         match H.postAppsSecrets _req
+         match Handlers.postAppsSecrets _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_apps_secret ~op:_op ~ctype:_resp_ctype content in
@@ -67503,7 +67537,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/apps/secrets *)
   let getAppsSecrets = let _op = "GetAppsSecrets" in
     Routes.route (Paths'.getAppsSecrets ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67541,7 +67575,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'scope' is required by operation 'GetAppsSecrets'")
          in 
-         match H.getAppsSecrets ?ending_before ?expand ?limit ~scope
+         match Handlers.getAppsSecrets ?ending_before ?expand ?limit ~scope
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -67565,7 +67599,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_intents/search *)
   let getPaymentIntentsSearch = let _op = "GetPaymentIntentsSearch" in
     Routes.route (Paths'.getPaymentIntentsSearch ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67599,7 +67633,8 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'query' is required by operation 'GetPaymentIntentsSearch'")
          in
-         match H.getPaymentIntentsSearch ?expand ?limit ?page ~query _req
+         match Handlers.getPaymentIntentsSearch ?expand ?limit ?page ~query
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2b5089e91b ~op:_op ~ctype:_resp_ctype content in
@@ -67620,7 +67655,7 @@ module Routes' (H : HANDLERS) = struct
   let getEntitlementsActiveEntitlements = let _op = "GetEntitlementsActiveEntitlements"
     in
     Routes.route (Paths'.getEntitlementsActiveEntitlements ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67658,8 +67693,8 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'customer' is required by operation 'GetEntitlementsActiveEntitlements'")
          in 
-         match H.getEntitlementsActiveEntitlements ~customer ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getEntitlementsActiveEntitlements ~customer
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_a59bf7d41a ~op:_op ~ctype:_resp_ctype content in
@@ -67679,7 +67714,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/configurations *)
   let postTerminalConfigurations = let _op = "PostTerminalConfigurations" in
     Routes.route (Paths'.postTerminalConfigurations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67693,7 +67728,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalConfigurations'")
            | _, None -> None in
-         match H.postTerminalConfigurations _req
+         match Handlers.postTerminalConfigurations _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -67713,7 +67748,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/configurations *)
   let getTerminalConfigurations = let _op = "GetTerminalConfigurations" in
     Routes.route (Paths'.getTerminalConfigurations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67746,7 +67781,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTerminalConfigurations'")
            | _, None -> None in 
-         match H.getTerminalConfigurations ?ending_before ?expand
+         match Handlers.getTerminalConfigurations ?ending_before ?expand
            ?is_account_default ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -67767,7 +67802,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscription_schedules *)
   let postSubscriptionSchedules = let _op = "PostSubscriptionSchedules" in
     Routes.route (Paths'.postSubscriptionSchedules ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67781,7 +67816,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionSchedules'")
            | _, None -> None in
-         match H.postSubscriptionSchedules _req
+         match Handlers.postSubscriptionSchedules _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_schedule ~op:_op ~ctype:_resp_ctype content in
@@ -67801,7 +67836,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscription_schedules *)
   let getSubscriptionSchedules = let _op = "GetSubscriptionSchedules" in
     Routes.route (Paths'.getSubscriptionSchedules ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67854,9 +67889,9 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSubscriptionSchedules'")
            | _, None -> None in 
-         match H.getSubscriptionSchedules ?canceled_at ?completed_at ?created
-           ?customer ?ending_before ?expand ?limit ?released_at ?scheduled
-           ?starting_after _req
+         match Handlers.getSubscriptionSchedules ?canceled_at ?completed_at
+           ?created ?customer ?ending_before ?expand ?limit ?released_at
+           ?scheduled ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_131d8d58f6 ~op:_op ~ctype:_resp_ctype content in
@@ -67876,7 +67911,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/reporting/report_runs *)
   let postReportingReportRuns = let _op = "PostReportingReportRuns" in
     Routes.route (Paths'.postReportingReportRuns ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67890,7 +67925,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostReportingReportRuns'")
            | _, None -> None in
-         match H.postReportingReportRuns _req
+         match Handlers.postReportingReportRuns _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_reporting_report_run ~op:_op ~ctype:_resp_ctype content in
@@ -67910,7 +67945,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/reporting/report_runs *)
   let getReportingReportRuns = let _op = "GetReportingReportRuns" in
     Routes.route (Paths'.getReportingReportRuns ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67943,8 +67978,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetReportingReportRuns'")
            | _, None -> None in 
-         match H.getReportingReportRuns ?created ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getReportingReportRuns ?created ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_c990e5bff8 ~op:_op ~ctype:_resp_ctype content in
@@ -67965,7 +68000,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/climate/orders *)
   let postClimateOrders = let _op = "PostClimateOrders" in
     Routes.route (Paths'.postClimateOrders ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -67979,7 +68014,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostClimateOrders'")
            | _, None -> None in
-         match H.postClimateOrders _req
+         match Handlers.postClimateOrders _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_climate_order ~op:_op ~ctype:_resp_ctype content in
@@ -68000,7 +68035,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/climate/orders *)
   let getClimateOrders = let _op = "GetClimateOrders" in
     Routes.route (Paths'.getClimateOrders ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68029,7 +68064,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetClimateOrders'")
            | _, None -> None in 
-         match H.getClimateOrders ?ending_before ?expand ?limit
+         match Handlers.getClimateOrders ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -68050,7 +68085,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/plans *)
   let postPlans = let _op = "PostPlans" in
     Routes.route (Paths'.postPlans ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68064,7 +68099,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPlans'")
            | _, None -> None in
-         match H.postPlans _req
+         match Handlers.postPlans _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_plan ~op:_op ~ctype:_resp_ctype content in
@@ -68084,7 +68119,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/plans *)
   let getPlans = let _op = "GetPlans" in
     Routes.route (Paths'.getPlans ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68125,8 +68160,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPlans'")
            | _, None -> None in 
-         match H.getPlans ?active ?created ?ending_before ?expand ?limit
-           ?product ?starting_after _req
+         match Handlers.getPlans ?active ?created ?ending_before ?expand
+           ?limit ?product ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_dd09d84db3 ~op:_op ~ctype:_resp_ctype content in
@@ -68146,7 +68181,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/tokens *)
   let getIssuingTokens = let _op = "GetIssuingTokens" in
     Routes.route (Paths'.getIssuingTokens ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68192,8 +68227,8 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'card' is required by operation 'GetIssuingTokens'")
          in 
-         match H.getIssuingTokens ~card ?created ?ending_before ?expand
-           ?limit ?starting_after ?status _req
+         match Handlers.getIssuingTokens ~card ?created ?ending_before
+           ?expand ?limit ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_d442622ac0 ~op:_op ~ctype:_resp_ctype content in
@@ -68213,7 +68248,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/upcoming/lines *)
   let getInvoicesUpcomingLines = let _op = "GetInvoicesUpcomingLines" in
     Routes.route (Paths'.getInvoicesUpcomingLines ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68346,9 +68381,9 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetInvoicesUpcomingLines'")
            | _, None -> None in 
-         match H.getInvoicesUpcomingLines ?automatic_tax ?coupon ?currency
-           ?customer ?customer_details ?discounts ?ending_before ?expand
-           ?invoice_items ?issuer ?limit ?on_behalf_of ?preview_mode
+         match Handlers.getInvoicesUpcomingLines ?automatic_tax ?coupon
+           ?currency ?customer ?customer_details ?discounts ?ending_before
+           ?expand ?invoice_items ?issuer ?limit ?on_behalf_of ?preview_mode
            ?schedule ?schedule_details ?starting_after ?subscription
            ?subscription_billing_cycle_anchor ?subscription_cancel_at
            ?subscription_cancel_at_period_end ?subscription_cancel_now
@@ -68376,7 +68411,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryReceivedDebits = let _op = "PostTestHelpersTreasuryReceivedDebits"
     in
     Routes.route (Paths'.postTestHelpersTreasuryReceivedDebits ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68390,7 +68425,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryReceivedDebits'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryReceivedDebits _req
+         match Handlers.postTestHelpersTreasuryReceivedDebits _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_received_debit ~op:_op ~ctype:_resp_ctype content in
@@ -68412,7 +68447,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingTransactionsCreateUnlinkedRefund ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68426,7 +68461,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingTransactionsCreateUnlinkedRefund'")
            | _, None -> None in
-         match H.postTestHelpersIssuingTransactionsCreateUnlinkedRefund _req
+         match Handlers.postTestHelpersIssuingTransactionsCreateUnlinkedRefund
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -68447,7 +68483,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersIssuingAuthorizations = let _op = "PostTestHelpersIssuingAuthorizations"
     in
     Routes.route (Paths'.postTestHelpersIssuingAuthorizations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68461,7 +68497,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingAuthorizations'")
            | _, None -> None in
-         match H.postTestHelpersIssuingAuthorizations _req
+         match Handlers.postTestHelpersIssuingAuthorizations _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_authorization ~op:_op ~ctype:_resp_ctype content in
@@ -68487,7 +68523,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscriptions *)
   let postSubscriptions = let _op = "PostSubscriptions" in
     Routes.route (Paths'.postSubscriptions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68501,7 +68537,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptions'")
            | _, None -> None in
-         match H.postSubscriptions _req
+         match Handlers.postSubscriptions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription ~op:_op ~ctype:_resp_ctype content in
@@ -68521,7 +68557,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscriptions *)
   let getSubscriptions = let _op = "GetSubscriptions" in
     Routes.route (Paths'.getSubscriptions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68586,9 +68622,10 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSubscriptions'")
            | _, None -> None in 
-         match H.getSubscriptions ?automatic_tax ?collection_method ?created
-           ?current_period_end ?current_period_start ?customer ?ending_before
-           ?expand ?limit ?price ?starting_after ?status ?test_clock _req
+         match Handlers.getSubscriptions ?automatic_tax ?collection_method
+           ?created ?current_period_end ?current_period_start ?customer
+           ?ending_before ?expand ?limit ?price ?starting_after ?status
+           ?test_clock _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2f50dabf8e ~op:_op ~ctype:_resp_ctype content in
@@ -68608,7 +68645,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/events *)
   let getEvents = let _op = "GetEvents" in
     Routes.route (Paths'.getEvents ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68653,8 +68690,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetEvents'")
            | _, None -> None in 
-         match H.getEvents ?created ?delivery_success ?ending_before ?expand
-           ?limit ?starting_after ?type_ ?types _req
+         match Handlers.getEvents ?created ?delivery_success ?ending_before
+           ?expand ?limit ?starting_after ?type_ ?types _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_a9fe829193 ~op:_op ~ctype:_resp_ctype content in
@@ -68675,7 +68712,7 @@ module Routes' (H : HANDLERS) = struct
   let postBillingPortalConfigurations = let _op = "PostBillingPortalConfigurations"
     in
     Routes.route (Paths'.postBillingPortalConfigurations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68689,7 +68726,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingPortalConfigurations'")
            | _, None -> None in
-         match H.postBillingPortalConfigurations _req
+         match Handlers.postBillingPortalConfigurations _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_portal_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -68710,7 +68747,7 @@ module Routes' (H : HANDLERS) = struct
   let getBillingPortalConfigurations = let _op = "GetBillingPortalConfigurations"
     in
     Routes.route (Paths'.getBillingPortalConfigurations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68747,7 +68784,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBillingPortalConfigurations'")
            | _, None -> None in 
-         match H.getBillingPortalConfigurations ?active ?ending_before
+         match Handlers.getBillingPortalConfigurations ?active ?ending_before
            ?expand ?is_default ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -68770,7 +68807,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/balance/history *)
   let getBalanceHistory = let _op = "GetBalanceHistory" in
     Routes.route (Paths'.getBalanceHistory ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68819,8 +68856,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBalanceHistory'")
            | _, None -> None in 
-         match H.getBalanceHistory ?created ?currency ?ending_before ?expand
-           ?limit ?payout ?source ?starting_after ?type_ _req
+         match Handlers.getBalanceHistory ?created ?currency ?ending_before
+           ?expand ?limit ?payout ?source ?starting_after ?type_ _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2202d52174 ~op:_op ~ctype:_resp_ctype content in
@@ -68846,7 +68883,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/create_preview *)
   let postInvoicesCreatePreview = let _op = "PostInvoicesCreatePreview" in
     Routes.route (Paths'.postInvoicesCreatePreview ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68860,7 +68897,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesCreatePreview'")
            | _, None -> None in
-         match H.postInvoicesCreatePreview _req
+         match Handlers.postInvoicesCreatePreview _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -68881,7 +68918,7 @@ module Routes' (H : HANDLERS) = struct
   let postBillingMeterEventAdjustments = let _op = "PostBillingMeterEventAdjustments"
     in
     Routes.route (Paths'.postBillingMeterEventAdjustments ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68895,7 +68932,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingMeterEventAdjustments'")
            | _, None -> None in
-         match H.postBillingMeterEventAdjustments _req
+         match Handlers.postBillingMeterEventAdjustments _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_meter_event_adjustment ~op:_op ~ctype:_resp_ctype content in
@@ -68916,7 +68953,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalConnectionTokens = let _op = "PostTerminalConnectionTokens"
     in
     Routes.route (Paths'.postTerminalConnectionTokens ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68930,7 +68967,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalConnectionTokens'")
            | _, None -> None in
-         match H.postTerminalConnectionTokens _req
+         match Handlers.postTerminalConnectionTokens _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_connection_token ~op:_op ~ctype:_resp_ctype content in
@@ -68950,7 +68987,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/physical_bundles *)
   let getIssuingPhysicalBundles = let _op = "GetIssuingPhysicalBundles" in
     Routes.route (Paths'.getIssuingPhysicalBundles ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -68987,8 +69024,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingPhysicalBundles'")
            | _, None -> None in 
-         match H.getIssuingPhysicalBundles ?ending_before ?expand ?limit
-           ?starting_after ?status ?type_ _req
+         match Handlers.getIssuingPhysicalBundles ?ending_before ?expand
+           ?limit ?starting_after ?status ?type_ _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_93afe9bb1d ~op:_op ~ctype:_resp_ctype content in
@@ -69008,7 +69045,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/apps/secrets/find *)
   let getAppsSecretsFind = let _op = "GetAppsSecretsFind" in
     Routes.route (Paths'.getAppsSecretsFind ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69043,7 +69080,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'scope' is required by operation 'GetAppsSecretsFind'")
          in
-         match H.getAppsSecretsFind ?expand ~name ~scope _req
+         match Handlers.getAppsSecretsFind ?expand ~name ~scope _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_apps_secret ~op:_op ~ctype:_resp_ctype content in
@@ -69063,7 +69100,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/entitlements/features *)
   let postEntitlementsFeatures = let _op = "PostEntitlementsFeatures" in
     Routes.route (Paths'.postEntitlementsFeatures ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69077,7 +69114,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostEntitlementsFeatures'")
            | _, None -> None in
-         match H.postEntitlementsFeatures _req
+         match Handlers.postEntitlementsFeatures _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_entitlements_feature ~op:_op ~ctype:_resp_ctype content in
@@ -69097,7 +69134,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/entitlements/features *)
   let getEntitlementsFeatures = let _op = "GetEntitlementsFeatures" in
     Routes.route (Paths'.getEntitlementsFeatures ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69134,8 +69171,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetEntitlementsFeatures'")
            | _, None -> None in 
-         match H.getEntitlementsFeatures ?archived ?ending_before ?expand
-           ?limit ?lookup_key ?starting_after _req
+         match Handlers.getEntitlementsFeatures ?archived ?ending_before
+           ?expand ?limit ?lookup_key ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_5c8bbeb9fe ~op:_op ~ctype:_resp_ctype content in
@@ -69155,7 +69192,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_links *)
   let postPaymentLinks = let _op = "PostPaymentLinks" in
     Routes.route (Paths'.postPaymentLinks ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69169,7 +69206,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentLinks'")
            | _, None -> None in
-         match H.postPaymentLinks _req
+         match Handlers.postPaymentLinks _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_link ~op:_op ~ctype:_resp_ctype content in
@@ -69189,7 +69226,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_links *)
   let getPaymentLinks = let _op = "GetPaymentLinks" in
     Routes.route (Paths'.getPaymentLinks ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69222,7 +69259,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentLinks'")
            | _, None -> None in 
-         match H.getPaymentLinks ?active ?ending_before ?expand ?limit
+         match Handlers.getPaymentLinks ?active ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -69243,7 +69280,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/cardholders *)
   let postIssuingCardholders = let _op = "PostIssuingCardholders" in
     Routes.route (Paths'.postIssuingCardholders ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69257,7 +69294,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingCardholders'")
            | _, None -> None in
-         match H.postIssuingCardholders _req
+         match Handlers.postIssuingCardholders _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_cardholder ~op:_op ~ctype:_resp_ctype content in
@@ -69277,7 +69314,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/cardholders *)
   let getIssuingCardholders = let _op = "GetIssuingCardholders" in
     Routes.route (Paths'.getIssuingCardholders ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69326,8 +69363,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingCardholders'")
            | _, None -> None in 
-         match H.getIssuingCardholders ?created ?email ?ending_before ?expand
-           ?limit ?phone_number ?starting_after ?status ?type_ _req
+         match Handlers.getIssuingCardholders ?created ?email ?ending_before
+           ?expand ?limit ?phone_number ?starting_after ?status ?type_ _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_159106836c ~op:_op ~ctype:_resp_ctype content in
@@ -69347,7 +69384,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/credit_notes/preview/lines *)
   let getCreditNotesPreviewLines = let _op = "GetCreditNotesPreviewLines" in
     Routes.route (Paths'.getCreditNotesPreviewLines ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69429,7 +69466,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'invoice' is required by operation 'GetCreditNotesPreviewLines'")
          in 
-         match H.getCreditNotesPreviewLines ?amount ?credit_amount
+         match Handlers.getCreditNotesPreviewLines ?amount ?credit_amount
            ?effective_at ?ending_before ?expand ~invoice ?limit ?lines ?memo
            ?metadata ?out_of_band_amount ?reason ?refund ?refund_amount
            ?shipping_cost ?starting_after _req
@@ -69452,7 +69489,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax/settings *)
   let postTaxSettings = let _op = "PostTaxSettings" in
     Routes.route (Paths'.postTaxSettings ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69466,7 +69503,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxSettings'")
            | _, None -> None in
-         match H.postTaxSettings _req
+         match Handlers.postTaxSettings _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_settings ~op:_op ~ctype:_resp_ctype content in
@@ -69486,7 +69523,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax/settings *)
   let getTaxSettings = let _op = "GetTaxSettings" in
     Routes.route (Paths'.getTaxSettings ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69503,7 +69540,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxSettings'")
            | _, None -> None in
-         match H.getTaxSettings ?expand _req
+         match Handlers.getTaxSettings ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_settings ~op:_op ~ctype:_resp_ctype content in
@@ -69523,7 +69560,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax/calculations *)
   let postTaxCalculations = let _op = "PostTaxCalculations" in
     Routes.route (Paths'.postTaxCalculations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69537,7 +69574,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxCalculations'")
            | _, None -> None in
-         match H.postTaxCalculations _req
+         match Handlers.postTaxCalculations _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_calculation ~op:_op ~ctype:_resp_ctype content in
@@ -69557,7 +69594,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/disputes *)
   let getDisputes = let _op = "GetDisputes" in
     Routes.route (Paths'.getDisputes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69598,8 +69635,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetDisputes'")
            | _, None -> None in 
-         match H.getDisputes ?charge ?created ?ending_before ?expand ?limit
-           ?payment_intent ?starting_after _req
+         match Handlers.getDisputes ?charge ?created ?ending_before ?expand
+           ?limit ?payment_intent ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_922afa3fe7 ~op:_op ~ctype:_resp_ctype content in
@@ -69625,7 +69662,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/upcoming *)
   let getInvoicesUpcoming = let _op = "GetInvoicesUpcoming" in
     Routes.route (Paths'.getInvoicesUpcoming ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69746,7 +69783,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetInvoicesUpcoming'")
            | _, None -> None in 
-         match H.getInvoicesUpcoming ?automatic_tax ?coupon ?currency
+         match Handlers.getInvoicesUpcoming ?automatic_tax ?coupon ?currency
            ?customer ?customer_details ?discounts ?expand ?invoice_items
            ?issuer ?on_behalf_of ?preview_mode ?schedule ?schedule_details
            ?subscription ?subscription_billing_cycle_anchor
@@ -69775,7 +69812,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/apple_pay/domains *)
   let postApplePayDomains = let _op = "PostApplePayDomains" in
     Routes.route (Paths'.postApplePayDomains ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69789,7 +69826,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostApplePayDomains'")
            | _, None -> None in
-         match H.postApplePayDomains _req
+         match Handlers.postApplePayDomains _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_apple_pay_domain ~op:_op ~ctype:_resp_ctype content in
@@ -69809,7 +69846,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/apple_pay/domains *)
   let getApplePayDomains = let _op = "GetApplePayDomains" in
     Routes.route (Paths'.getApplePayDomains ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69842,8 +69879,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetApplePayDomains'")
            | _, None -> None in 
-         match H.getApplePayDomains ?domain_name ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getApplePayDomains ?domain_name ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2c4769bee6 ~op:_op ~ctype:_resp_ctype content in
@@ -69863,7 +69900,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/radar/value_lists *)
   let postRadarValueLists = let _op = "PostRadarValueLists" in
     Routes.route (Paths'.postRadarValueLists ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69877,7 +69914,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostRadarValueLists'")
            | _, None -> None in
-         match H.postRadarValueLists _req
+         match Handlers.postRadarValueLists _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_radar_value_list ~op:_op ~ctype:_resp_ctype content in
@@ -69897,7 +69934,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/radar/value_lists *)
   let getRadarValueLists = let _op = "GetRadarValueLists" in
     Routes.route (Paths'.getRadarValueLists ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69938,8 +69975,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetRadarValueLists'")
            | _, None -> None in 
-         match H.getRadarValueLists ?alias ?contains ?created ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getRadarValueLists ?alias ?contains ?created
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_46113411f3 ~op:_op ~ctype:_resp_ctype content in
@@ -69959,7 +69996,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/link_account_sessions *)
   let postLinkAccountSessions = let _op = "PostLinkAccountSessions" in
     Routes.route (Paths'.postLinkAccountSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -69973,7 +70010,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostLinkAccountSessions'")
            | _, None -> None in
-         match H.postLinkAccountSessions _req
+         match Handlers.postLinkAccountSessions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_session ~op:_op ~ctype:_resp_ctype content in
@@ -69993,7 +70030,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/file_links *)
   let postFileLinks = let _op = "PostFileLinks" in
     Routes.route (Paths'.postFileLinks ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70007,7 +70044,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostFileLinks'")
            | _, None -> None in
-         match H.postFileLinks _req
+         match Handlers.postFileLinks _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_file_link ~op:_op ~ctype:_resp_ctype content in
@@ -70027,7 +70064,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/file_links *)
   let getFileLinks = let _op = "GetFileLinks" in
     Routes.route (Paths'.getFileLinks ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70068,8 +70105,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFileLinks'")
            | _, None -> None in 
-         match H.getFileLinks ?created ?ending_before ?expand ?expired ?file
-           ?limit ?starting_after _req
+         match Handlers.getFileLinks ?created ?ending_before ?expand ?expired
+           ?file ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_725237f1c4 ~op:_op ~ctype:_resp_ctype content in
@@ -70091,7 +70128,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/coupons *)
   let postCoupons = let _op = "PostCoupons" in
     Routes.route (Paths'.postCoupons ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70105,7 +70142,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCoupons'")
            | _, None -> None in
-         match H.postCoupons _req
+         match Handlers.postCoupons _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_coupon ~op:_op ~ctype:_resp_ctype content in
@@ -70125,7 +70162,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/coupons *)
   let getCoupons = let _op = "GetCoupons" in
     Routes.route (Paths'.getCoupons ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70158,7 +70195,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCoupons'")
            | _, None -> None in 
-         match H.getCoupons ?created ?ending_before ?expand ?limit
+         match Handlers.getCoupons ?created ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -70179,7 +70216,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/transactions *)
   let getIssuingTransactions = let _op = "GetIssuingTransactions" in
     Routes.route (Paths'.getIssuingTransactions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70224,7 +70261,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingTransactions'")
            | _, None -> None in 
-         match H.getIssuingTransactions ?card ?cardholder ?created
+         match Handlers.getIssuingTransactions ?card ?cardholder ?created
            ?ending_before ?expand ?limit ?starting_after ?type_ _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -70245,7 +70282,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/authorizations *)
   let getIssuingAuthorizations = let _op = "GetIssuingAuthorizations" in
     Routes.route (Paths'.getIssuingAuthorizations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70290,7 +70327,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingAuthorizations'")
            | _, None -> None in 
-         match H.getIssuingAuthorizations ?card ?cardholder ?created
+         match Handlers.getIssuingAuthorizations ?card ?cardholder ?created
            ?ending_before ?expand ?limit ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -70312,7 +70349,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryTransactionEntries = let _op = "GetTreasuryTransactionEntries"
     in
     Routes.route (Paths'.getTreasuryTransactionEntries ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70366,7 +70403,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryTransactionEntries'")
          in 
-         match H.getTreasuryTransactionEntries ?created ?effective_at
+         match Handlers.getTreasuryTransactionEntries ?created ?effective_at
            ?ending_before ?expand ~financial_account ?limit ?order_by
            ?starting_after ?transaction _req
          with
@@ -70388,7 +70425,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/treasury/received_debits *)
   let getTreasuryReceivedDebits = let _op = "GetTreasuryReceivedDebits" in
     Routes.route (Paths'.getTreasuryReceivedDebits ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70430,7 +70467,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryReceivedDebits'")
          in 
-         match H.getTreasuryReceivedDebits ?ending_before ?expand
+         match Handlers.getTreasuryReceivedDebits ?ending_before ?expand
            ~financial_account ?limit ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -70452,7 +70489,7 @@ module Routes' (H : HANDLERS) = struct
   let postTreasuryOutboundTransfers = let _op = "PostTreasuryOutboundTransfers"
     in
     Routes.route (Paths'.postTreasuryOutboundTransfers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70466,7 +70503,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryOutboundTransfers'")
            | _, None -> None in
-         match H.postTreasuryOutboundTransfers _req
+         match Handlers.postTreasuryOutboundTransfers _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -70487,7 +70524,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryOutboundTransfers = let _op = "GetTreasuryOutboundTransfers"
     in
     Routes.route (Paths'.getTreasuryOutboundTransfers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70529,7 +70566,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryOutboundTransfers'")
          in 
-         match H.getTreasuryOutboundTransfers ?ending_before ?expand
+         match Handlers.getTreasuryOutboundTransfers ?ending_before ?expand
            ~financial_account ?limit ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -70550,7 +70587,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/transfers *)
   let postTransfers = let _op = "PostTransfers" in
     Routes.route (Paths'.postTransfers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70564,7 +70601,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTransfers'")
            | _, None -> None in
-         match H.postTransfers _req
+         match Handlers.postTransfers _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -70584,7 +70621,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/transfers *)
   let getTransfers = let _op = "GetTransfers" in
     Routes.route (Paths'.getTransfers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70625,8 +70662,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTransfers'")
            | _, None -> None in 
-         match H.getTransfers ?created ?destination ?ending_before ?expand
-           ?limit ?starting_after ?transfer_group _req
+         match Handlers.getTransfers ?created ?destination ?ending_before
+           ?expand ?limit ?starting_after ?transfer_group _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_33072f36c2 ~op:_op ~ctype:_resp_ctype content in
@@ -70646,7 +70683,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/shipping_rates *)
   let postShippingRates = let _op = "PostShippingRates" in
     Routes.route (Paths'.postShippingRates ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70660,7 +70697,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostShippingRates'")
            | _, None -> None in
-         match H.postShippingRates _req
+         match Handlers.postShippingRates _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_shipping_rate ~op:_op ~ctype:_resp_ctype content in
@@ -70680,7 +70717,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/shipping_rates *)
   let getShippingRates = let _op = "GetShippingRates" in
     Routes.route (Paths'.getShippingRates ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70721,8 +70758,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetShippingRates'")
            | _, None -> None in 
-         match H.getShippingRates ?active ?created ?currency ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getShippingRates ?active ?created ?currency
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_455e067f38 ~op:_op ~ctype:_resp_ctype content in
@@ -70742,7 +70779,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/cards *)
   let postIssuingCards = let _op = "PostIssuingCards" in
     Routes.route (Paths'.postIssuingCards ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70756,7 +70793,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingCards'")
            | _, None -> None in
-         match H.postIssuingCards _req
+         match Handlers.postIssuingCards _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_card ~op:_op ~ctype:_resp_ctype content in
@@ -70776,7 +70813,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/cards *)
   let getIssuingCards = let _op = "GetIssuingCards" in
     Routes.route (Paths'.getIssuingCards ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70837,7 +70874,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingCards'")
            | _, None -> None in 
-         match H.getIssuingCards ?cardholder ?created ?ending_before
+         match Handlers.getIssuingCards ?cardholder ?created ?ending_before
            ?exp_month ?exp_year ?expand ?last4 ?limit ?personalization_design
            ?starting_after ?status ?type_ _req
          with
@@ -70859,7 +70896,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/credit_notes/preview *)
   let getCreditNotesPreview = let _op = "GetCreditNotesPreview" in
     Routes.route (Paths'.getCreditNotesPreview ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70929,9 +70966,10 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'invoice' is required by operation 'GetCreditNotesPreview'")
          in 
-         match H.getCreditNotesPreview ?amount ?credit_amount ?effective_at
-           ?expand ~invoice ?lines ?memo ?metadata ?out_of_band_amount
-           ?reason ?refund ?refund_amount ?shipping_cost _req
+         match Handlers.getCreditNotesPreview ?amount ?credit_amount
+           ?effective_at ?expand ~invoice ?lines ?memo ?metadata
+           ?out_of_band_amount ?reason ?refund ?refund_amount ?shipping_cost
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_credit_note ~op:_op ~ctype:_resp_ctype content in
@@ -70951,7 +70989,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/account_sessions *)
   let postAccountSessions = let _op = "PostAccountSessions" in
     Routes.route (Paths'.postAccountSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -70965,7 +71003,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountSessions'")
            | _, None -> None in
-         match H.postAccountSessions _req
+         match Handlers.postAccountSessions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_account_session ~op:_op ~ctype:_resp_ctype content in
@@ -70985,7 +71023,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/linked_accounts *)
   let getLinkedAccounts = let _op = "GetLinkedAccounts" in
     Routes.route (Paths'.getLinkedAccounts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71022,8 +71060,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetLinkedAccounts'")
            | _, None -> None in 
-         match H.getLinkedAccounts ?account_holder ?ending_before ?expand
-           ?limit ?session ?starting_after _req
+         match Handlers.getLinkedAccounts ?account_holder ?ending_before
+           ?expand ?limit ?session ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_6583320a34 ~op:_op ~ctype:_resp_ctype content in
@@ -71044,7 +71082,7 @@ module Routes' (H : HANDLERS) = struct
   let getFinancialConnectionsAccounts = let _op = "GetFinancialConnectionsAccounts"
     in
     Routes.route (Paths'.getFinancialConnectionsAccounts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71081,7 +71119,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFinancialConnectionsAccounts'")
            | _, None -> None in 
-         match H.getFinancialConnectionsAccounts ?account_holder
+         match Handlers.getFinancialConnectionsAccounts ?account_holder
            ?ending_before ?expand ?limit ?session ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -71105,7 +71143,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/search *)
   let getChargesSearch = let _op = "GetChargesSearch" in
     Routes.route (Paths'.getChargesSearch ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71139,7 +71177,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'query' is required by operation 'GetChargesSearch'")
          in
-         match H.getChargesSearch ?expand ?limit ?page ~query _req
+         match Handlers.getChargesSearch ?expand ?limit ?page ~query _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_54d21de021 ~op:_op ~ctype:_resp_ctype content in
@@ -71159,7 +71197,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/test_helpers/test_clocks *)
   let postTestHelpersTestClocks = let _op = "PostTestHelpersTestClocks" in
     Routes.route (Paths'.postTestHelpersTestClocks ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71173,7 +71211,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTestClocks'")
            | _, None -> None in
-         match H.postTestHelpersTestClocks _req
+         match Handlers.postTestHelpersTestClocks _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_test_helpers_test_clock ~op:_op ~ctype:_resp_ctype content in
@@ -71193,7 +71231,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/test_helpers/test_clocks *)
   let getTestHelpersTestClocks = let _op = "GetTestHelpersTestClocks" in
     Routes.route (Paths'.getTestHelpersTestClocks ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71222,8 +71260,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTestHelpersTestClocks'")
            | _, None -> None in 
-         match H.getTestHelpersTestClocks ?ending_before ?expand ?limit
-           ?starting_after _req
+         match Handlers.getTestHelpersTestClocks ?ending_before ?expand
+           ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_56aeea4dc2 ~op:_op ~ctype:_resp_ctype content in
@@ -71244,7 +71282,7 @@ module Routes' (H : HANDLERS) = struct
   let postTaxTransactionsCreateFromCalculation = let _op = "PostTaxTransactionsCreateFromCalculation"
     in
     Routes.route (Paths'.postTaxTransactionsCreateFromCalculation ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71258,7 +71296,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxTransactionsCreateFromCalculation'")
            | _, None -> None in
-         match H.postTaxTransactionsCreateFromCalculation _req
+         match Handlers.postTaxTransactionsCreateFromCalculation _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -71279,7 +71317,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentMethodConfigurations = let _op = "PostPaymentMethodConfigurations"
     in
     Routes.route (Paths'.postPaymentMethodConfigurations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71293,7 +71331,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodConfigurations'")
            | _, None -> None in
-         match H.postPaymentMethodConfigurations _req
+         match Handlers.postPaymentMethodConfigurations _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -71314,7 +71352,7 @@ module Routes' (H : HANDLERS) = struct
   let getPaymentMethodConfigurations = let _op = "GetPaymentMethodConfigurations"
     in
     Routes.route (Paths'.getPaymentMethodConfigurations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71347,8 +71385,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentMethodConfigurations'")
            | _, None -> None in 
-         match H.getPaymentMethodConfigurations ?application ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getPaymentMethodConfigurations ?application
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_4aa3de8048 ~op:_op ~ctype:_resp_ctype content in
@@ -71375,7 +71413,7 @@ module Routes' (H : HANDLERS) = struct
   let postIdentityVerificationSessions = let _op = "PostIdentityVerificationSessions"
     in
     Routes.route (Paths'.postIdentityVerificationSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71389,7 +71427,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIdentityVerificationSessions'")
            | _, None -> None in
-         match H.postIdentityVerificationSessions _req
+         match Handlers.postIdentityVerificationSessions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_identity_verification_session ~op:_op ~ctype:_resp_ctype content in
@@ -71410,7 +71448,7 @@ module Routes' (H : HANDLERS) = struct
   let getIdentityVerificationSessions = let _op = "GetIdentityVerificationSessions"
     in
     Routes.route (Paths'.getIdentityVerificationSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71451,7 +71489,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIdentityVerificationSessions'")
            | _, None -> None in 
-         match H.getIdentityVerificationSessions ?client_reference_id
+         match Handlers.getIdentityVerificationSessions ?client_reference_id
            ?created ?ending_before ?expand ?limit ?starting_after ?status
            _req
          with
@@ -71473,7 +71511,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/climate/suppliers *)
   let getClimateSuppliers = let _op = "GetClimateSuppliers" in
     Routes.route (Paths'.getClimateSuppliers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71502,7 +71540,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetClimateSuppliers'")
            | _, None -> None in 
-         match H.getClimateSuppliers ?ending_before ?expand ?limit
+         match Handlers.getClimateSuppliers ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -71525,7 +71563,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/balance_transactions *)
   let getBalanceTransactions = let _op = "GetBalanceTransactions" in
     Routes.route (Paths'.getBalanceTransactions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71574,8 +71612,9 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBalanceTransactions'")
            | _, None -> None in 
-         match H.getBalanceTransactions ?created ?currency ?ending_before
-           ?expand ?limit ?payout ?source ?starting_after ?type_ _req
+         match Handlers.getBalanceTransactions ?created ?currency
+           ?ending_before ?expand ?limit ?payout ?source ?starting_after
+           ?type_ _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_8c2090b0f2 ~op:_op ~ctype:_resp_ctype content in
@@ -71595,7 +71634,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/disputes *)
   let postIssuingDisputes = let _op = "PostIssuingDisputes" in
     Routes.route (Paths'.postIssuingDisputes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71609,7 +71648,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingDisputes'")
            | _, None -> None in
-         match H.postIssuingDisputes _req
+         match Handlers.postIssuingDisputes _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -71629,7 +71668,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/disputes *)
   let getIssuingDisputes = let _op = "GetIssuingDisputes" in
     Routes.route (Paths'.getIssuingDisputes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71670,8 +71709,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingDisputes'")
            | _, None -> None in 
-         match H.getIssuingDisputes ?created ?ending_before ?expand ?limit
-           ?starting_after ?status ?transaction _req
+         match Handlers.getIssuingDisputes ?created ?ending_before ?expand
+           ?limit ?starting_after ?status ?transaction _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_bd998bd157 ~op:_op ~ctype:_resp_ctype content in
@@ -71691,7 +71730,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/billing/meters *)
   let postBillingMeters = let _op = "PostBillingMeters" in
     Routes.route (Paths'.postBillingMeters ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71705,7 +71744,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingMeters'")
            | _, None -> None in
-         match H.postBillingMeters _req
+         match Handlers.postBillingMeters _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_meter ~op:_op ~ctype:_resp_ctype content in
@@ -71725,7 +71764,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/billing/meters *)
   let getBillingMeters = let _op = "GetBillingMeters" in
     Routes.route (Paths'.getBillingMeters ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71758,7 +71797,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBillingMeters'")
            | _, None -> None in 
-         match H.getBillingMeters ?ending_before ?expand ?limit
+         match Handlers.getBillingMeters ?ending_before ?expand ?limit
            ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -71779,7 +71818,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customer_sessions *)
   let postCustomerSessions = let _op = "PostCustomerSessions" in
     Routes.route (Paths'.postCustomerSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71793,7 +71832,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomerSessions'")
            | _, None -> None in
-         match H.postCustomerSessions _req
+         match Handlers.postCustomerSessions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_customer_session ~op:_op ~ctype:_resp_ctype content in
@@ -71816,7 +71855,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/products/search *)
   let getProductsSearch = let _op = "GetProductsSearch" in
     Routes.route (Paths'.getProductsSearch ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71850,7 +71889,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'query' is required by operation 'GetProductsSearch'")
          in
-         match H.getProductsSearch ?expand ?limit ?page ~query _req
+         match Handlers.getProductsSearch ?expand ?limit ?page ~query _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_be54f3678d ~op:_op ~ctype:_resp_ctype content in
@@ -71870,7 +71909,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/forwarding/requests *)
   let postForwardingRequests = let _op = "PostForwardingRequests" in
     Routes.route (Paths'.postForwardingRequests ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71884,7 +71923,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostForwardingRequests'")
            | _, None -> None in
-         match H.postForwardingRequests _req
+         match Handlers.postForwardingRequests _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_forwarding_request ~op:_op ~ctype:_resp_ctype content in
@@ -71904,7 +71943,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/forwarding/requests *)
   let getForwardingRequests = let _op = "GetForwardingRequests" in
     Routes.route (Paths'.getForwardingRequests ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71937,8 +71976,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetForwardingRequests'")
            | _, None -> None in 
-         match H.getForwardingRequests ?created ?ending_before ?expand ?limit
-           ?starting_after _req
+         match Handlers.getForwardingRequests ?created ?ending_before ?expand
+           ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_893b63e1ac ~op:_op ~ctype:_resp_ctype content in
@@ -71959,7 +71998,7 @@ module Routes' (H : HANDLERS) = struct
   let postTreasuryFinancialAccounts = let _op = "PostTreasuryFinancialAccounts"
     in
     Routes.route (Paths'.postTreasuryFinancialAccounts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -71973,7 +72012,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryFinancialAccounts'")
            | _, None -> None in
-         match H.postTreasuryFinancialAccounts _req
+         match Handlers.postTreasuryFinancialAccounts _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_financial_account ~op:_op ~ctype:_resp_ctype content in
@@ -71994,7 +72033,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryFinancialAccounts = let _op = "GetTreasuryFinancialAccounts"
     in
     Routes.route (Paths'.getTreasuryFinancialAccounts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72027,8 +72066,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryFinancialAccounts'")
            | _, None -> None in 
-         match H.getTreasuryFinancialAccounts ?created ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getTreasuryFinancialAccounts ?created ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_03e433631d ~op:_op ~ctype:_resp_ctype content in
@@ -72049,7 +72088,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tokens *)
   let postTokens = let _op = "PostTokens" in
     Routes.route (Paths'.postTokens ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72063,7 +72102,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTokens'")
            | _, None -> None in
-         match H.postTokens _req
+         match Handlers.postTokens _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_token ~op:_op ~ctype:_resp_ctype content in
@@ -72083,7 +72122,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_rates *)
   let postTaxRates = let _op = "PostTaxRates" in
     Routes.route (Paths'.postTaxRates ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72097,7 +72136,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxRates'")
            | _, None -> None in
-         match H.postTaxRates _req
+         match Handlers.postTaxRates _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_rate ~op:_op ~ctype:_resp_ctype content in
@@ -72117,7 +72156,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_rates *)
   let getTaxRates = let _op = "GetTaxRates" in
     Routes.route (Paths'.getTaxRates ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72158,7 +72197,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxRates'")
            | _, None -> None in 
-         match H.getTaxRates ?active ?created ?ending_before ?expand
+         match Handlers.getTaxRates ?active ?created ?ending_before ?expand
            ?inclusive ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -72179,7 +72218,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/sigma/scheduled_query_runs *)
   let getSigmaScheduledQueryRuns = let _op = "GetSigmaScheduledQueryRuns" in
     Routes.route (Paths'.getSigmaScheduledQueryRuns ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72208,8 +72247,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSigmaScheduledQueryRuns'")
            | _, None -> None in 
-         match H.getSigmaScheduledQueryRuns ?ending_before ?expand ?limit
-           ?starting_after _req
+         match Handlers.getSigmaScheduledQueryRuns ?ending_before ?expand
+           ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_eca50da3b0 ~op:_op ~ctype:_resp_ctype content in
@@ -72229,7 +72268,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes *)
   let postQuotes = let _op = "PostQuotes" in
     Routes.route (Paths'.postQuotes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72243,7 +72282,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostQuotes'")
            | _, None -> None in
-         match H.postQuotes _req
+         match Handlers.postQuotes _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_quote ~op:_op ~ctype:_resp_ctype content in
@@ -72263,7 +72302,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes *)
   let getQuotes = let _op = "GetQuotes" in
     Routes.route (Paths'.getQuotes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72304,7 +72343,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetQuotes'")
            | _, None -> None in 
-         match H.getQuotes ?customer ?ending_before ?expand ?limit
+         match Handlers.getQuotes ?customer ?ending_before ?expand ?limit
            ?starting_after ?status ?test_clock _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -72325,7 +72364,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers *)
   let postCustomers = let _op = "PostCustomers" in
     Routes.route (Paths'.postCustomers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72339,7 +72378,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomers'")
            | _, None -> None in
-         match H.postCustomers _req
+         match Handlers.postCustomers _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_customer ~op:_op ~ctype:_resp_ctype content in
@@ -72359,7 +72398,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers *)
   let getCustomers = let _op = "GetCustomers" in
     Routes.route (Paths'.getCustomers ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72400,8 +72439,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomers'")
            | _, None -> None in 
-         match H.getCustomers ?created ?email ?ending_before ?expand ?limit
-           ?starting_after ?test_clock _req
+         match Handlers.getCustomers ?created ?email ?ending_before ?expand
+           ?limit ?starting_after ?test_clock _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_37ec4334cc ~op:_op ~ctype:_resp_ctype content in
@@ -72421,7 +72460,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/application_fees *)
   let getApplicationFees = let _op = "GetApplicationFees" in
     Routes.route (Paths'.getApplicationFees ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72458,8 +72497,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetApplicationFees'")
            | _, None -> None in 
-         match H.getApplicationFees ?charge ?created ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getApplicationFees ?charge ?created ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_0a9659a95b ~op:_op ~ctype:_resp_ctype content in
@@ -72479,7 +72518,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/sources *)
   let postSources = let _op = "PostSources" in
     Routes.route (Paths'.postSources ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72493,7 +72532,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSources'")
            | _, None -> None in
-         match H.postSources _req
+         match Handlers.postSources _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_source ~op:_op ~ctype:_resp_ctype content in
@@ -72513,7 +72552,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/setup_attempts *)
   let getSetupAttempts = let _op = "GetSetupAttempts" in
     Routes.route (Paths'.getSetupAttempts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72555,8 +72594,8 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'setup_intent' is required by operation 'GetSetupAttempts'")
          in 
-         match H.getSetupAttempts ?created ?ending_before ?expand ?limit
-           ~setup_intent ?starting_after _req
+         match Handlers.getSetupAttempts ?created ?ending_before ?expand
+           ?limit ~setup_intent ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_7e943f39e7 ~op:_op ~ctype:_resp_ctype content in
@@ -72585,7 +72624,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_intents *)
   let postPaymentIntents = let _op = "PostPaymentIntents" in
     Routes.route (Paths'.postPaymentIntents ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72599,7 +72638,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntents'")
            | _, None -> None in
-         match H.postPaymentIntents _req
+         match Handlers.postPaymentIntents _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -72619,7 +72658,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_intents *)
   let getPaymentIntents = let _op = "GetPaymentIntents" in
     Routes.route (Paths'.getPaymentIntents ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72656,8 +72695,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentIntents'")
            | _, None -> None in 
-         match H.getPaymentIntents ?created ?customer ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getPaymentIntents ?created ?customer ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_35ca92ace5 ~op:_op ~ctype:_resp_ctype content in
@@ -72678,7 +72717,7 @@ module Routes' (H : HANDLERS) = struct
   let getFinancialConnectionsTransactions = let _op = "GetFinancialConnectionsTransactions"
     in
     Routes.route (Paths'.getFinancialConnectionsTransactions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72724,9 +72763,9 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'account' is required by operation 'GetFinancialConnectionsTransactions'")
          in 
-         match H.getFinancialConnectionsTransactions ~account ?ending_before
-           ?expand ?limit ?starting_after ?transacted_at ?transaction_refresh
-           _req
+         match Handlers.getFinancialConnectionsTransactions ~account
+           ?ending_before ?expand ?limit ?starting_after ?transacted_at
+           ?transaction_refresh _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_3224eff6ab ~op:_op ~ctype:_resp_ctype content in
@@ -72746,7 +72785,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_codes *)
   let getTaxCodes = let _op = "GetTaxCodes" in
     Routes.route (Paths'.getTaxCodes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72775,8 +72814,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxCodes'")
            | _, None -> None in 
-         match H.getTaxCodes ?ending_before ?expand ?limit ?starting_after
-           _req
+         match Handlers.getTaxCodes ?ending_before ?expand ?limit
+           ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_766d30cb77 ~op:_op ~ctype:_resp_ctype content in
@@ -72796,7 +72835,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/products *)
   let postProducts = let _op = "PostProducts" in
     Routes.route (Paths'.postProducts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72810,7 +72849,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostProducts'")
            | _, None -> None in
-         match H.postProducts _req
+         match Handlers.postProducts _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_product ~op:_op ~ctype:_resp_ctype content in
@@ -72830,7 +72869,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/products *)
   let getProducts = let _op = "GetProducts" in
     Routes.route (Paths'.getProducts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72879,8 +72918,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetProducts'")
            | _, None -> None in 
-         match H.getProducts ?active ?created ?ending_before ?expand ?ids
-           ?limit ?shippable ?starting_after ?url _req
+         match Handlers.getProducts ?active ?created ?ending_before ?expand
+           ?ids ?limit ?shippable ?starting_after ?url _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_23767204da ~op:_op ~ctype:_resp_ctype content in
@@ -72900,7 +72939,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/billing_portal/sessions *)
   let postBillingPortalSessions = let _op = "PostBillingPortalSessions" in
     Routes.route (Paths'.postBillingPortalSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72914,7 +72953,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingPortalSessions'")
            | _, None -> None in
-         match H.postBillingPortalSessions _req
+         match Handlers.postBillingPortalSessions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_portal_session ~op:_op ~ctype:_resp_ctype content in
@@ -72936,7 +72975,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges *)
   let postCharges = let _op = "PostCharges" in
     Routes.route (Paths'.postCharges ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -72950,7 +72989,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCharges'")
            | _, None -> None in
-         match H.postCharges _req
+         match Handlers.postCharges _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_charge ~op:_op ~ctype:_resp_ctype content in
@@ -72970,7 +73009,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges *)
   let getCharges = let _op = "GetCharges" in
     Routes.route (Paths'.getCharges ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73015,8 +73054,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCharges'")
            | _, None -> None in 
-         match H.getCharges ?created ?customer ?ending_before ?expand ?limit
-           ?payment_intent ?starting_after ?transfer_group _req
+         match Handlers.getCharges ?created ?customer ?ending_before ?expand
+           ?limit ?payment_intent ?starting_after ?transfer_group _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_e9250fb72c ~op:_op ~ctype:_resp_ctype content in
@@ -73036,7 +73075,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/radar/value_list_items *)
   let postRadarValueListItems = let _op = "PostRadarValueListItems" in
     Routes.route (Paths'.postRadarValueListItems ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73050,7 +73089,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostRadarValueListItems'")
            | _, None -> None in
-         match H.postRadarValueListItems _req
+         match Handlers.postRadarValueListItems _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_radar_value_list_item ~op:_op ~ctype:_resp_ctype content in
@@ -73070,7 +73109,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/radar/value_list_items *)
   let getRadarValueListItems = let _op = "GetRadarValueListItems" in
     Routes.route (Paths'.getRadarValueListItems ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73116,8 +73155,8 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'value_list' is required by operation 'GetRadarValueListItems'")
          in
-         match H.getRadarValueListItems ?created ?ending_before ?expand
-           ?limit ?starting_after ?value ~value_list _req
+         match Handlers.getRadarValueListItems ?created ?ending_before
+           ?expand ?limit ?starting_after ?value ~value_list _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_8856fbd6de ~op:_op ~ctype:_resp_ctype content in
@@ -73137,7 +73176,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_method_domains *)
   let postPaymentMethodDomains = let _op = "PostPaymentMethodDomains" in
     Routes.route (Paths'.postPaymentMethodDomains ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73151,7 +73190,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodDomains'")
            | _, None -> None in
-         match H.postPaymentMethodDomains _req
+         match Handlers.postPaymentMethodDomains _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method_domain ~op:_op ~ctype:_resp_ctype content in
@@ -73171,7 +73210,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_method_domains *)
   let getPaymentMethodDomains = let _op = "GetPaymentMethodDomains" in
     Routes.route (Paths'.getPaymentMethodDomains ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73208,8 +73247,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentMethodDomains'")
            | _, None -> None in 
-         match H.getPaymentMethodDomains ?domain_name ?enabled ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getPaymentMethodDomains ?domain_name ?enabled
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_ae8386a4f0 ~op:_op ~ctype:_resp_ctype content in
@@ -73229,7 +73268,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/treasury/received_credits *)
   let getTreasuryReceivedCredits = let _op = "GetTreasuryReceivedCredits" in
     Routes.route (Paths'.getTreasuryReceivedCredits ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73275,7 +73314,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryReceivedCredits'")
          in 
-         match H.getTreasuryReceivedCredits ?ending_before ?expand
+         match Handlers.getTreasuryReceivedCredits ?ending_before ?expand
            ~financial_account ?limit ?linked_flows ?starting_after ?status
            _req
          with
@@ -73298,7 +73337,7 @@ module Routes' (H : HANDLERS) = struct
   let postTreasuryOutboundPayments = let _op = "PostTreasuryOutboundPayments"
     in
     Routes.route (Paths'.postTreasuryOutboundPayments ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73312,7 +73351,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryOutboundPayments'")
            | _, None -> None in
-         match H.postTreasuryOutboundPayments _req
+         match Handlers.postTreasuryOutboundPayments _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_payment ~op:_op ~ctype:_resp_ctype content in
@@ -73333,7 +73372,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryOutboundPayments = let _op = "GetTreasuryOutboundPayments"
     in
     Routes.route (Paths'.getTreasuryOutboundPayments ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73383,7 +73422,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryOutboundPayments'")
          in 
-         match H.getTreasuryOutboundPayments ?created ?customer
+         match Handlers.getTreasuryOutboundPayments ?created ?customer
            ?ending_before ?expand ~financial_account ?limit ?starting_after
            ?status _req
          with
@@ -73405,7 +73444,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/readers *)
   let postTerminalReaders = let _op = "PostTerminalReaders" in
     Routes.route (Paths'.postTerminalReaders ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73419,7 +73458,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalReaders'")
            | _, None -> None in
-         match H.postTerminalReaders _req
+         match Handlers.postTerminalReaders _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_reader ~op:_op ~ctype:_resp_ctype content in
@@ -73439,7 +73478,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/readers *)
   let getTerminalReaders = let _op = "GetTerminalReaders" in
     Routes.route (Paths'.getTerminalReaders ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73484,8 +73523,9 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTerminalReaders'")
            | _, None -> None in 
-         match H.getTerminalReaders ?device_type ?ending_before ?expand
-           ?limit ?location ?serial_number ?starting_after ?status _req
+         match Handlers.getTerminalReaders ?device_type ?ending_before
+           ?expand ?limit ?location ?serial_number ?starting_after ?status
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_a08011fc7e ~op:_op ~ctype:_resp_ctype content in
@@ -73505,7 +73545,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_ids *)
   let postTaxIds = let _op = "PostTaxIds" in
     Routes.route (Paths'.postTaxIds ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73519,7 +73559,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxIds'")
            | _, None -> None in
-         match H.postTaxIds _req
+         match Handlers.postTaxIds _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_id ~op:_op ~ctype:_resp_ctype content in
@@ -73539,7 +73579,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_ids *)
   let getTaxIds = let _op = "GetTaxIds" in
     Routes.route (Paths'.getTaxIds ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73572,7 +73612,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxIds'")
            | _, None -> None in 
-         match H.getTaxIds ?ending_before ?expand ?limit ?owner
+         match Handlers.getTaxIds ?ending_before ?expand ?limit ?owner
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -73593,7 +73633,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax/registrations *)
   let postTaxRegistrations = let _op = "PostTaxRegistrations" in
     Routes.route (Paths'.postTaxRegistrations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73607,7 +73647,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxRegistrations'")
            | _, None -> None in
-         match H.postTaxRegistrations _req
+         match Handlers.postTaxRegistrations _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_registration ~op:_op ~ctype:_resp_ctype content in
@@ -73627,7 +73667,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax/registrations *)
   let getTaxRegistrations = let _op = "GetTaxRegistrations" in
     Routes.route (Paths'.getTaxRegistrations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73660,7 +73700,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxRegistrations'")
            | _, None -> None in 
-         match H.getTaxRegistrations ?ending_before ?expand ?limit
+         match Handlers.getTaxRegistrations ?ending_before ?expand ?limit
            ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -73681,7 +73721,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/billing/meter_events *)
   let postBillingMeterEvents = let _op = "PostBillingMeterEvents" in
     Routes.route (Paths'.postBillingMeterEvents ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73695,7 +73735,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingMeterEvents'")
            | _, None -> None in
-         match H.postBillingMeterEvents _req
+         match Handlers.postBillingMeterEvents _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_meter_event ~op:_op ~ctype:_resp_ctype content in
@@ -73718,7 +73758,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/setup_intents *)
   let postSetupIntents = let _op = "PostSetupIntents" in
     Routes.route (Paths'.postSetupIntents ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73732,7 +73772,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSetupIntents'")
            | _, None -> None in
-         match H.postSetupIntents _req
+         match Handlers.postSetupIntents _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_setup_intent ~op:_op ~ctype:_resp_ctype content in
@@ -73752,7 +73792,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/setup_intents *)
   let getSetupIntents = let _op = "GetSetupIntents" in
     Routes.route (Paths'.getSetupIntents ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73797,7 +73837,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSetupIntents'")
            | _, None -> None in 
-         match H.getSetupIntents ?attach_to_self ?created ?customer
+         match Handlers.getSetupIntents ?attach_to_self ?created ?customer
            ?ending_before ?expand ?limit ?payment_method ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -73823,7 +73863,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts *)
   let postAccounts = let _op = "PostAccounts" in
     Routes.route (Paths'.postAccounts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73837,7 +73877,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccounts'")
            | _, None -> None in
-         match H.postAccounts _req
+         match Handlers.postAccounts _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_account ~op:_op ~ctype:_resp_ctype content in
@@ -73857,7 +73897,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts *)
   let getAccounts = let _op = "GetAccounts" in
     Routes.route (Paths'.getAccounts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73890,7 +73930,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccounts'")
            | _, None -> None in 
-         match H.getAccounts ?created ?ending_before ?expand ?limit
+         match Handlers.getAccounts ?created ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -73914,7 +73954,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/prices/search *)
   let getPricesSearch = let _op = "GetPricesSearch" in
     Routes.route (Paths'.getPricesSearch ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -73948,7 +73988,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'query' is required by operation 'GetPricesSearch'")
          in
-         match H.getPricesSearch ?expand ?limit ?page ~query _req
+         match Handlers.getPricesSearch ?expand ?limit ?page ~query _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_b12b4b0777 ~op:_op ~ctype:_resp_ctype content in
@@ -73970,12 +74010,12 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/files *)
   let postFiles = let _op = "PostFiles" in
     Routes.route (Paths'.postFiles ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        try let _req = _body in
-         match H.postFiles _req
+         match Handlers.postFiles _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_file ~op:_op ~ctype:_resp_ctype content in
@@ -73994,7 +74034,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/files *)
   let getFiles = let _op = "GetFiles" in
     Routes.route (Paths'.getFiles ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74031,8 +74071,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFiles'")
            | _, None -> None in 
-         match H.getFiles ?created ?ending_before ?expand ?limit ?purpose
-           ?starting_after _req
+         match Handlers.getFiles ?created ?ending_before ?expand ?limit
+           ?purpose ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2a634191d6 ~op:_op ~ctype:_resp_ctype content in
@@ -74052,7 +74092,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/reporting/report_types *)
   let getReportingReportTypes = let _op = "GetReportingReportTypes" in
     Routes.route (Paths'.getReportingReportTypes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74069,7 +74109,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetReportingReportTypes'")
            | _, None -> None in
-         match H.getReportingReportTypes ?expand _req
+         match Handlers.getReportingReportTypes ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_e7f85dc1b8 ~op:_op ~ctype:_resp_ctype content in
@@ -74089,7 +74129,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices *)
   let postInvoices = let _op = "PostInvoices" in
     Routes.route (Paths'.postInvoices ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74103,7 +74143,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoices'")
            | _, None -> None in
-         match H.postInvoices _req
+         match Handlers.postInvoices _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -74123,7 +74163,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices *)
   let getInvoices = let _op = "GetInvoices" in
     Routes.route (Paths'.getInvoices ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74176,8 +74216,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetInvoices'")
            | _, None -> None in 
-         match H.getInvoices ?collection_method ?created ?customer ?due_date
-           ?ending_before ?expand ?limit ?starting_after ?status
+         match Handlers.getInvoices ?collection_method ?created ?customer
+           ?due_date ?ending_before ?expand ?limit ?starting_after ?status
            ?subscription _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -74198,7 +74238,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/country_specs *)
   let getCountrySpecs = let _op = "GetCountrySpecs" in
     Routes.route (Paths'.getCountrySpecs ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74227,7 +74267,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCountrySpecs'")
            | _, None -> None in 
-         match H.getCountrySpecs ?ending_before ?expand ?limit
+         match Handlers.getCountrySpecs ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -74248,7 +74288,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/apps/secrets/delete *)
   let postAppsSecretsDelete = let _op = "PostAppsSecretsDelete" in
     Routes.route (Paths'.postAppsSecretsDelete ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74262,7 +74302,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAppsSecretsDelete'")
            | _, None -> None in
-         match H.postAppsSecretsDelete _req
+         match Handlers.postAppsSecretsDelete _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_apps_secret ~op:_op ~ctype:_resp_ctype content in
@@ -74282,7 +74322,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/account_links *)
   let postAccountLinks = let _op = "PostAccountLinks" in
     Routes.route (Paths'.postAccountLinks ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74296,7 +74336,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountLinks'")
            | _, None -> None in
-         match H.postAccountLinks _req
+         match Handlers.postAccountLinks _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_account_link ~op:_op ~ctype:_resp_ctype content in
@@ -74318,7 +74358,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_methods *)
   let postPaymentMethods = let _op = "PostPaymentMethods" in
     Routes.route (Paths'.postPaymentMethods ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74332,7 +74372,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethods'")
            | _, None -> None in
-         match H.postPaymentMethods _req
+         match Handlers.postPaymentMethods _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method ~op:_op ~ctype:_resp_ctype content in
@@ -74352,7 +74392,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_methods *)
   let getPaymentMethods = let _op = "GetPaymentMethods" in
     Routes.route (Paths'.getPaymentMethods ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74389,8 +74429,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentMethods'")
            | _, None -> None in 
-         match H.getPaymentMethods ?customer ?ending_before ?expand ?limit
-           ?starting_after ?type_ _req
+         match Handlers.getPaymentMethods ?customer ?ending_before ?expand
+           ?limit ?starting_after ?type_ _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_74744e00a9 ~op:_op ~ctype:_resp_ctype content in
@@ -74411,7 +74451,7 @@ module Routes' (H : HANDLERS) = struct
   let postFinancialConnectionsSessions = let _op = "PostFinancialConnectionsSessions"
     in
     Routes.route (Paths'.postFinancialConnectionsSessions ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74425,7 +74465,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostFinancialConnectionsSessions'")
            | _, None -> None in
-         match H.postFinancialConnectionsSessions _req
+         match Handlers.postFinancialConnectionsSessions _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_session ~op:_op ~ctype:_resp_ctype content in
@@ -74446,7 +74486,7 @@ module Routes' (H : HANDLERS) = struct
   let postTreasuryCreditReversals = let _op = "PostTreasuryCreditReversals"
     in
     Routes.route (Paths'.postTreasuryCreditReversals ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74460,7 +74500,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryCreditReversals'")
            | _, None -> None in
-         match H.postTreasuryCreditReversals _req
+         match Handlers.postTreasuryCreditReversals _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_credit_reversal ~op:_op ~ctype:_resp_ctype content in
@@ -74480,7 +74520,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/treasury/credit_reversals *)
   let getTreasuryCreditReversals = let _op = "GetTreasuryCreditReversals" in
     Routes.route (Paths'.getTreasuryCreditReversals ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74526,7 +74566,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'financial_account' is required by operation 'GetTreasuryCreditReversals'")
          in 
-         match H.getTreasuryCreditReversals ?ending_before ?expand
+         match Handlers.getTreasuryCreditReversals ?ending_before ?expand
            ~financial_account ?limit ?received_credit ?starting_after ?status
            _req
          with
@@ -74548,7 +74588,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/topups *)
   let postTopups = let _op = "PostTopups" in
     Routes.route (Paths'.postTopups ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74562,7 +74602,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTopups'")
            | _, None -> None in
-         match H.postTopups _req
+         match Handlers.postTopups _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_topup ~op:_op ~ctype:_resp_ctype content in
@@ -74582,7 +74622,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/topups *)
   let getTopups = let _op = "GetTopups" in
     Routes.route (Paths'.getTopups ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74623,8 +74663,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTopups'")
            | _, None -> None in 
-         match H.getTopups ?amount ?created ?ending_before ?expand ?limit
-           ?starting_after ?status _req
+         match Handlers.getTopups ?amount ?created ?ending_before ?expand
+           ?limit ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_b3bb6e49c1 ~op:_op ~ctype:_resp_ctype content in
@@ -74645,7 +74685,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/locations *)
   let postTerminalLocations = let _op = "PostTerminalLocations" in
     Routes.route (Paths'.postTerminalLocations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74659,7 +74699,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalLocations'")
            | _, None -> None in
-         match H.postTerminalLocations _req
+         match Handlers.postTerminalLocations _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_location ~op:_op ~ctype:_resp_ctype content in
@@ -74679,7 +74719,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/locations *)
   let getTerminalLocations = let _op = "GetTerminalLocations" in
     Routes.route (Paths'.getTerminalLocations ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74708,7 +74748,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTerminalLocations'")
            | _, None -> None in 
-         match H.getTerminalLocations ?ending_before ?expand ?limit
+         match Handlers.getTerminalLocations ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -74732,7 +74772,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/search *)
   let getInvoicesSearch = let _op = "GetInvoicesSearch" in
     Routes.route (Paths'.getInvoicesSearch ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74766,7 +74806,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'query' is required by operation 'GetInvoicesSearch'")
          in
-         match H.getInvoicesSearch ?expand ?limit ?page ~query _req
+         match Handlers.getInvoicesSearch ?expand ?limit ?page ~query _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_0dd02c6566 ~op:_op ~ctype:_resp_ctype content in
@@ -74787,7 +74827,7 @@ module Routes' (H : HANDLERS) = struct
   let postTaxTransactionsCreateReversal = let _op = "PostTaxTransactionsCreateReversal"
     in
     Routes.route (Paths'.postTaxTransactionsCreateReversal ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74801,7 +74841,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxTransactionsCreateReversal'")
            | _, None -> None in
-         match H.postTaxTransactionsCreateReversal _req
+         match Handlers.postTaxTransactionsCreateReversal _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -74821,7 +74861,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/radar/early_fraud_warnings *)
   let getRadarEarlyFraudWarnings = let _op = "GetRadarEarlyFraudWarnings" in
     Routes.route (Paths'.getRadarEarlyFraudWarnings ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74862,8 +74902,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetRadarEarlyFraudWarnings'")
            | _, None -> None in 
-         match H.getRadarEarlyFraudWarnings ?charge ?created ?ending_before
-           ?expand ?limit ?payment_intent ?starting_after _req
+         match Handlers.getRadarEarlyFraudWarnings ?charge ?created
+           ?ending_before ?expand ?limit ?payment_intent ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_c75c63afbf ~op:_op ~ctype:_resp_ctype content in
@@ -74887,7 +74927,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payouts *)
   let postPayouts = let _op = "PostPayouts" in
     Routes.route (Paths'.postPayouts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74901,7 +74941,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPayouts'")
            | _, None -> None in
-         match H.postPayouts _req
+         match Handlers.postPayouts _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payout ~op:_op ~ctype:_resp_ctype content in
@@ -74921,7 +74961,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payouts *)
   let getPayouts = let _op = "GetPayouts" in
     Routes.route (Paths'.getPayouts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -74966,7 +75006,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPayouts'")
            | _, None -> None in 
-         match H.getPayouts ?arrival_date ?created ?destination
+         match Handlers.getPayouts ?arrival_date ?created ?destination
            ?ending_before ?expand ?limit ?starting_after ?status _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -74987,7 +75027,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/promotion_codes *)
   let postPromotionCodes = let _op = "PostPromotionCodes" in
     Routes.route (Paths'.postPromotionCodes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75001,7 +75041,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPromotionCodes'")
            | _, None -> None in
-         match H.postPromotionCodes _req
+         match Handlers.postPromotionCodes _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_promotion_code ~op:_op ~ctype:_resp_ctype content in
@@ -75021,7 +75061,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/promotion_codes *)
   let getPromotionCodes = let _op = "GetPromotionCodes" in
     Routes.route (Paths'.getPromotionCodes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75070,8 +75110,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPromotionCodes'")
            | _, None -> None in 
-         match H.getPromotionCodes ?active ?code ?coupon ?created ?customer
-           ?ending_before ?expand ?limit ?starting_after _req
+         match Handlers.getPromotionCodes ?active ?code ?coupon ?created
+           ?customer ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2bf486f9cb ~op:_op ~ctype:_resp_ctype content in
@@ -75092,7 +75132,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersConfirmationTokens = let _op = "PostTestHelpersConfirmationTokens"
     in
     Routes.route (Paths'.postTestHelpersConfirmationTokens ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75106,7 +75146,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersConfirmationTokens'")
            | _, None -> None in
-         match H.postTestHelpersConfirmationTokens _req
+         match Handlers.postTestHelpersConfirmationTokens _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_confirmation_token ~op:_op ~ctype:_resp_ctype content in
@@ -75126,7 +75166,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscription_items *)
   let postSubscriptionItems = let _op = "PostSubscriptionItems" in
     Routes.route (Paths'.postSubscriptionItems ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75140,7 +75180,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionItems'")
            | _, None -> None in
-         match H.postSubscriptionItems _req
+         match Handlers.postSubscriptionItems _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_item ~op:_op ~ctype:_resp_ctype content in
@@ -75160,7 +75200,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscription_items *)
   let getSubscriptionItems = let _op = "GetSubscriptionItems" in
     Routes.route (Paths'.getSubscriptionItems ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75198,7 +75238,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'subscription' is required by operation 'GetSubscriptionItems'")
          in
-         match H.getSubscriptionItems ?ending_before ?expand ?limit
+         match Handlers.getSubscriptionItems ?ending_before ?expand ?limit
            ?starting_after ~subscription _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -75220,7 +75260,7 @@ module Routes' (H : HANDLERS) = struct
   let getIdentityVerificationReports = let _op = "GetIdentityVerificationReports"
     in
     Routes.route (Paths'.getIdentityVerificationReports ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75265,8 +75305,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIdentityVerificationReports'")
            | _, None -> None in 
-         match H.getIdentityVerificationReports ?client_reference_id ?created
-           ?ending_before ?expand ?limit ?starting_after ?type_
+         match Handlers.getIdentityVerificationReports ?client_reference_id
+           ?created ?ending_before ?expand ?limit ?starting_after ?type_
            ?verification_session _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -75300,7 +75340,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/credit_notes *)
   let postCreditNotes = let _op = "PostCreditNotes" in
     Routes.route (Paths'.postCreditNotes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75314,7 +75354,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCreditNotes'")
            | _, None -> None in
-         match H.postCreditNotes _req
+         match Handlers.postCreditNotes _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_credit_note ~op:_op ~ctype:_resp_ctype content in
@@ -75334,7 +75374,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/credit_notes *)
   let getCreditNotes = let _op = "GetCreditNotes" in
     Routes.route (Paths'.getCreditNotes ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75375,8 +75415,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCreditNotes'")
            | _, None -> None in 
-         match H.getCreditNotes ?created ?customer ?ending_before ?expand
-           ?invoice ?limit ?starting_after _req
+         match Handlers.getCreditNotes ?created ?customer ?ending_before
+           ?expand ?invoice ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_4187904f5b ~op:_op ~ctype:_resp_ctype content in
@@ -75396,7 +75436,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/climate/products *)
   let getClimateProducts = let _op = "GetClimateProducts" in
     Routes.route (Paths'.getClimateProducts ())
-      (fun (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75425,7 +75465,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetClimateProducts'")
            | _, None -> None in 
-         match H.getClimateProducts ?ending_before ?expand ?limit
+         match Handlers.getClimateProducts ?ending_before ?expand ?limit
            ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -75448,7 +75488,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteWebhookEndpointsWebhookEndpoint = let _op = "DeleteWebhookEndpointsWebhookEndpoint"
     in
     Routes.route (Paths'.deleteWebhookEndpointsWebhookEndpoint ())
-      (fun webhook_endpoint (_uri:Uri.t) (_resp:_resp)
+      (fun webhook_endpoint (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75462,7 +75502,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteWebhookEndpointsWebhookEndpoint'")
            | _, None -> None in
-         match H.deleteWebhookEndpointsWebhookEndpoint ~webhook_endpoint _req
+         match Handlers.deleteWebhookEndpointsWebhookEndpoint
+           ~webhook_endpoint _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_webhook_endpoint ~op:_op ~ctype:_resp_ctype content in
@@ -75484,7 +75525,7 @@ module Routes' (H : HANDLERS) = struct
   let postWebhookEndpointsWebhookEndpoint = let _op = "PostWebhookEndpointsWebhookEndpoint"
     in
     Routes.route (Paths'.postWebhookEndpointsWebhookEndpoint ())
-      (fun webhook_endpoint (_uri:Uri.t) (_resp:_resp)
+      (fun webhook_endpoint (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75498,7 +75539,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostWebhookEndpointsWebhookEndpoint'")
            | _, None -> None in
-         match H.postWebhookEndpointsWebhookEndpoint ~webhook_endpoint _req
+         match Handlers.postWebhookEndpointsWebhookEndpoint ~webhook_endpoint
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_webhook_endpoint ~op:_op ~ctype:_resp_ctype content in
@@ -75520,7 +75562,7 @@ module Routes' (H : HANDLERS) = struct
   let getWebhookEndpointsWebhookEndpoint = let _op = "GetWebhookEndpointsWebhookEndpoint"
     in
     Routes.route (Paths'.getWebhookEndpointsWebhookEndpoint ())
-      (fun webhook_endpoint (_uri:Uri.t) (_resp:_resp)
+      (fun webhook_endpoint (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75537,8 +75579,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetWebhookEndpointsWebhookEndpoint'")
            | _, None -> None in
-         match H.getWebhookEndpointsWebhookEndpoint ~webhook_endpoint ?expand
-           _req
+         match Handlers.getWebhookEndpointsWebhookEndpoint ~webhook_endpoint
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_webhook_endpoint ~op:_op ~ctype:_resp_ctype content in
@@ -75561,7 +75603,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingAuthorizationsAuthorizationIncrement ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75575,7 +75617,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingAuthorizationsAuthorizationIncrement'")
            | _, None -> None in
-         match H.postTestHelpersIssuingAuthorizationsAuthorizationIncrement
+         match Handlers.postTestHelpersIssuingAuthorizationsAuthorizationIncrement
            ~authorization _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -75597,7 +75639,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers/\{customer\} *)
   let deleteCustomersCustomer = let _op = "DeleteCustomersCustomer" in
     Routes.route (Paths'.deleteCustomersCustomer ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75611,7 +75653,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomer'")
            | _, None -> None in
-         match H.deleteCustomersCustomer ~customer _req
+         match Handlers.deleteCustomersCustomer ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_customer ~op:_op ~ctype:_resp_ctype content in
@@ -75634,7 +75676,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers/\{customer\} *)
   let postCustomersCustomer = let _op = "PostCustomersCustomer" in
     Routes.route (Paths'.postCustomersCustomer ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75648,7 +75690,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomer'")
            | _, None -> None in
-         match H.postCustomersCustomer ~customer _req
+         match Handlers.postCustomersCustomer ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_customer ~op:_op ~ctype:_resp_ctype content in
@@ -75669,7 +75711,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers/\{customer\} *)
   let getCustomersCustomer = let _op = "GetCustomersCustomer" in
     Routes.route (Paths'.getCustomersCustomer ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75686,7 +75728,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomer'")
            | _, None -> None in
-         match H.getCustomersCustomer ~customer ?expand _req
+         match Handlers.getCustomersCustomer ~customer ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_a33375052d ~op:_op ~ctype:_resp_ctype content in
@@ -75707,8 +75749,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/plans/\{plan\} *)
   let deletePlansPlan = let _op = "DeletePlansPlan" in
     Routes.route (Paths'.deletePlansPlan ())
-      (fun plan (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun plan (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -75721,7 +75763,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeletePlansPlan'")
            | _, None -> None in
-         match H.deletePlansPlan ~plan _req
+         match Handlers.deletePlansPlan ~plan _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_plan ~op:_op ~ctype:_resp_ctype content in
@@ -75742,8 +75784,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/plans/\{plan\} *)
   let postPlansPlan = let _op = "PostPlansPlan" in
     Routes.route (Paths'.postPlansPlan ())
-      (fun plan (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun plan (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -75756,7 +75798,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPlansPlan'")
            | _, None -> None in
-         match H.postPlansPlan ~plan _req
+         match Handlers.postPlansPlan ~plan _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_plan ~op:_op ~ctype:_resp_ctype content in
@@ -75777,8 +75819,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/plans/\{plan\} *)
   let getPlansPlan = let _op = "GetPlansPlan" in
     Routes.route (Paths'.getPlansPlan ())
-      (fun plan (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun plan (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let expand = let _nvs = _queries in
@@ -75794,7 +75836,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPlansPlan'")
            | _, None -> None in
-         match H.getPlansPlan ~plan ?expand _req
+         match Handlers.getPlansPlan ~plan ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_plan ~op:_op ~ctype:_resp_ctype content in
@@ -75821,7 +75863,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\} *)
   let deleteAccountsAccount = let _op = "DeleteAccountsAccount" in
     Routes.route (Paths'.deleteAccountsAccount ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75835,7 +75877,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteAccountsAccount'")
            | _, None -> None in
-         match H.deleteAccountsAccount ~account _req
+         match Handlers.deleteAccountsAccount ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_account ~op:_op ~ctype:_resp_ctype content in
@@ -75868,7 +75910,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\} *)
   let postAccountsAccount = let _op = "PostAccountsAccount" in
     Routes.route (Paths'.postAccountsAccount ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75882,7 +75924,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccount'")
            | _, None -> None in
-         match H.postAccountsAccount ~account _req
+         match Handlers.postAccountsAccount ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_account ~op:_op ~ctype:_resp_ctype content in
@@ -75903,7 +75945,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\} *)
   let getAccountsAccount = let _op = "GetAccountsAccount" in
     Routes.route (Paths'.getAccountsAccount ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75920,7 +75962,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccount'")
            | _, None -> None in
-         match H.getAccountsAccount ~account ?expand _req
+         match Handlers.getAccountsAccount ~account ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_account ~op:_op ~ctype:_resp_ctype content in
@@ -75943,7 +75985,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTreasuryInboundTransfersInboundTransferCancel ())
-      (fun inbound_transfer (_uri:Uri.t) (_resp:_resp)
+      (fun inbound_transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75957,7 +75999,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryInboundTransfersInboundTransferCancel'")
            | _, None -> None in
-         match H.postTreasuryInboundTransfersInboundTransferCancel
+         match Handlers.postTreasuryInboundTransfersInboundTransferCancel
            ~inbound_transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -75980,7 +76022,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteTerminalConfigurationsConfiguration = let _op = "DeleteTerminalConfigurationsConfiguration"
     in
     Routes.route (Paths'.deleteTerminalConfigurationsConfiguration ())
-      (fun configuration (_uri:Uri.t) (_resp:_resp)
+      (fun configuration (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -75994,8 +76036,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteTerminalConfigurationsConfiguration'")
            | _, None -> None in
-         match H.deleteTerminalConfigurationsConfiguration ~configuration
-           _req
+         match Handlers.deleteTerminalConfigurationsConfiguration
+           ~configuration _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_terminal_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -76017,7 +76059,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalConfigurationsConfiguration = let _op = "PostTerminalConfigurationsConfiguration"
     in
     Routes.route (Paths'.postTerminalConfigurationsConfiguration ())
-      (fun configuration (_uri:Uri.t) (_resp:_resp)
+      (fun configuration (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76031,7 +76073,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalConfigurationsConfiguration'")
            | _, None -> None in
-         match H.postTerminalConfigurationsConfiguration ~configuration _req
+         match Handlers.postTerminalConfigurationsConfiguration
+           ~configuration _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_d5eeab4c25 ~op:_op ~ctype:_resp_ctype content in
@@ -76053,7 +76096,7 @@ module Routes' (H : HANDLERS) = struct
   let getTerminalConfigurationsConfiguration = let _op = "GetTerminalConfigurationsConfiguration"
     in
     Routes.route (Paths'.getTerminalConfigurationsConfiguration ())
-      (fun configuration (_uri:Uri.t) (_resp:_resp)
+      (fun configuration (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76070,7 +76113,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTerminalConfigurationsConfiguration'")
            | _, None -> None in
-         match H.getTerminalConfigurationsConfiguration ~configuration
+         match Handlers.getTerminalConfigurationsConfiguration ~configuration
            ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -76093,7 +76136,7 @@ module Routes' (H : HANDLERS) = struct
   let getFinancialConnectionsSessionsSession = let _op = "GetFinancialConnectionsSessionsSession"
     in
     Routes.route (Paths'.getFinancialConnectionsSessionsSession ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76110,7 +76153,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFinancialConnectionsSessionsSession'")
            | _, None -> None in
-         match H.getFinancialConnectionsSessionsSession ~session ?expand _req
+         match Handlers.getFinancialConnectionsSessionsSession ~session
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_session ~op:_op ~ctype:_resp_ctype content in
@@ -76131,7 +76175,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes/\{quote\}/finalize *)
   let postQuotesQuoteFinalize = let _op = "PostQuotesQuoteFinalize" in
     Routes.route (Paths'.postQuotesQuoteFinalize ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76145,7 +76189,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostQuotesQuoteFinalize'")
            | _, None -> None in
-         match H.postQuotesQuoteFinalize ~quote _req
+         match Handlers.postQuotesQuoteFinalize ~quote _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_quote ~op:_op ~ctype:_resp_ctype content in
@@ -76167,7 +76211,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTestClocksTestClockAdvance = let _op = "PostTestHelpersTestClocksTestClockAdvance"
     in
     Routes.route (Paths'.postTestHelpersTestClocksTestClockAdvance ())
-      (fun test_clock (_uri:Uri.t) (_resp:_resp)
+      (fun test_clock (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76181,7 +76225,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTestClocksTestClockAdvance'")
            | _, None -> None in
-         match H.postTestHelpersTestClocksTestClockAdvance ~test_clock _req
+         match Handlers.postTestHelpersTestClocksTestClockAdvance ~test_clock
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_test_helpers_test_clock ~op:_op ~ctype:_resp_ctype content in
@@ -76203,7 +76248,7 @@ module Routes' (H : HANDLERS) = struct
   let getSourcesSourceSourceTransactions = let _op = "GetSourcesSourceSourceTransactions"
     in
     Routes.route (Paths'.getSourcesSourceSourceTransactions ())
-      (fun source (_uri:Uri.t) (_resp:_resp)
+      (fun source (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76232,8 +76277,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSourcesSourceSourceTransactions'")
            | _, None -> None in 
-         match H.getSourcesSourceSourceTransactions ~source ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getSourcesSourceSourceTransactions ~source
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_f3516c2ed7 ~op:_op ~ctype:_resp_ctype content in
@@ -76254,7 +76299,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\} *)
   let postChargesCharge = let _op = "PostChargesCharge" in
     Routes.route (Paths'.postChargesCharge ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76268,7 +76313,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostChargesCharge'")
            | _, None -> None in
-         match H.postChargesCharge ~charge _req
+         match Handlers.postChargesCharge ~charge _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_charge ~op:_op ~ctype:_resp_ctype content in
@@ -76289,7 +76334,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\} *)
   let getChargesCharge = let _op = "GetChargesCharge" in
     Routes.route (Paths'.getChargesCharge ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76306,7 +76351,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetChargesCharge'")
            | _, None -> None in
-         match H.getChargesCharge ~charge ?expand _req
+         match Handlers.getChargesCharge ~charge ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_charge ~op:_op ~ctype:_resp_ctype content in
@@ -76328,7 +76373,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentLinksPaymentLink = let _op = "PostPaymentLinksPaymentLink"
     in
     Routes.route (Paths'.postPaymentLinksPaymentLink ())
-      (fun payment_link (_uri:Uri.t) (_resp:_resp)
+      (fun payment_link (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76342,7 +76387,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentLinksPaymentLink'")
            | _, None -> None in
-         match H.postPaymentLinksPaymentLink ~payment_link _req
+         match Handlers.postPaymentLinksPaymentLink ~payment_link _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_link ~op:_op ~ctype:_resp_ctype content in
@@ -76363,7 +76408,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_links/\{payment_link\} *)
   let getPaymentLinksPaymentLink = let _op = "GetPaymentLinksPaymentLink" in
     Routes.route (Paths'.getPaymentLinksPaymentLink ())
-      (fun payment_link (_uri:Uri.t) (_resp:_resp)
+      (fun payment_link (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76380,7 +76425,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentLinksPaymentLink'")
            | _, None -> None in
-         match H.getPaymentLinksPaymentLink ~payment_link ?expand _req
+         match Handlers.getPaymentLinksPaymentLink ~payment_link ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_link ~op:_op ~ctype:_resp_ctype content in
@@ -76402,7 +76447,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryReceivedCreditsId = let _op = "GetTreasuryReceivedCreditsId"
     in
     Routes.route (Paths'.getTreasuryReceivedCreditsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76419,7 +76464,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryReceivedCreditsId'")
            | _, None -> None in
-         match H.getTreasuryReceivedCreditsId ~id ?expand _req
+         match Handlers.getTreasuryReceivedCreditsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_received_credit ~op:_op ~ctype:_resp_ctype content in
@@ -76442,7 +76487,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersTreasuryOutboundTransfersOutboundTransfer ())
-      (fun outbound_transfer (_uri:Uri.t) (_resp:_resp)
+      (fun outbound_transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76456,7 +76501,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundTransfersOutboundTransfer'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundTransfersOutboundTransfer
+         match Handlers.postTestHelpersTreasuryOutboundTransfersOutboundTransfer
            ~outbound_transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -76479,7 +76524,7 @@ module Routes' (H : HANDLERS) = struct
   let postSubscriptionSchedulesSchedule = let _op = "PostSubscriptionSchedulesSchedule"
     in
     Routes.route (Paths'.postSubscriptionSchedulesSchedule ())
-      (fun schedule (_uri:Uri.t) (_resp:_resp)
+      (fun schedule (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76493,7 +76538,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionSchedulesSchedule'")
            | _, None -> None in
-         match H.postSubscriptionSchedulesSchedule ~schedule _req
+         match Handlers.postSubscriptionSchedulesSchedule ~schedule _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_schedule ~op:_op ~ctype:_resp_ctype content in
@@ -76515,7 +76560,7 @@ module Routes' (H : HANDLERS) = struct
   let getSubscriptionSchedulesSchedule = let _op = "GetSubscriptionSchedulesSchedule"
     in
     Routes.route (Paths'.getSubscriptionSchedulesSchedule ())
-      (fun schedule (_uri:Uri.t) (_resp:_resp)
+      (fun schedule (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76532,7 +76577,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSubscriptionSchedulesSchedule'")
            | _, None -> None in
-         match H.getSubscriptionSchedulesSchedule ~schedule ?expand _req
+         match Handlers.getSubscriptionSchedulesSchedule ~schedule ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_schedule ~op:_op ~ctype:_resp_ctype content in
@@ -76557,7 +76603,7 @@ module Routes' (H : HANDLERS) = struct
   let postIdentityVerificationSessionsSession = let _op = "PostIdentityVerificationSessionsSession"
     in
     Routes.route (Paths'.postIdentityVerificationSessionsSession ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76571,7 +76617,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIdentityVerificationSessionsSession'")
            | _, None -> None in
-         match H.postIdentityVerificationSessionsSession ~session _req
+         match Handlers.postIdentityVerificationSessionsSession ~session _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_identity_verification_session ~op:_op ~ctype:_resp_ctype content in
@@ -76596,7 +76642,7 @@ module Routes' (H : HANDLERS) = struct
   let getIdentityVerificationSessionsSession = let _op = "GetIdentityVerificationSessionsSession"
     in
     Routes.route (Paths'.getIdentityVerificationSessionsSession ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76613,7 +76659,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIdentityVerificationSessionsSession'")
            | _, None -> None in
-         match H.getIdentityVerificationSessionsSession ~session ?expand _req
+         match Handlers.getIdentityVerificationSessionsSession ~session
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_identity_verification_session ~op:_op ~ctype:_resp_ctype content in
@@ -76635,7 +76682,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentMethodsPaymentMethod = let _op = "PostPaymentMethodsPaymentMethod"
     in
     Routes.route (Paths'.postPaymentMethodsPaymentMethod ())
-      (fun payment_method (_uri:Uri.t) (_resp:_resp)
+      (fun payment_method (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76649,7 +76696,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodsPaymentMethod'")
            | _, None -> None in
-         match H.postPaymentMethodsPaymentMethod ~payment_method _req
+         match Handlers.postPaymentMethodsPaymentMethod ~payment_method _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method ~op:_op ~ctype:_resp_ctype content in
@@ -76671,7 +76718,7 @@ module Routes' (H : HANDLERS) = struct
   let getPaymentMethodsPaymentMethod = let _op = "GetPaymentMethodsPaymentMethod"
     in
     Routes.route (Paths'.getPaymentMethodsPaymentMethod ())
-      (fun payment_method (_uri:Uri.t) (_resp:_resp)
+      (fun payment_method (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76688,7 +76735,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentMethodsPaymentMethod'")
            | _, None -> None in
-         match H.getPaymentMethodsPaymentMethod ~payment_method ?expand _req
+         match Handlers.getPaymentMethodsPaymentMethod ~payment_method
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method ~op:_op ~ctype:_resp_ctype content in
@@ -76709,7 +76757,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/checkout/sessions/\{session\} *)
   let getCheckoutSessionsSession = let _op = "GetCheckoutSessionsSession" in
     Routes.route (Paths'.getCheckoutSessionsSession ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76726,7 +76774,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCheckoutSessionsSession'")
            | _, None -> None in
-         match H.getCheckoutSessionsSession ~session ?expand _req
+         match Handlers.getCheckoutSessionsSession ~session ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_checkout_session ~op:_op ~ctype:_resp_ctype content in
@@ -76748,7 +76796,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalReadersReaderProcessSetupIntent = let _op = "PostTerminalReadersReaderProcessSetupIntent"
     in
     Routes.route (Paths'.postTerminalReadersReaderProcessSetupIntent ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76762,7 +76810,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalReadersReaderProcessSetupIntent'")
            | _, None -> None in
-         match H.postTerminalReadersReaderProcessSetupIntent ~reader _req
+         match Handlers.postTerminalReadersReaderProcessSetupIntent ~reader
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_reader ~op:_op ~ctype:_resp_ctype content in
@@ -76784,7 +76833,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteRadarValueListsValueList = let _op = "DeleteRadarValueListsValueList"
     in
     Routes.route (Paths'.deleteRadarValueListsValueList ())
-      (fun value_list (_uri:Uri.t) (_resp:_resp)
+      (fun value_list (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76798,7 +76847,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteRadarValueListsValueList'")
            | _, None -> None in
-         match H.deleteRadarValueListsValueList ~value_list _req
+         match Handlers.deleteRadarValueListsValueList ~value_list _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_radar_value_list ~op:_op ~ctype:_resp_ctype content in
@@ -76820,7 +76869,7 @@ module Routes' (H : HANDLERS) = struct
   let postRadarValueListsValueList = let _op = "PostRadarValueListsValueList"
     in
     Routes.route (Paths'.postRadarValueListsValueList ())
-      (fun value_list (_uri:Uri.t) (_resp:_resp)
+      (fun value_list (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76834,7 +76883,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostRadarValueListsValueList'")
            | _, None -> None in
-         match H.postRadarValueListsValueList ~value_list _req
+         match Handlers.postRadarValueListsValueList ~value_list _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_radar_value_list ~op:_op ~ctype:_resp_ctype content in
@@ -76856,7 +76905,7 @@ module Routes' (H : HANDLERS) = struct
   let getRadarValueListsValueList = let _op = "GetRadarValueListsValueList"
     in
     Routes.route (Paths'.getRadarValueListsValueList ())
-      (fun value_list (_uri:Uri.t) (_resp:_resp)
+      (fun value_list (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76873,7 +76922,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetRadarValueListsValueList'")
            | _, None -> None in
-         match H.getRadarValueListsValueList ~value_list ?expand _req
+         match Handlers.getRadarValueListsValueList ~value_list ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_radar_value_list ~op:_op ~ctype:_resp_ctype content in
@@ -76896,7 +76945,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/disputes/\{dispute\} *)
   let postDisputesDispute = let _op = "PostDisputesDispute" in
     Routes.route (Paths'.postDisputesDispute ())
-      (fun dispute (_uri:Uri.t) (_resp:_resp)
+      (fun dispute (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76910,7 +76959,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostDisputesDispute'")
            | _, None -> None in
-         match H.postDisputesDispute ~dispute _req
+         match Handlers.postDisputesDispute ~dispute _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -76931,7 +76980,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/disputes/\{dispute\} *)
   let getDisputesDispute = let _op = "GetDisputesDispute" in
     Routes.route (Paths'.getDisputesDispute ())
-      (fun dispute (_uri:Uri.t) (_resp:_resp)
+      (fun dispute (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76948,7 +76997,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetDisputesDispute'")
            | _, None -> None in
-         match H.getDisputesDispute ~dispute ?expand _req
+         match Handlers.getDisputesDispute ~dispute ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -76970,7 +77019,7 @@ module Routes' (H : HANDLERS) = struct
   let getIssuingPhysicalBundlesPhysicalBundle = let _op = "GetIssuingPhysicalBundlesPhysicalBundle"
     in
     Routes.route (Paths'.getIssuingPhysicalBundlesPhysicalBundle ())
-      (fun physical_bundle (_uri:Uri.t) (_resp:_resp)
+      (fun physical_bundle (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -76987,8 +77036,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingPhysicalBundlesPhysicalBundle'")
            | _, None -> None in
-         match H.getIssuingPhysicalBundlesPhysicalBundle ~physical_bundle
-           ?expand _req
+         match Handlers.getIssuingPhysicalBundlesPhysicalBundle
+           ~physical_bundle ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_physical_bundle ~op:_op ~ctype:_resp_ctype content in
@@ -77010,7 +77059,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryCreditReversalsCreditReversal = let _op = "GetTreasuryCreditReversalsCreditReversal"
     in
     Routes.route (Paths'.getTreasuryCreditReversalsCreditReversal ())
-      (fun credit_reversal (_uri:Uri.t) (_resp:_resp)
+      (fun credit_reversal (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77027,8 +77076,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryCreditReversalsCreditReversal'")
            | _, None -> None in
-         match H.getTreasuryCreditReversalsCreditReversal ~credit_reversal
-           ?expand _req
+         match Handlers.getTreasuryCreditReversalsCreditReversal
+           ~credit_reversal ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_credit_reversal ~op:_op ~ctype:_resp_ctype content in
@@ -77050,7 +77099,7 @@ module Routes' (H : HANDLERS) = struct
   let getTaxTransactionsTransactionLineItems = let _op = "GetTaxTransactionsTransactionLineItems"
     in
     Routes.route (Paths'.getTaxTransactionsTransactionLineItems ())
-      (fun transaction (_uri:Uri.t) (_resp:_resp)
+      (fun transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77079,7 +77128,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxTransactionsTransactionLineItems'")
            | _, None -> None in 
-         match H.getTaxTransactionsTransactionLineItems ~transaction
+         match Handlers.getTaxTransactionsTransactionLineItems ~transaction
            ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -77103,7 +77152,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/\{invoice\}/send *)
   let postInvoicesInvoiceSend = let _op = "PostInvoicesInvoiceSend" in
     Routes.route (Paths'.postInvoicesInvoiceSend ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77117,7 +77166,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesInvoiceSend'")
            | _, None -> None in
-         match H.postInvoicesInvoiceSend ~invoice _req
+         match Handlers.postInvoicesInvoiceSend ~invoice _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -77139,7 +77188,7 @@ module Routes' (H : HANDLERS) = struct
   let postBillingMetersIdDeactivate = let _op = "PostBillingMetersIdDeactivate"
     in
     Routes.route (Paths'.postBillingMetersIdDeactivate ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77153,7 +77202,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingMetersIdDeactivate'")
            | _, None -> None in
-         match H.postBillingMetersIdDeactivate ~id _req
+         match Handlers.postBillingMetersIdDeactivate ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_meter ~op:_op ~ctype:_resp_ctype content in
@@ -77177,7 +77226,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignReject ())
-      (fun personalization_design (_uri:Uri.t) (_resp:_resp)
+      (fun personalization_design (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77191,7 +77240,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingPersonalizationDesignsPersonalizationDesignReject'")
            | _, None -> None in
-         match H.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignReject
+         match Handlers.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignReject
            ~personalization_design _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -77214,7 +77263,7 @@ module Routes' (H : HANDLERS) = struct
   let postSetupIntentsIntentVerifyMicrodeposits = let _op = "PostSetupIntentsIntentVerifyMicrodeposits"
     in
     Routes.route (Paths'.postSetupIntentsIntentVerifyMicrodeposits ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77228,7 +77277,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSetupIntentsIntentVerifyMicrodeposits'")
            | _, None -> None in
-         match H.postSetupIntentsIntentVerifyMicrodeposits ~intent _req
+         match Handlers.postSetupIntentsIntentVerifyMicrodeposits ~intent
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_setup_intent ~op:_op ~ctype:_resp_ctype content in
@@ -77250,7 +77300,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerCashBalance = let _op = "PostCustomersCustomerCashBalance"
     in
     Routes.route (Paths'.postCustomersCustomerCashBalance ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77264,7 +77314,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerCashBalance'")
            | _, None -> None in
-         match H.postCustomersCustomerCashBalance ~customer _req
+         match Handlers.postCustomersCustomerCashBalance ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_cash_balance ~op:_op ~ctype:_resp_ctype content in
@@ -77286,7 +77336,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerCashBalance = let _op = "GetCustomersCustomerCashBalance"
     in
     Routes.route (Paths'.getCustomersCustomerCashBalance ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77303,7 +77353,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerCashBalance'")
            | _, None -> None in
-         match H.getCustomersCustomerCashBalance ~customer ?expand _req
+         match Handlers.getCustomersCustomerCashBalance ~customer ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_cash_balance ~op:_op ~ctype:_resp_ctype content in
@@ -77330,7 +77381,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_intents/\{intent\} *)
   let postPaymentIntentsIntent = let _op = "PostPaymentIntentsIntent" in
     Routes.route (Paths'.postPaymentIntentsIntent ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77344,7 +77395,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntentsIntent'")
            | _, None -> None in
-         match H.postPaymentIntentsIntent ~intent _req
+         match Handlers.postPaymentIntentsIntent ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -77369,7 +77420,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payment_intents/\{intent\} *)
   let getPaymentIntentsIntent = let _op = "GetPaymentIntentsIntent" in
     Routes.route (Paths'.getPaymentIntentsIntent ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77390,7 +77441,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentIntentsIntent'")
            | _, None -> None in 
-         match H.getPaymentIntentsIntent ~intent ?client_secret ?expand _req
+         match Handlers.getPaymentIntentsIntent ~intent ?client_secret
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -77412,7 +77464,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryTransactionEntriesId = let _op = "GetTreasuryTransactionEntriesId"
     in
     Routes.route (Paths'.getTreasuryTransactionEntriesId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77429,7 +77481,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryTransactionEntriesId'")
            | _, None -> None in
-         match H.getTreasuryTransactionEntriesId ~id ?expand _req
+         match Handlers.getTreasuryTransactionEntriesId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_transaction_entry ~op:_op ~ctype:_resp_ctype content in
@@ -77451,7 +77503,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteInvoiceitemsInvoiceitem = let _op = "DeleteInvoiceitemsInvoiceitem"
     in
     Routes.route (Paths'.deleteInvoiceitemsInvoiceitem ())
-      (fun invoiceitem (_uri:Uri.t) (_resp:_resp)
+      (fun invoiceitem (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77465,7 +77517,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteInvoiceitemsInvoiceitem'")
            | _, None -> None in
-         match H.deleteInvoiceitemsInvoiceitem ~invoiceitem _req
+         match Handlers.deleteInvoiceitemsInvoiceitem ~invoiceitem _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_invoiceitem ~op:_op ~ctype:_resp_ctype content in
@@ -77487,7 +77539,7 @@ module Routes' (H : HANDLERS) = struct
   let postInvoiceitemsInvoiceitem = let _op = "PostInvoiceitemsInvoiceitem"
     in
     Routes.route (Paths'.postInvoiceitemsInvoiceitem ())
-      (fun invoiceitem (_uri:Uri.t) (_resp:_resp)
+      (fun invoiceitem (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77501,7 +77553,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoiceitemsInvoiceitem'")
            | _, None -> None in
-         match H.postInvoiceitemsInvoiceitem ~invoiceitem _req
+         match Handlers.postInvoiceitemsInvoiceitem ~invoiceitem _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoiceitem ~op:_op ~ctype:_resp_ctype content in
@@ -77522,7 +77574,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoiceitems/\{invoiceitem\} *)
   let getInvoiceitemsInvoiceitem = let _op = "GetInvoiceitemsInvoiceitem" in
     Routes.route (Paths'.getInvoiceitemsInvoiceitem ())
-      (fun invoiceitem (_uri:Uri.t) (_resp:_resp)
+      (fun invoiceitem (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77539,7 +77591,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetInvoiceitemsInvoiceitem'")
            | _, None -> None in
-         match H.getInvoiceitemsInvoiceitem ~invoiceitem ?expand _req
+         match Handlers.getInvoiceitemsInvoiceitem ~invoiceitem ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoiceitem ~op:_op ~ctype:_resp_ctype content in
@@ -77561,7 +77613,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersCustomersCustomerFundCashBalance = let _op = "PostTestHelpersCustomersCustomerFundCashBalance"
     in
     Routes.route (Paths'.postTestHelpersCustomersCustomerFundCashBalance ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77575,8 +77627,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersCustomersCustomerFundCashBalance'")
            | _, None -> None in
-         match H.postTestHelpersCustomersCustomerFundCashBalance ~customer
-           _req
+         match Handlers.postTestHelpersCustomersCustomerFundCashBalance
+           ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_customer_cash_balance_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -77597,7 +77649,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/climate/orders/\{order\} *)
   let postClimateOrdersOrder = let _op = "PostClimateOrdersOrder" in
     Routes.route (Paths'.postClimateOrdersOrder ())
-      (fun order (_uri:Uri.t) (_resp:_resp)
+      (fun order (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77611,7 +77663,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostClimateOrdersOrder'")
            | _, None -> None in
-         match H.postClimateOrdersOrder ~order _req
+         match Handlers.postClimateOrdersOrder ~order _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_climate_order ~op:_op ~ctype:_resp_ctype content in
@@ -77632,7 +77684,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/climate/orders/\{order\} *)
   let getClimateOrdersOrder = let _op = "GetClimateOrdersOrder" in
     Routes.route (Paths'.getClimateOrdersOrder ())
-      (fun order (_uri:Uri.t) (_resp:_resp)
+      (fun order (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77649,7 +77701,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetClimateOrdersOrder'")
            | _, None -> None in
-         match H.getClimateOrdersOrder ~order ?expand _req
+         match Handlers.getClimateOrdersOrder ~order ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_climate_order ~op:_op ~ctype:_resp_ctype content in
@@ -77673,7 +77725,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerFundingInstructions = let _op = "PostCustomersCustomerFundingInstructions"
     in
     Routes.route (Paths'.postCustomersCustomerFundingInstructions ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77687,7 +77739,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerFundingInstructions'")
            | _, None -> None in
-         match H.postCustomersCustomerFundingInstructions ~customer _req
+         match Handlers.postCustomersCustomerFundingInstructions ~customer
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_funding_instructions ~op:_op ~ctype:_resp_ctype content in
@@ -77708,7 +77761,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payouts/\{payout\} *)
   let postPayoutsPayout = let _op = "PostPayoutsPayout" in
     Routes.route (Paths'.postPayoutsPayout ())
-      (fun payout (_uri:Uri.t) (_resp:_resp)
+      (fun payout (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77722,7 +77775,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPayoutsPayout'")
            | _, None -> None in
-         match H.postPayoutsPayout ~payout _req
+         match Handlers.postPayoutsPayout ~payout _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payout ~op:_op ~ctype:_resp_ctype content in
@@ -77743,7 +77796,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payouts/\{payout\} *)
   let getPayoutsPayout = let _op = "GetPayoutsPayout" in
     Routes.route (Paths'.getPayoutsPayout ())
-      (fun payout (_uri:Uri.t) (_resp:_resp)
+      (fun payout (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77760,7 +77813,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPayoutsPayout'")
            | _, None -> None in
-         match H.getPayoutsPayout ~payout ?expand _req
+         match Handlers.getPayoutsPayout ~payout ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payout ~op:_op ~ctype:_resp_ctype content in
@@ -77781,7 +77834,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\}/people *)
   let postAccountsAccountPeople = let _op = "PostAccountsAccountPeople" in
     Routes.route (Paths'.postAccountsAccountPeople ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77795,7 +77848,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountPeople'")
            | _, None -> None in
-         match H.postAccountsAccountPeople ~account _req
+         match Handlers.postAccountsAccountPeople ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_person ~op:_op ~ctype:_resp_ctype content in
@@ -77816,7 +77869,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\}/people *)
   let getAccountsAccountPeople = let _op = "GetAccountsAccountPeople" in
     Routes.route (Paths'.getAccountsAccountPeople ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77849,8 +77902,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountPeople'")
            | _, None -> None in 
-         match H.getAccountsAccountPeople ~account ?ending_before ?expand
-           ?limit ?relationship ?starting_after _req
+         match Handlers.getAccountsAccountPeople ~account ?ending_before
+           ?expand ?limit ?relationship ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_fde3b546b3 ~op:_op ~ctype:_resp_ctype content in
@@ -77872,7 +77925,7 @@ module Routes' (H : HANDLERS) = struct
   let postTreasuryFinancialAccountsFinancialAccount = let _op = "PostTreasuryFinancialAccountsFinancialAccount"
     in
     Routes.route (Paths'.postTreasuryFinancialAccountsFinancialAccount ())
-      (fun financial_account (_uri:Uri.t) (_resp:_resp)
+      (fun financial_account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77886,7 +77939,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryFinancialAccountsFinancialAccount'")
            | _, None -> None in
-         match H.postTreasuryFinancialAccountsFinancialAccount
+         match Handlers.postTreasuryFinancialAccountsFinancialAccount
            ~financial_account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -77909,7 +77962,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryFinancialAccountsFinancialAccount = let _op = "GetTreasuryFinancialAccountsFinancialAccount"
     in
     Routes.route (Paths'.getTreasuryFinancialAccountsFinancialAccount ())
-      (fun financial_account (_uri:Uri.t) (_resp:_resp)
+      (fun financial_account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77926,7 +77979,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryFinancialAccountsFinancialAccount'")
            | _, None -> None in
-         match H.getTreasuryFinancialAccountsFinancialAccount
+         match Handlers.getTreasuryFinancialAccountsFinancialAccount
            ~financial_account ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -77949,7 +78002,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersRefundsRefundExpire = let _op = "PostTestHelpersRefundsRefundExpire"
     in
     Routes.route (Paths'.postTestHelpersRefundsRefundExpire ())
-      (fun refund (_uri:Uri.t) (_resp:_resp)
+      (fun refund (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -77963,7 +78016,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersRefundsRefundExpire'")
            | _, None -> None in
-         match H.postTestHelpersRefundsRefundExpire ~refund _req
+         match Handlers.postTestHelpersRefundsRefundExpire ~refund _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -77985,7 +78038,7 @@ module Routes' (H : HANDLERS) = struct
   let getSigmaScheduledQueryRunsScheduledQueryRun = let _op = "GetSigmaScheduledQueryRunsScheduledQueryRun"
     in
     Routes.route (Paths'.getSigmaScheduledQueryRunsScheduledQueryRun ())
-      (fun scheduled_query_run (_uri:Uri.t) (_resp:_resp)
+      (fun scheduled_query_run (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78002,7 +78055,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSigmaScheduledQueryRunsScheduledQueryRun'")
            | _, None -> None in
-         match H.getSigmaScheduledQueryRunsScheduledQueryRun
+         match Handlers.getSigmaScheduledQueryRunsScheduledQueryRun
            ~scheduled_query_run ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -78025,7 +78078,7 @@ module Routes' (H : HANDLERS) = struct
   let postFinancialConnectionsAccountsAccountRefresh = let _op = "PostFinancialConnectionsAccountsAccountRefresh"
     in
     Routes.route (Paths'.postFinancialConnectionsAccountsAccountRefresh ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78039,7 +78092,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostFinancialConnectionsAccountsAccountRefresh'")
            | _, None -> None in
-         match H.postFinancialConnectionsAccountsAccountRefresh ~account _req
+         match Handlers.postFinancialConnectionsAccountsAccountRefresh
+           ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -78082,7 +78136,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentIntentsIntentConfirm = let _op = "PostPaymentIntentsIntentConfirm"
     in
     Routes.route (Paths'.postPaymentIntentsIntentConfirm ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78096,7 +78150,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntentsIntentConfirm'")
            | _, None -> None in
-         match H.postPaymentIntentsIntentConfirm ~intent _req
+         match Handlers.postPaymentIntentsIntentConfirm ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -78118,7 +78172,7 @@ module Routes' (H : HANDLERS) = struct
   let postBillingPortalConfigurationsConfiguration = let _op = "PostBillingPortalConfigurationsConfiguration"
     in
     Routes.route (Paths'.postBillingPortalConfigurationsConfiguration ())
-      (fun configuration (_uri:Uri.t) (_resp:_resp)
+      (fun configuration (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78132,8 +78186,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingPortalConfigurationsConfiguration'")
            | _, None -> None in
-         match H.postBillingPortalConfigurationsConfiguration ~configuration
-           _req
+         match Handlers.postBillingPortalConfigurationsConfiguration
+           ~configuration _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_portal_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -78155,7 +78209,7 @@ module Routes' (H : HANDLERS) = struct
   let getBillingPortalConfigurationsConfiguration = let _op = "GetBillingPortalConfigurationsConfiguration"
     in
     Routes.route (Paths'.getBillingPortalConfigurationsConfiguration ())
-      (fun configuration (_uri:Uri.t) (_resp:_resp)
+      (fun configuration (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78172,8 +78226,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBillingPortalConfigurationsConfiguration'")
            | _, None -> None in
-         match H.getBillingPortalConfigurationsConfiguration ~configuration
-           ?expand _req
+         match Handlers.getBillingPortalConfigurationsConfiguration
+           ~configuration ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_portal_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -78194,7 +78248,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_ids/\{id\} *)
   let deleteTaxIdsId = let _op = "DeleteTaxIdsId" in
     Routes.route (Paths'.deleteTaxIdsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78208,7 +78262,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteTaxIdsId'")
            | _, None -> None in
-         match H.deleteTaxIdsId ~id _req
+         match Handlers.deleteTaxIdsId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_tax_id ~op:_op ~ctype:_resp_ctype content in
@@ -78229,7 +78283,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_ids/\{id\} *)
   let getTaxIdsId = let _op = "GetTaxIdsId" in
     Routes.route (Paths'.getTaxIdsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78246,7 +78300,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxIdsId'")
            | _, None -> None in
-         match H.getTaxIdsId ~id ?expand _req
+         match Handlers.getTaxIdsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_id ~op:_op ~ctype:_resp_ctype content in
@@ -78267,7 +78321,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes/\{quote\} *)
   let postQuotesQuote = let _op = "PostQuotesQuote" in
     Routes.route (Paths'.postQuotesQuote ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78281,7 +78335,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostQuotesQuote'")
            | _, None -> None in
-         match H.postQuotesQuote ~quote _req
+         match Handlers.postQuotesQuote ~quote _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_quote ~op:_op ~ctype:_resp_ctype content in
@@ -78302,7 +78356,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes/\{quote\} *)
   let getQuotesQuote = let _op = "GetQuotesQuote" in
     Routes.route (Paths'.getQuotesQuote ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78319,7 +78373,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetQuotesQuote'")
            | _, None -> None in
-         match H.getQuotesQuote ~quote ?expand _req
+         match Handlers.getQuotesQuote ~quote ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_quote ~op:_op ~ctype:_resp_ctype content in
@@ -78340,7 +78394,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/credit_notes/\{id\}/void *)
   let postCreditNotesIdVoid = let _op = "PostCreditNotesIdVoid" in
     Routes.route (Paths'.postCreditNotesIdVoid ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78354,7 +78408,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCreditNotesIdVoid'")
            | _, None -> None in
-         match H.postCreditNotesIdVoid ~id _req
+         match Handlers.postCreditNotesIdVoid ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_credit_note ~op:_op ~ctype:_resp_ctype content in
@@ -78377,7 +78431,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingAuthorizationsAuthorizationApprove = let _op = "PostIssuingAuthorizationsAuthorizationApprove"
     in
     Routes.route (Paths'.postIssuingAuthorizationsAuthorizationApprove ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78391,8 +78445,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingAuthorizationsAuthorizationApprove'")
            | _, None -> None in
-         match H.postIssuingAuthorizationsAuthorizationApprove ~authorization
-           _req
+         match Handlers.postIssuingAuthorizationsAuthorizationApprove
+           ~authorization _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_authorization ~op:_op ~ctype:_resp_ctype content in
@@ -78413,7 +78467,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/forwarding/requests/\{id\} *)
   let getForwardingRequestsId = let _op = "GetForwardingRequestsId" in
     Routes.route (Paths'.getForwardingRequestsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78430,7 +78484,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetForwardingRequestsId'")
            | _, None -> None in
-         match H.getForwardingRequestsId ~id ?expand _req
+         match Handlers.getForwardingRequestsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_forwarding_request ~op:_op ~ctype:_resp_ctype content in
@@ -78454,7 +78508,7 @@ module Routes' (H : HANDLERS) = struct
   let getRadarEarlyFraudWarningsEarlyFraudWarning = let _op = "GetRadarEarlyFraudWarningsEarlyFraudWarning"
     in
     Routes.route (Paths'.getRadarEarlyFraudWarningsEarlyFraudWarning ())
-      (fun early_fraud_warning (_uri:Uri.t) (_resp:_resp)
+      (fun early_fraud_warning (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78471,7 +78525,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetRadarEarlyFraudWarningsEarlyFraudWarning'")
            | _, None -> None in
-         match H.getRadarEarlyFraudWarningsEarlyFraudWarning
+         match Handlers.getRadarEarlyFraudWarningsEarlyFraudWarning
            ~early_fraud_warning ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -78494,7 +78548,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryOutboundPaymentsId = let _op = "PostTestHelpersTreasuryOutboundPaymentsId"
     in
     Routes.route (Paths'.postTestHelpersTreasuryOutboundPaymentsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78508,7 +78562,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundPaymentsId'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundPaymentsId ~id _req
+         match Handlers.postTestHelpersTreasuryOutboundPaymentsId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_payment ~op:_op ~ctype:_resp_ctype content in
@@ -78530,8 +78584,8 @@ module Routes' (H : HANDLERS) = struct
   let deleteSubscriptionItemsItem = let _op = "DeleteSubscriptionItemsItem"
     in
     Routes.route (Paths'.deleteSubscriptionItemsItem ())
-      (fun item (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun item (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -78544,7 +78598,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteSubscriptionItemsItem'")
            | _, None -> None in
-         match H.deleteSubscriptionItemsItem ~item _req
+         match Handlers.deleteSubscriptionItemsItem ~item _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_subscription_item ~op:_op ~ctype:_resp_ctype content in
@@ -78565,8 +78619,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscription_items/\{item\} *)
   let postSubscriptionItemsItem = let _op = "PostSubscriptionItemsItem" in
     Routes.route (Paths'.postSubscriptionItemsItem ())
-      (fun item (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun item (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -78579,7 +78633,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionItemsItem'")
            | _, None -> None in
-         match H.postSubscriptionItemsItem ~item _req
+         match Handlers.postSubscriptionItemsItem ~item _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_item ~op:_op ~ctype:_resp_ctype content in
@@ -78600,8 +78654,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/subscription_items/\{item\} *)
   let getSubscriptionItemsItem = let _op = "GetSubscriptionItemsItem" in
     Routes.route (Paths'.getSubscriptionItemsItem ())
-      (fun item (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun item (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let expand = let _nvs = _queries in
@@ -78617,7 +78671,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSubscriptionItemsItem'")
            | _, None -> None in
-         match H.getSubscriptionItemsItem ~item ?expand _req
+         match Handlers.getSubscriptionItemsItem ~item ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_item ~op:_op ~ctype:_resp_ctype content in
@@ -78648,7 +78702,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\}/refund *)
   let postChargesChargeRefund = let _op = "PostChargesChargeRefund" in
     Routes.route (Paths'.postChargesChargeRefund ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78662,7 +78716,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostChargesChargeRefund'")
            | _, None -> None in
-         match H.postChargesChargeRefund ~charge _req
+         match Handlers.postChargesChargeRefund ~charge _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_charge ~op:_op ~ctype:_resp_ctype content in
@@ -78684,7 +78738,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingDisputesDisputeSubmit = let _op = "PostIssuingDisputesDisputeSubmit"
     in
     Routes.route (Paths'.postIssuingDisputesDisputeSubmit ())
-      (fun dispute (_uri:Uri.t) (_resp:_resp)
+      (fun dispute (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78698,7 +78752,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingDisputesDisputeSubmit'")
            | _, None -> None in
-         match H.postIssuingDisputesDisputeSubmit ~dispute _req
+         match Handlers.postIssuingDisputesDisputeSubmit ~dispute _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -78723,7 +78777,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/transfers/\{id\}/reversals *)
   let postTransfersIdReversals = let _op = "PostTransfersIdReversals" in
     Routes.route (Paths'.postTransfersIdReversals ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78737,7 +78791,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTransfersIdReversals'")
            | _, None -> None in
-         match H.postTransfersIdReversals ~id _req
+         match Handlers.postTransfersIdReversals ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_transfer_reversal ~op:_op ~ctype:_resp_ctype content in
@@ -78758,7 +78812,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/transfers/\{id\}/reversals *)
   let getTransfersIdReversals = let _op = "GetTransfersIdReversals" in
     Routes.route (Paths'.getTransfersIdReversals ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78787,8 +78841,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTransfersIdReversals'")
            | _, None -> None in 
-         match H.getTransfersIdReversals ~id ?ending_before ?expand ?limit
-           ?starting_after _req
+         match Handlers.getTransfersIdReversals ~id ?ending_before ?expand
+           ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2e23061d84 ~op:_op ~ctype:_resp_ctype content in
@@ -78809,7 +78863,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/country_specs/\{country\} *)
   let getCountrySpecsCountry = let _op = "GetCountrySpecsCountry" in
     Routes.route (Paths'.getCountrySpecsCountry ())
-      (fun country (_uri:Uri.t) (_resp:_resp)
+      (fun country (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78826,7 +78880,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCountrySpecsCountry'")
            | _, None -> None in
-         match H.getCountrySpecsCountry ~country ?expand _req
+         match Handlers.getCountrySpecsCountry ~country ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_country_spec ~op:_op ~ctype:_resp_ctype content in
@@ -78848,7 +78902,7 @@ module Routes' (H : HANDLERS) = struct
   let postLinkedAccountsAccountRefresh = let _op = "PostLinkedAccountsAccountRefresh"
     in
     Routes.route (Paths'.postLinkedAccountsAccountRefresh ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78862,7 +78916,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostLinkedAccountsAccountRefresh'")
            | _, None -> None in
-         match H.postLinkedAccountsAccountRefresh ~account _req
+         match Handlers.postLinkedAccountsAccountRefresh ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -78884,8 +78938,8 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersIssuingCardsCardShippingReturn = let _op = "PostTestHelpersIssuingCardsCardShippingReturn"
     in
     Routes.route (Paths'.postTestHelpersIssuingCardsCardShippingReturn ())
-      (fun card (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun card (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -78898,7 +78952,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingCardsCardShippingReturn'")
            | _, None -> None in
-         match H.postTestHelpersIssuingCardsCardShippingReturn ~card _req
+         match Handlers.postTestHelpersIssuingCardsCardShippingReturn ~card
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_card ~op:_op ~ctype:_resp_ctype content in
@@ -78921,7 +78976,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\}/reject *)
   let postAccountsAccountReject = let _op = "PostAccountsAccountReject" in
     Routes.route (Paths'.postAccountsAccountReject ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78935,7 +78990,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountReject'")
            | _, None -> None in
-         match H.postAccountsAccountReject ~account _req
+         match Handlers.postAccountsAccountReject ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_account ~op:_op ~ctype:_resp_ctype content in
@@ -78956,7 +79011,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/\{invoice\}/lines *)
   let getInvoicesInvoiceLines = let _op = "GetInvoicesInvoiceLines" in
     Routes.route (Paths'.getInvoicesInvoiceLines ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -78985,8 +79040,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetInvoicesInvoiceLines'")
            | _, None -> None in 
-         match H.getInvoicesInvoiceLines ~invoice ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getInvoicesInvoiceLines ~invoice ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_40aa9228af ~op:_op ~ctype:_resp_ctype content in
@@ -79007,7 +79062,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/treasury/transactions/\{id\} *)
   let getTreasuryTransactionsId = let _op = "GetTreasuryTransactionsId" in
     Routes.route (Paths'.getTreasuryTransactionsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79024,7 +79079,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryTransactionsId'")
            | _, None -> None in
-         match H.getTreasuryTransactionsId ~id ?expand _req
+         match Handlers.getTreasuryTransactionsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -79047,7 +79102,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingAuthorizationsAuthorizationCapture ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79061,7 +79116,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingAuthorizationsAuthorizationCapture'")
            | _, None -> None in
-         match H.postTestHelpersIssuingAuthorizationsAuthorizationCapture
+         match Handlers.postTestHelpersIssuingAuthorizationsAuthorizationCapture
            ~authorization _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -79085,7 +79140,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payouts/\{payout\}/reverse *)
   let postPayoutsPayoutReverse = let _op = "PostPayoutsPayoutReverse" in
     Routes.route (Paths'.postPayoutsPayoutReverse ())
-      (fun payout (_uri:Uri.t) (_resp:_resp)
+      (fun payout (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79099,7 +79154,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPayoutsPayoutReverse'")
            | _, None -> None in
-         match H.postPayoutsPayoutReverse ~payout _req
+         match Handlers.postPayoutsPayoutReverse ~payout _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payout ~op:_op ~ctype:_resp_ctype content in
@@ -79121,7 +79176,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteSubscriptionsSubscriptionExposedIdDiscount = let _op = "DeleteSubscriptionsSubscriptionExposedIdDiscount"
     in
     Routes.route (Paths'.deleteSubscriptionsSubscriptionExposedIdDiscount ())
-      (fun subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79135,7 +79190,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteSubscriptionsSubscriptionExposedIdDiscount'")
            | _, None -> None in
-         match H.deleteSubscriptionsSubscriptionExposedIdDiscount
+         match Handlers.deleteSubscriptionsSubscriptionExposedIdDiscount
            ~subscription_exposed_id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -79157,7 +79212,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\}/persons *)
   let postAccountsAccountPersons = let _op = "PostAccountsAccountPersons" in
     Routes.route (Paths'.postAccountsAccountPersons ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79171,7 +79226,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountPersons'")
            | _, None -> None in
-         match H.postAccountsAccountPersons ~account _req
+         match Handlers.postAccountsAccountPersons ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_person ~op:_op ~ctype:_resp_ctype content in
@@ -79192,7 +79247,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/accounts/\{account\}/persons *)
   let getAccountsAccountPersons = let _op = "GetAccountsAccountPersons" in
     Routes.route (Paths'.getAccountsAccountPersons ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79225,8 +79280,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountPersons'")
            | _, None -> None in 
-         match H.getAccountsAccountPersons ~account ?ending_before ?expand
-           ?limit ?relationship ?starting_after _req
+         match Handlers.getAccountsAccountPersons ~account ?ending_before
+           ?expand ?limit ?relationship ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_adf6bacbbd ~op:_op ~ctype:_resp_ctype content in
@@ -79247,7 +79302,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes/\{quote\}/cancel *)
   let postQuotesQuoteCancel = let _op = "PostQuotesQuoteCancel" in
     Routes.route (Paths'.postQuotesQuoteCancel ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79261,7 +79316,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostQuotesQuoteCancel'")
            | _, None -> None in
-         match H.postQuotesQuoteCancel ~quote _req
+         match Handlers.postQuotesQuoteCancel ~quote _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_quote ~op:_op ~ctype:_resp_ctype content in
@@ -79282,7 +79337,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_rates/\{tax_rate\} *)
   let postTaxRatesTaxRate = let _op = "PostTaxRatesTaxRate" in
     Routes.route (Paths'.postTaxRatesTaxRate ())
-      (fun tax_rate (_uri:Uri.t) (_resp:_resp)
+      (fun tax_rate (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79296,7 +79351,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxRatesTaxRate'")
            | _, None -> None in
-         match H.postTaxRatesTaxRate ~tax_rate _req
+         match Handlers.postTaxRatesTaxRate ~tax_rate _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_rate ~op:_op ~ctype:_resp_ctype content in
@@ -79317,7 +79372,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_rates/\{tax_rate\} *)
   let getTaxRatesTaxRate = let _op = "GetTaxRatesTaxRate" in
     Routes.route (Paths'.getTaxRatesTaxRate ())
-      (fun tax_rate (_uri:Uri.t) (_resp:_resp)
+      (fun tax_rate (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79334,7 +79389,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxRatesTaxRate'")
            | _, None -> None in
-         match H.getTaxRatesTaxRate ~tax_rate ?expand _req
+         match Handlers.getTaxRatesTaxRate ~tax_rate ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_rate ~op:_op ~ctype:_resp_ctype content in
@@ -79357,7 +79412,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/sources/\{source\} *)
   let postSourcesSource = let _op = "PostSourcesSource" in
     Routes.route (Paths'.postSourcesSource ())
-      (fun source (_uri:Uri.t) (_resp:_resp)
+      (fun source (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79371,7 +79426,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSourcesSource'")
            | _, None -> None in
-         match H.postSourcesSource ~source _req
+         match Handlers.postSourcesSource ~source _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_source ~op:_op ~ctype:_resp_ctype content in
@@ -79392,7 +79447,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/sources/\{source\} *)
   let getSourcesSource = let _op = "GetSourcesSource" in
     Routes.route (Paths'.getSourcesSource ())
-      (fun source (_uri:Uri.t) (_resp:_resp)
+      (fun source (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79413,7 +79468,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSourcesSource'")
            | _, None -> None in 
-         match H.getSourcesSource ~source ?client_secret ?expand _req
+         match Handlers.getSourcesSource ~source ?client_secret ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_source ~op:_op ~ctype:_resp_ctype content in
@@ -79436,7 +79491,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postFinancialConnectionsAccountsAccountUnsubscribe ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79450,8 +79505,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostFinancialConnectionsAccountsAccountUnsubscribe'")
            | _, None -> None in
-         match H.postFinancialConnectionsAccountsAccountUnsubscribe ~account
-           _req
+         match Handlers.postFinancialConnectionsAccountsAccountUnsubscribe
+           ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -79473,7 +79528,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentIntentsIntentVerifyMicrodeposits = let _op = "PostPaymentIntentsIntentVerifyMicrodeposits"
     in
     Routes.route (Paths'.postPaymentIntentsIntentVerifyMicrodeposits ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79487,7 +79542,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntentsIntentVerifyMicrodeposits'")
            | _, None -> None in
-         match H.postPaymentIntentsIntentVerifyMicrodeposits ~intent _req
+         match Handlers.postPaymentIntentsIntentVerifyMicrodeposits ~intent
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -79510,7 +79566,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTreasuryOutboundTransfersOutboundTransferCancel ())
-      (fun outbound_transfer (_uri:Uri.t) (_resp:_resp)
+      (fun outbound_transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79524,7 +79580,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryOutboundTransfersOutboundTransferCancel'")
            | _, None -> None in
-         match H.postTreasuryOutboundTransfersOutboundTransferCancel
+         match Handlers.postTreasuryOutboundTransfersOutboundTransferCancel
            ~outbound_transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -79547,7 +79603,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryOutboundPaymentsIdPost = let _op = "PostTestHelpersTreasuryOutboundPaymentsIdPost"
     in
     Routes.route (Paths'.postTestHelpersTreasuryOutboundPaymentsIdPost ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79561,7 +79617,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundPaymentsIdPost'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundPaymentsIdPost ~id _req
+         match Handlers.postTestHelpersTreasuryOutboundPaymentsIdPost ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_payment ~op:_op ~ctype:_resp_ctype content in
@@ -79590,7 +79647,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postSubscriptionItemsSubscriptionItemUsageRecords ())
-      (fun subscription_item (_uri:Uri.t) (_resp:_resp)
+      (fun subscription_item (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79604,7 +79661,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionItemsSubscriptionItemUsageRecords'")
            | _, None -> None in
-         match H.postSubscriptionItemsSubscriptionItemUsageRecords
+         match Handlers.postSubscriptionItemsSubscriptionItemUsageRecords
            ~subscription_item _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -79627,7 +79684,7 @@ module Routes' (H : HANDLERS) = struct
   let getIdentityVerificationReportsReport = let _op = "GetIdentityVerificationReportsReport"
     in
     Routes.route (Paths'.getIdentityVerificationReportsReport ())
-      (fun report (_uri:Uri.t) (_resp:_resp)
+      (fun report (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79644,7 +79701,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIdentityVerificationReportsReport'")
            | _, None -> None in
-         match H.getIdentityVerificationReportsReport ~report ?expand _req
+         match Handlers.getIdentityVerificationReportsReport ~report ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_identity_verification_report ~op:_op ~ctype:_resp_ctype content in
@@ -79672,7 +79730,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postPaymentMethodDomainsPaymentMethodDomainValidate ())
-      (fun payment_method_domain (_uri:Uri.t) (_resp:_resp)
+      (fun payment_method_domain (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79686,7 +79744,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodDomainsPaymentMethodDomainValidate'")
            | _, None -> None in
-         match H.postPaymentMethodDomainsPaymentMethodDomainValidate
+         match Handlers.postPaymentMethodDomainsPaymentMethodDomainValidate
            ~payment_method_domain _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -79709,7 +79767,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalReadersReaderCancelAction = let _op = "PostTerminalReadersReaderCancelAction"
     in
     Routes.route (Paths'.postTerminalReadersReaderCancelAction ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79723,7 +79781,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalReadersReaderCancelAction'")
            | _, None -> None in
-         match H.postTerminalReadersReaderCancelAction ~reader _req
+         match Handlers.postTerminalReadersReaderCancelAction ~reader _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_reader ~op:_op ~ctype:_resp_ctype content in
@@ -79745,8 +79803,8 @@ module Routes' (H : HANDLERS) = struct
   let deleteRadarValueListItemsItem = let _op = "DeleteRadarValueListItemsItem"
     in
     Routes.route (Paths'.deleteRadarValueListItemsItem ())
-      (fun item (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun item (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -79759,7 +79817,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteRadarValueListItemsItem'")
            | _, None -> None in
-         match H.deleteRadarValueListItemsItem ~item _req
+         match Handlers.deleteRadarValueListItemsItem ~item _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_radar_value_list_item ~op:_op ~ctype:_resp_ctype content in
@@ -79780,8 +79838,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/radar/value_list_items/\{item\} *)
   let getRadarValueListItemsItem = let _op = "GetRadarValueListItemsItem" in
     Routes.route (Paths'.getRadarValueListItemsItem ())
-      (fun item (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun item (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let expand = let _nvs = _queries in
@@ -79797,7 +79855,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetRadarValueListItemsItem'")
            | _, None -> None in
-         match H.getRadarValueListItemsItem ~item ?expand _req
+         match Handlers.getRadarValueListItemsItem ~item ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_radar_value_list_item ~op:_op ~ctype:_resp_ctype content in
@@ -79817,7 +79875,7 @@ module Routes' (H : HANDLERS) = struct
   let postApplicationFeesIdRefund = let _op = "PostApplicationFeesIdRefund"
     in
     Routes.route (Paths'.postApplicationFeesIdRefund ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79831,7 +79889,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostApplicationFeesIdRefund'")
            | _, None -> None in
-         match H.postApplicationFeesIdRefund ~id _req
+         match Handlers.postApplicationFeesIdRefund ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_application_fee ~op:_op ~ctype:_resp_ctype content in
@@ -79854,7 +79912,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postIssuingPersonalizationDesignsPersonalizationDesign ())
-      (fun personalization_design (_uri:Uri.t) (_resp:_resp)
+      (fun personalization_design (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79868,7 +79926,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingPersonalizationDesignsPersonalizationDesign'")
            | _, None -> None in
-         match H.postIssuingPersonalizationDesignsPersonalizationDesign
+         match Handlers.postIssuingPersonalizationDesignsPersonalizationDesign
            ~personalization_design _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -79892,7 +79950,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getIssuingPersonalizationDesignsPersonalizationDesign ())
-      (fun personalization_design (_uri:Uri.t) (_resp:_resp)
+      (fun personalization_design (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79909,7 +79967,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingPersonalizationDesignsPersonalizationDesign'")
            | _, None -> None in
-         match H.getIssuingPersonalizationDesignsPersonalizationDesign
+         match Handlers.getIssuingPersonalizationDesignsPersonalizationDesign
            ~personalization_design ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -79935,7 +79993,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers/\{customer\}/cards *)
   let postCustomersCustomerCards = let _op = "PostCustomersCustomerCards" in
     Routes.route (Paths'.postCustomersCustomerCards ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -79949,7 +80007,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerCards'")
            | _, None -> None in
-         match H.postCustomersCustomerCards ~customer _req
+         match Handlers.postCustomersCustomerCards ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_source ~op:_op ~ctype:_resp_ctype content in
@@ -79972,7 +80030,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers/\{customer\}/cards *)
   let getCustomersCustomerCards = let _op = "GetCustomersCustomerCards" in
     Routes.route (Paths'.getCustomersCustomerCards ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80001,8 +80059,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerCards'")
            | _, None -> None in 
-         match H.getCustomersCustomerCards ~customer ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getCustomersCustomerCards ~customer ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_935be5d592 ~op:_op ~ctype:_resp_ctype content in
@@ -80023,7 +80081,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/products/\{id\} *)
   let deleteProductsId = let _op = "DeleteProductsId" in
     Routes.route (Paths'.deleteProductsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80037,7 +80095,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteProductsId'")
            | _, None -> None in
-         match H.deleteProductsId ~id _req
+         match Handlers.deleteProductsId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_product ~op:_op ~ctype:_resp_ctype content in
@@ -80058,7 +80116,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/products/\{id\} *)
   let postProductsId = let _op = "PostProductsId" in
     Routes.route (Paths'.postProductsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80072,7 +80130,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostProductsId'")
            | _, None -> None in
-         match H.postProductsId ~id _req
+         match Handlers.postProductsId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_product ~op:_op ~ctype:_resp_ctype content in
@@ -80093,7 +80151,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/products/\{id\} *)
   let getProductsId = let _op = "GetProductsId" in
     Routes.route (Paths'.getProductsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80110,7 +80168,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetProductsId'")
            | _, None -> None in
-         match H.getProductsId ~id ?expand _req
+         match Handlers.getProductsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_product ~op:_op ~ctype:_resp_ctype content in
@@ -80134,7 +80192,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignActivate ())
-      (fun personalization_design (_uri:Uri.t) (_resp:_resp)
+      (fun personalization_design (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80148,7 +80206,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingPersonalizationDesignsPersonalizationDesignActivate'")
            | _, None -> None in
-         match H.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignActivate
+         match Handlers.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignActivate
            ~personalization_design _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -80173,7 +80231,7 @@ module Routes' (H : HANDLERS) = struct
   let postSetupIntentsIntentCancel = let _op = "PostSetupIntentsIntentCancel"
     in
     Routes.route (Paths'.postSetupIntentsIntentCancel ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80187,7 +80245,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSetupIntentsIntentCancel'")
            | _, None -> None in
-         match H.postSetupIntentsIntentCancel ~intent _req
+         match Handlers.postSetupIntentsIntentCancel ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_setup_intent ~op:_op ~ctype:_resp_ctype content in
@@ -80208,7 +80266,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/coupons/\{coupon\} *)
   let deleteCouponsCoupon = let _op = "DeleteCouponsCoupon" in
     Routes.route (Paths'.deleteCouponsCoupon ())
-      (fun coupon (_uri:Uri.t) (_resp:_resp)
+      (fun coupon (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80222,7 +80280,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCouponsCoupon'")
            | _, None -> None in
-         match H.deleteCouponsCoupon ~coupon _req
+         match Handlers.deleteCouponsCoupon ~coupon _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_coupon ~op:_op ~ctype:_resp_ctype content in
@@ -80243,7 +80301,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/coupons/\{coupon\} *)
   let postCouponsCoupon = let _op = "PostCouponsCoupon" in
     Routes.route (Paths'.postCouponsCoupon ())
-      (fun coupon (_uri:Uri.t) (_resp:_resp)
+      (fun coupon (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80257,7 +80315,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCouponsCoupon'")
            | _, None -> None in
-         match H.postCouponsCoupon ~coupon _req
+         match Handlers.postCouponsCoupon ~coupon _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_coupon ~op:_op ~ctype:_resp_ctype content in
@@ -80278,7 +80336,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/coupons/\{coupon\} *)
   let getCouponsCoupon = let _op = "GetCouponsCoupon" in
     Routes.route (Paths'.getCouponsCoupon ())
-      (fun coupon (_uri:Uri.t) (_resp:_resp)
+      (fun coupon (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80295,7 +80353,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCouponsCoupon'")
            | _, None -> None in
-         match H.getCouponsCoupon ~coupon ?expand _req
+         match Handlers.getCouponsCoupon ~coupon ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_coupon ~op:_op ~ctype:_resp_ctype content in
@@ -80317,7 +80375,7 @@ module Routes' (H : HANDLERS) = struct
   let postInvoicesInvoiceMarkUncollectible = let _op = "PostInvoicesInvoiceMarkUncollectible"
     in
     Routes.route (Paths'.postInvoicesInvoiceMarkUncollectible ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80331,7 +80389,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesInvoiceMarkUncollectible'")
            | _, None -> None in
-         match H.postInvoicesInvoiceMarkUncollectible ~invoice _req
+         match Handlers.postInvoicesInvoiceMarkUncollectible ~invoice _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -80353,7 +80411,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryReceivedDebitsId = let _op = "GetTreasuryReceivedDebitsId"
     in
     Routes.route (Paths'.getTreasuryReceivedDebitsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80370,7 +80428,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryReceivedDebitsId'")
            | _, None -> None in
-         match H.getTreasuryReceivedDebitsId ~id ?expand _req
+         match Handlers.getTreasuryReceivedDebitsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_received_debit ~op:_op ~ctype:_resp_ctype content in
@@ -80392,7 +80450,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalReadersReaderSetReaderDisplay = let _op = "PostTerminalReadersReaderSetReaderDisplay"
     in
     Routes.route (Paths'.postTerminalReadersReaderSetReaderDisplay ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80406,7 +80464,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalReadersReaderSetReaderDisplay'")
            | _, None -> None in
-         match H.postTerminalReadersReaderSetReaderDisplay ~reader _req
+         match Handlers.postTerminalReadersReaderSetReaderDisplay ~reader
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_reader ~op:_op ~ctype:_resp_ctype content in
@@ -80446,7 +80505,7 @@ module Routes' (H : HANDLERS) = struct
   let postIdentityVerificationSessionsSessionRedact = let _op = "PostIdentityVerificationSessionsSessionRedact"
     in
     Routes.route (Paths'.postIdentityVerificationSessionsSessionRedact ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80460,7 +80519,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIdentityVerificationSessionsSessionRedact'")
            | _, None -> None in
-         match H.postIdentityVerificationSessionsSessionRedact ~session _req
+         match Handlers.postIdentityVerificationSessionsSessionRedact
+           ~session _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_identity_verification_session ~op:_op ~ctype:_resp_ctype content in
@@ -80483,7 +80543,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/refunds/\{refund\} *)
   let postRefundsRefund = let _op = "PostRefundsRefund" in
     Routes.route (Paths'.postRefundsRefund ())
-      (fun refund (_uri:Uri.t) (_resp:_resp)
+      (fun refund (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80497,7 +80557,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostRefundsRefund'")
            | _, None -> None in
-         match H.postRefundsRefund ~refund _req
+         match Handlers.postRefundsRefund ~refund _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -80518,7 +80578,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/refunds/\{refund\} *)
   let getRefundsRefund = let _op = "GetRefundsRefund" in
     Routes.route (Paths'.getRefundsRefund ())
-      (fun refund (_uri:Uri.t) (_resp:_resp)
+      (fun refund (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80535,7 +80595,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetRefundsRefund'")
            | _, None -> None in
-         match H.getRefundsRefund ~refund ?expand _req
+         match Handlers.getRefundsRefund ~refund ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -80557,7 +80617,7 @@ module Routes' (H : HANDLERS) = struct
   let getCheckoutSessionsSessionLineItems = let _op = "GetCheckoutSessionsSessionLineItems"
     in
     Routes.route (Paths'.getCheckoutSessionsSessionLineItems ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80586,8 +80646,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCheckoutSessionsSessionLineItems'")
            | _, None -> None in 
-         match H.getCheckoutSessionsSessionLineItems ~session ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getCheckoutSessionsSessionLineItems ~session
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_b5bae8d183 ~op:_op ~ctype:_resp_ctype content in
@@ -80611,7 +80671,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersTreasuryOutboundTransfersOutboundTransferPost ())
-      (fun outbound_transfer (_uri:Uri.t) (_resp:_resp)
+      (fun outbound_transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80625,7 +80685,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundTransfersOutboundTransferPost'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundTransfersOutboundTransferPost
+         match Handlers.postTestHelpersTreasuryOutboundTransfersOutboundTransferPost
            ~outbound_transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -80648,7 +80708,7 @@ module Routes' (H : HANDLERS) = struct
   let postSubscriptionSchedulesScheduleRelease = let _op = "PostSubscriptionSchedulesScheduleRelease"
     in
     Routes.route (Paths'.postSubscriptionSchedulesScheduleRelease ())
-      (fun schedule (_uri:Uri.t) (_resp:_resp)
+      (fun schedule (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80662,7 +80722,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionSchedulesScheduleRelease'")
            | _, None -> None in
-         match H.postSubscriptionSchedulesScheduleRelease ~schedule _req
+         match Handlers.postSubscriptionSchedulesScheduleRelease ~schedule
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_schedule ~op:_op ~ctype:_resp_ctype content in
@@ -80684,7 +80745,7 @@ module Routes' (H : HANDLERS) = struct
   let getCreditNotesCreditNoteLines = let _op = "GetCreditNotesCreditNoteLines"
     in
     Routes.route (Paths'.getCreditNotesCreditNoteLines ())
-      (fun credit_note (_uri:Uri.t) (_resp:_resp)
+      (fun credit_note (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80713,8 +80774,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCreditNotesCreditNoteLines'")
            | _, None -> None in 
-         match H.getCreditNotesCreditNoteLines ~credit_note ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getCreditNotesCreditNoteLines ~credit_note
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_17654892a5 ~op:_op ~ctype:_resp_ctype content in
@@ -80736,7 +80797,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentMethodsPaymentMethodDetach = let _op = "PostPaymentMethodsPaymentMethodDetach"
     in
     Routes.route (Paths'.postPaymentMethodsPaymentMethodDetach ())
-      (fun payment_method (_uri:Uri.t) (_resp:_resp)
+      (fun payment_method (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80750,7 +80811,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodsPaymentMethodDetach'")
            | _, None -> None in
-         match H.postPaymentMethodsPaymentMethodDetach ~payment_method _req
+         match Handlers.postPaymentMethodsPaymentMethodDetach ~payment_method
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method ~op:_op ~ctype:_resp_ctype content in
@@ -80772,7 +80834,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryDebitReversalsDebitReversal = let _op = "GetTreasuryDebitReversalsDebitReversal"
     in
     Routes.route (Paths'.getTreasuryDebitReversalsDebitReversal ())
-      (fun debit_reversal (_uri:Uri.t) (_resp:_resp)
+      (fun debit_reversal (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80789,8 +80851,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryDebitReversalsDebitReversal'")
            | _, None -> None in
-         match H.getTreasuryDebitReversalsDebitReversal ~debit_reversal
-           ?expand _req
+         match Handlers.getTreasuryDebitReversalsDebitReversal
+           ~debit_reversal ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_debit_reversal ~op:_op ~ctype:_resp_ctype content in
@@ -80811,7 +80873,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax_codes/\{id\} *)
   let getTaxCodesId = let _op = "GetTaxCodesId" in
     Routes.route (Paths'.getTaxCodesId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80828,7 +80890,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxCodesId'")
            | _, None -> None in
-         match H.getTaxCodesId ~id ?expand _req
+         match Handlers.getTaxCodesId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_code ~op:_op ~ctype:_resp_ctype content in
@@ -80851,7 +80913,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postFinancialConnectionsAccountsAccountDisconnect ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80865,8 +80927,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostFinancialConnectionsAccountsAccountDisconnect'")
            | _, None -> None in
-         match H.postFinancialConnectionsAccountsAccountDisconnect ~account
-           _req
+         match Handlers.postFinancialConnectionsAccountsAccountDisconnect
+           ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -80888,7 +80950,7 @@ module Routes' (H : HANDLERS) = struct
   let postPromotionCodesPromotionCode = let _op = "PostPromotionCodesPromotionCode"
     in
     Routes.route (Paths'.postPromotionCodesPromotionCode ())
-      (fun promotion_code (_uri:Uri.t) (_resp:_resp)
+      (fun promotion_code (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80902,7 +80964,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPromotionCodesPromotionCode'")
            | _, None -> None in
-         match H.postPromotionCodesPromotionCode ~promotion_code _req
+         match Handlers.postPromotionCodesPromotionCode ~promotion_code _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_promotion_code ~op:_op ~ctype:_resp_ctype content in
@@ -80924,7 +80986,7 @@ module Routes' (H : HANDLERS) = struct
   let getPromotionCodesPromotionCode = let _op = "GetPromotionCodesPromotionCode"
     in
     Routes.route (Paths'.getPromotionCodesPromotionCode ())
-      (fun promotion_code (_uri:Uri.t) (_resp:_resp)
+      (fun promotion_code (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80941,7 +81003,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPromotionCodesPromotionCode'")
            | _, None -> None in
-         match H.getPromotionCodesPromotionCode ~promotion_code ?expand _req
+         match Handlers.getPromotionCodesPromotionCode ~promotion_code
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_promotion_code ~op:_op ~ctype:_resp_ctype content in
@@ -80963,7 +81026,7 @@ module Routes' (H : HANDLERS) = struct
   let postShippingRatesShippingRateToken = let _op = "PostShippingRatesShippingRateToken"
     in
     Routes.route (Paths'.postShippingRatesShippingRateToken ())
-      (fun shipping_rate_token (_uri:Uri.t) (_resp:_resp)
+      (fun shipping_rate_token (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -80977,7 +81040,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostShippingRatesShippingRateToken'")
            | _, None -> None in
-         match H.postShippingRatesShippingRateToken ~shipping_rate_token _req
+         match Handlers.postShippingRatesShippingRateToken
+           ~shipping_rate_token _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_shipping_rate ~op:_op ~ctype:_resp_ctype content in
@@ -80999,7 +81063,7 @@ module Routes' (H : HANDLERS) = struct
   let getShippingRatesShippingRateToken = let _op = "GetShippingRatesShippingRateToken"
     in
     Routes.route (Paths'.getShippingRatesShippingRateToken ())
-      (fun shipping_rate_token (_uri:Uri.t) (_resp:_resp)
+      (fun shipping_rate_token (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81016,8 +81080,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetShippingRatesShippingRateToken'")
            | _, None -> None in
-         match H.getShippingRatesShippingRateToken ~shipping_rate_token
-           ?expand _req
+         match Handlers.getShippingRatesShippingRateToken
+           ~shipping_rate_token ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_shipping_rate ~op:_op ~ctype:_resp_ctype content in
@@ -81039,7 +81103,7 @@ module Routes' (H : HANDLERS) = struct
   let postBillingMetersIdReactivate = let _op = "PostBillingMetersIdReactivate"
     in
     Routes.route (Paths'.postBillingMetersIdReactivate ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81053,7 +81117,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingMetersIdReactivate'")
            | _, None -> None in
-         match H.postBillingMetersIdReactivate ~id _req
+         match Handlers.postBillingMetersIdReactivate ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_meter ~op:_op ~ctype:_resp_ctype content in
@@ -81079,7 +81143,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentIntentsIntentCancel = let _op = "PostPaymentIntentsIntentCancel"
     in
     Routes.route (Paths'.postPaymentIntentsIntentCancel ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81093,7 +81157,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntentsIntentCancel'")
            | _, None -> None in
-         match H.postPaymentIntentsIntentCancel ~intent _req
+         match Handlers.postPaymentIntentsIntentCancel ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -81115,7 +81179,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryOutboundPaymentsId = let _op = "GetTreasuryOutboundPaymentsId"
     in
     Routes.route (Paths'.getTreasuryOutboundPaymentsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81132,7 +81196,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryOutboundPaymentsId'")
            | _, None -> None in
-         match H.getTreasuryOutboundPaymentsId ~id ?expand _req
+         match Handlers.getTreasuryOutboundPaymentsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_payment ~op:_op ~ctype:_resp_ctype content in
@@ -81154,7 +81218,7 @@ module Routes' (H : HANDLERS) = struct
   let getFinancialConnectionsTransactionsTransaction = let _op = "GetFinancialConnectionsTransactionsTransaction"
     in
     Routes.route (Paths'.getFinancialConnectionsTransactionsTransaction ())
-      (fun transaction (_uri:Uri.t) (_resp:_resp)
+      (fun transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81171,8 +81235,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFinancialConnectionsTransactionsTransaction'")
            | _, None -> None in
-         match H.getFinancialConnectionsTransactionsTransaction ~transaction
-           ?expand _req
+         match Handlers.getFinancialConnectionsTransactionsTransaction
+           ~transaction ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -81193,7 +81257,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes/\{quote\}/pdf *)
   let getQuotesQuotePdf = let _op = "GetQuotesQuotePdf" in
     Routes.route (Paths'.getQuotesQuotePdf ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81210,7 +81274,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetQuotesQuotePdf'")
            | _, None -> None in
-         match H.getQuotesQuotePdf ~quote ?expand _req
+         match Handlers.getQuotesQuotePdf ~quote ?expand _req
          with
          | Ok (`CH_OK (code,body,_headers)) ->
            let headers = [] in _resp ~code ~headers body
@@ -81228,7 +81292,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\}/dispute *)
   let postChargesChargeDispute = let _op = "PostChargesChargeDispute" in
     Routes.route (Paths'.postChargesChargeDispute ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81242,7 +81306,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostChargesChargeDispute'")
            | _, None -> None in
-         match H.postChargesChargeDispute ~charge _req
+         match Handlers.postChargesChargeDispute ~charge _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -81263,7 +81327,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\}/dispute *)
   let getChargesChargeDispute = let _op = "GetChargesChargeDispute" in
     Routes.route (Paths'.getChargesChargeDispute ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81280,7 +81344,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetChargesChargeDispute'")
            | _, None -> None in
-         match H.getChargesChargeDispute ~charge ?expand _req
+         match Handlers.getChargesChargeDispute ~charge ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -81302,7 +81366,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryInboundTransfersIdReturn = let _op = "PostTestHelpersTreasuryInboundTransfersIdReturn"
     in
     Routes.route (Paths'.postTestHelpersTreasuryInboundTransfersIdReturn ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81316,7 +81380,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryInboundTransfersIdReturn'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryInboundTransfersIdReturn ~id _req
+         match Handlers.postTestHelpersTreasuryInboundTransfersIdReturn ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_inbound_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -81338,7 +81403,7 @@ module Routes' (H : HANDLERS) = struct
   let getConfirmationTokensConfirmationToken = let _op = "GetConfirmationTokensConfirmationToken"
     in
     Routes.route (Paths'.getConfirmationTokensConfirmationToken ())
-      (fun confirmation_token (_uri:Uri.t) (_resp:_resp)
+      (fun confirmation_token (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81355,8 +81420,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetConfirmationTokensConfirmationToken'")
            | _, None -> None in
-         match H.getConfirmationTokensConfirmationToken ~confirmation_token
-           ?expand _req
+         match Handlers.getConfirmationTokensConfirmationToken
+           ~confirmation_token ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_confirmation_token ~op:_op ~ctype:_resp_ctype content in
@@ -81377,7 +81442,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/sources/\{source\}/verify *)
   let postSourcesSourceVerify = let _op = "PostSourcesSourceVerify" in
     Routes.route (Paths'.postSourcesSourceVerify ())
-      (fun source (_uri:Uri.t) (_resp:_resp)
+      (fun source (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81391,7 +81456,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSourcesSourceVerify'")
            | _, None -> None in
-         match H.postSourcesSourceVerify ~source _req
+         match Handlers.postSourcesSourceVerify ~source _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_source ~op:_op ~ctype:_resp_ctype content in
@@ -81412,7 +81477,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/topups/\{topup\}/cancel *)
   let postTopupsTopupCancel = let _op = "PostTopupsTopupCancel" in
     Routes.route (Paths'.postTopupsTopupCancel ())
-      (fun topup (_uri:Uri.t) (_resp:_resp)
+      (fun topup (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81426,7 +81491,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTopupsTopupCancel'")
            | _, None -> None in
-         match H.postTopupsTopupCancel ~topup _req
+         match Handlers.postTopupsTopupCancel ~topup _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_topup ~op:_op ~ctype:_resp_ctype content in
@@ -81448,7 +81513,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerSubscriptions = let _op = "PostCustomersCustomerSubscriptions"
     in
     Routes.route (Paths'.postCustomersCustomerSubscriptions ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81462,7 +81527,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerSubscriptions'")
            | _, None -> None in
-         match H.postCustomersCustomerSubscriptions ~customer _req
+         match Handlers.postCustomersCustomerSubscriptions ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription ~op:_op ~ctype:_resp_ctype content in
@@ -81484,7 +81549,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerSubscriptions = let _op = "GetCustomersCustomerSubscriptions"
     in
     Routes.route (Paths'.getCustomersCustomerSubscriptions ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81513,8 +81578,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerSubscriptions'")
            | _, None -> None in 
-         match H.getCustomersCustomerSubscriptions ~customer ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getCustomersCustomerSubscriptions ~customer
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_725e7e390f ~op:_op ~ctype:_resp_ctype content in
@@ -81536,7 +81601,7 @@ module Routes' (H : HANDLERS) = struct
   let postLinkedAccountsAccountDisconnect = let _op = "PostLinkedAccountsAccountDisconnect"
     in
     Routes.route (Paths'.postLinkedAccountsAccountDisconnect ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81550,7 +81615,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostLinkedAccountsAccountDisconnect'")
            | _, None -> None in
-         match H.postLinkedAccountsAccountDisconnect ~account _req
+         match Handlers.postLinkedAccountsAccountDisconnect ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -81572,8 +81637,8 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersIssuingCardsCardShippingDeliver = let _op = "PostTestHelpersIssuingCardsCardShippingDeliver"
     in
     Routes.route (Paths'.postTestHelpersIssuingCardsCardShippingDeliver ())
-      (fun card (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun card (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -81586,7 +81651,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingCardsCardShippingDeliver'")
            | _, None -> None in
-         match H.postTestHelpersIssuingCardsCardShippingDeliver ~card _req
+         match Handlers.postTestHelpersIssuingCardsCardShippingDeliver ~card
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_card ~op:_op ~ctype:_resp_ctype content in
@@ -81607,7 +81673,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/reviews/\{review\}/approve *)
   let postReviewsReviewApprove = let _op = "PostReviewsReviewApprove" in
     Routes.route (Paths'.postReviewsReviewApprove ())
-      (fun review (_uri:Uri.t) (_resp:_resp)
+      (fun review (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81621,7 +81687,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostReviewsReviewApprove'")
            | _, None -> None in
-         match H.postReviewsReviewApprove ~review _req
+         match Handlers.postReviewsReviewApprove ~review _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_review ~op:_op ~ctype:_resp_ctype content in
@@ -81643,7 +81709,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteApplePayDomainsDomain = let _op = "DeleteApplePayDomainsDomain"
     in
     Routes.route (Paths'.deleteApplePayDomainsDomain ())
-      (fun domain (_uri:Uri.t) (_resp:_resp)
+      (fun domain (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81657,7 +81723,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteApplePayDomainsDomain'")
            | _, None -> None in
-         match H.deleteApplePayDomainsDomain ~domain _req
+         match Handlers.deleteApplePayDomainsDomain ~domain _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_apple_pay_domain ~op:_op ~ctype:_resp_ctype content in
@@ -81678,7 +81744,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/apple_pay/domains/\{domain\} *)
   let getApplePayDomainsDomain = let _op = "GetApplePayDomainsDomain" in
     Routes.route (Paths'.getApplePayDomainsDomain ())
-      (fun domain (_uri:Uri.t) (_resp:_resp)
+      (fun domain (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81695,7 +81761,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetApplePayDomainsDomain'")
            | _, None -> None in
-         match H.getApplePayDomainsDomain ~domain ?expand _req
+         match Handlers.getApplePayDomainsDomain ~domain ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_apple_pay_domain ~op:_op ~ctype:_resp_ctype content in
@@ -81716,7 +81782,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/\{invoice\} *)
   let deleteInvoicesInvoice = let _op = "DeleteInvoicesInvoice" in
     Routes.route (Paths'.deleteInvoicesInvoice ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81730,7 +81796,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteInvoicesInvoice'")
            | _, None -> None in
-         match H.deleteInvoicesInvoice ~invoice _req
+         match Handlers.deleteInvoicesInvoice ~invoice _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -81756,7 +81822,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/\{invoice\} *)
   let postInvoicesInvoice = let _op = "PostInvoicesInvoice" in
     Routes.route (Paths'.postInvoicesInvoice ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81770,7 +81836,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesInvoice'")
            | _, None -> None in
-         match H.postInvoicesInvoice ~invoice _req
+         match Handlers.postInvoicesInvoice ~invoice _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -81791,7 +81857,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/\{invoice\} *)
   let getInvoicesInvoice = let _op = "GetInvoicesInvoice" in
     Routes.route (Paths'.getInvoicesInvoice ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81808,7 +81874,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetInvoicesInvoice'")
            | _, None -> None in
-         match H.getInvoicesInvoice ~invoice ?expand _req
+         match Handlers.getInvoicesInvoice ~invoice ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -81831,7 +81897,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingAuthorizationsAuthorizationExpire ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81845,7 +81911,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingAuthorizationsAuthorizationExpire'")
            | _, None -> None in
-         match H.postTestHelpersIssuingAuthorizationsAuthorizationExpire
+         match Handlers.postTestHelpersIssuingAuthorizationsAuthorizationExpire
            ~authorization _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -81868,7 +81934,7 @@ module Routes' (H : HANDLERS) = struct
   let getLinkAccountSessionsSession = let _op = "GetLinkAccountSessionsSession"
     in
     Routes.route (Paths'.getLinkAccountSessionsSession ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81885,7 +81951,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetLinkAccountSessionsSession'")
            | _, None -> None in
-         match H.getLinkAccountSessionsSession ~session ?expand _req
+         match Handlers.getLinkAccountSessionsSession ~session ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_session ~op:_op ~ctype:_resp_ctype content in
@@ -81907,7 +81973,7 @@ module Routes' (H : HANDLERS) = struct
   let getReportingReportTypesReportType = let _op = "GetReportingReportTypesReportType"
     in
     Routes.route (Paths'.getReportingReportTypesReportType ())
-      (fun report_type (_uri:Uri.t) (_resp:_resp)
+      (fun report_type (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81924,7 +81990,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetReportingReportTypesReportType'")
            | _, None -> None in
-         match H.getReportingReportTypesReportType ~report_type ?expand _req
+         match Handlers.getReportingReportTypesReportType ~report_type
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_reporting_report_type ~op:_op ~ctype:_resp_ctype content in
@@ -81945,8 +82012,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/ephemeral_keys/\{key\} *)
   let deleteEphemeralKeysKey = let _op = "DeleteEphemeralKeysKey" in
     Routes.route (Paths'.deleteEphemeralKeysKey ())
-      (fun key (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun key (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -81959,7 +82026,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteEphemeralKeysKey'")
            | _, None -> None in
-         match H.deleteEphemeralKeysKey ~key _req
+         match Handlers.deleteEphemeralKeysKey ~key _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_ephemeral_key ~op:_op ~ctype:_resp_ctype content in
@@ -81980,7 +82047,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tokens/\{token\} *)
   let getTokensToken = let _op = "GetTokensToken" in
     Routes.route (Paths'.getTokensToken ())
-      (fun token (_uri:Uri.t) (_resp:_resp)
+      (fun token (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -81997,7 +82064,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTokensToken'")
            | _, None -> None in
-         match H.getTokensToken ~token ?expand _req
+         match Handlers.getTokensToken ~token ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_token ~op:_op ~ctype:_resp_ctype content in
@@ -82019,7 +82086,7 @@ module Routes' (H : HANDLERS) = struct
   let postSubscriptionsSubscriptionResume = let _op = "PostSubscriptionsSubscriptionResume"
     in
     Routes.route (Paths'.postSubscriptionsSubscriptionResume ())
-      (fun subscription (_uri:Uri.t) (_resp:_resp)
+      (fun subscription (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82033,7 +82100,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionsSubscriptionResume'")
            | _, None -> None in
-         match H.postSubscriptionsSubscriptionResume ~subscription _req
+         match Handlers.postSubscriptionsSubscriptionResume ~subscription
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription ~op:_op ~ctype:_resp_ctype content in
@@ -82055,7 +82123,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryInboundTransfersId = let _op = "GetTreasuryInboundTransfersId"
     in
     Routes.route (Paths'.getTreasuryInboundTransfersId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82072,7 +82140,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryInboundTransfersId'")
            | _, None -> None in
-         match H.getTreasuryInboundTransfersId ~id ?expand _req
+         match Handlers.getTreasuryInboundTransfersId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_inbound_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -82094,7 +82162,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingCardholdersCardholder = let _op = "PostIssuingCardholdersCardholder"
     in
     Routes.route (Paths'.postIssuingCardholdersCardholder ())
-      (fun cardholder (_uri:Uri.t) (_resp:_resp)
+      (fun cardholder (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82108,7 +82176,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingCardholdersCardholder'")
            | _, None -> None in
-         match H.postIssuingCardholdersCardholder ~cardholder _req
+         match Handlers.postIssuingCardholdersCardholder ~cardholder _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_cardholder ~op:_op ~ctype:_resp_ctype content in
@@ -82130,7 +82198,7 @@ module Routes' (H : HANDLERS) = struct
   let getIssuingCardholdersCardholder = let _op = "GetIssuingCardholdersCardholder"
     in
     Routes.route (Paths'.getIssuingCardholdersCardholder ())
-      (fun cardholder (_uri:Uri.t) (_resp:_resp)
+      (fun cardholder (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82147,7 +82215,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingCardholdersCardholder'")
            | _, None -> None in
-         match H.getIssuingCardholdersCardholder ~cardholder ?expand _req
+         match Handlers.getIssuingCardholdersCardholder ~cardholder ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_cardholder ~op:_op ~ctype:_resp_ctype content in
@@ -82169,7 +82238,7 @@ module Routes' (H : HANDLERS) = struct
   let getQuotesQuoteComputedUpfrontLineItems = let _op = "GetQuotesQuoteComputedUpfrontLineItems"
     in
     Routes.route (Paths'.getQuotesQuoteComputedUpfrontLineItems ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82198,8 +82267,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetQuotesQuoteComputedUpfrontLineItems'")
            | _, None -> None in 
-         match H.getQuotesQuoteComputedUpfrontLineItems ~quote ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getQuotesQuoteComputedUpfrontLineItems ~quote
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_61b163891b ~op:_op ~ctype:_resp_ctype content in
@@ -82220,7 +82289,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/climate/products/\{product\} *)
   let getClimateProductsProduct = let _op = "GetClimateProductsProduct" in
     Routes.route (Paths'.getClimateProductsProduct ())
-      (fun product (_uri:Uri.t) (_resp:_resp)
+      (fun product (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82237,7 +82306,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetClimateProductsProduct'")
            | _, None -> None in
-         match H.getClimateProductsProduct ~product ?expand _req
+         match Handlers.getClimateProductsProduct ~product ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_climate_product ~op:_op ~ctype:_resp_ctype content in
@@ -82259,7 +82328,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteTestHelpersTestClocksTestClock = let _op = "DeleteTestHelpersTestClocksTestClock"
     in
     Routes.route (Paths'.deleteTestHelpersTestClocksTestClock ())
-      (fun test_clock (_uri:Uri.t) (_resp:_resp)
+      (fun test_clock (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82273,7 +82342,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteTestHelpersTestClocksTestClock'")
            | _, None -> None in
-         match H.deleteTestHelpersTestClocksTestClock ~test_clock _req
+         match Handlers.deleteTestHelpersTestClocksTestClock ~test_clock _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_test_helpers_test_clock ~op:_op ~ctype:_resp_ctype content in
@@ -82295,7 +82364,7 @@ module Routes' (H : HANDLERS) = struct
   let getTestHelpersTestClocksTestClock = let _op = "GetTestHelpersTestClocksTestClock"
     in
     Routes.route (Paths'.getTestHelpersTestClocksTestClock ())
-      (fun test_clock (_uri:Uri.t) (_resp:_resp)
+      (fun test_clock (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82312,7 +82381,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTestHelpersTestClocksTestClock'")
            | _, None -> None in
-         match H.getTestHelpersTestClocksTestClock ~test_clock ?expand _req
+         match Handlers.getTestHelpersTestClocksTestClock ~test_clock ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_test_helpers_test_clock ~op:_op ~ctype:_resp_ctype content in
@@ -82338,7 +82408,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerSources = let _op = "PostCustomersCustomerSources"
     in
     Routes.route (Paths'.postCustomersCustomerSources ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82352,7 +82422,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerSources'")
            | _, None -> None in
-         match H.postCustomersCustomerSources ~customer _req
+         match Handlers.postCustomersCustomerSources ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_source ~op:_op ~ctype:_resp_ctype content in
@@ -82374,7 +82444,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerSources = let _op = "GetCustomersCustomerSources"
     in
     Routes.route (Paths'.getCustomersCustomerSources ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82407,8 +82477,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerSources'")
            | _, None -> None in 
-         match H.getCustomersCustomerSources ~customer ?ending_before ?expand
-           ?limit ?object_ ?starting_after _req
+         match Handlers.getCustomersCustomerSources ~customer ?ending_before
+           ?expand ?limit ?object_ ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_08def66363 ~op:_op ~ctype:_resp_ctype content in
@@ -82430,7 +82500,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalReadersReaderProcessPaymentIntent = let _op = "PostTerminalReadersReaderProcessPaymentIntent"
     in
     Routes.route (Paths'.postTerminalReadersReaderProcessPaymentIntent ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82444,7 +82514,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalReadersReaderProcessPaymentIntent'")
            | _, None -> None in
-         match H.postTerminalReadersReaderProcessPaymentIntent ~reader _req
+         match Handlers.postTerminalReadersReaderProcessPaymentIntent ~reader
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_reader ~op:_op ~ctype:_resp_ctype content in
@@ -82466,7 +82537,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryOutboundPaymentsIdReturn = let _op = "PostTestHelpersTreasuryOutboundPaymentsIdReturn"
     in
     Routes.route (Paths'.postTestHelpersTreasuryOutboundPaymentsIdReturn ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82480,7 +82551,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundPaymentsIdReturn'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundPaymentsIdReturn ~id _req
+         match Handlers.postTestHelpersTreasuryOutboundPaymentsIdReturn ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_payment ~op:_op ~ctype:_resp_ctype content in
@@ -82504,7 +82576,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountLoginLinks = let _op = "PostAccountsAccountLoginLinks"
     in
     Routes.route (Paths'.postAccountsAccountLoginLinks ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82518,7 +82590,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountLoginLinks'")
            | _, None -> None in
-         match H.postAccountsAccountLoginLinks ~account _req
+         match Handlers.postAccountsAccountLoginLinks ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_login_link ~op:_op ~ctype:_resp_ctype content in
@@ -82540,7 +82612,7 @@ module Routes' (H : HANDLERS) = struct
   let getTaxTransactionsTransaction = let _op = "GetTaxTransactionsTransaction"
     in
     Routes.route (Paths'.getTaxTransactionsTransaction ())
-      (fun transaction (_uri:Uri.t) (_resp:_resp)
+      (fun transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82557,7 +82629,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxTransactionsTransaction'")
            | _, None -> None in
-         match H.getTaxTransactionsTransaction ~transaction ?expand _req
+         match Handlers.getTaxTransactionsTransaction ~transaction ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -82578,8 +82651,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/files/\{file\} *)
   let getFilesFile = let _op = "GetFilesFile" in
     Routes.route (Paths'.getFilesFile ())
-      (fun file (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun file (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let expand = let _nvs = _queries in
@@ -82595,7 +82668,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFilesFile'")
            | _, None -> None in
-         match H.getFilesFile ~file ?expand _req
+         match Handlers.getFilesFile ~file ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_file ~op:_op ~ctype:_resp_ctype content in
@@ -82617,7 +82690,7 @@ module Routes' (H : HANDLERS) = struct
   let postProductsProductFeatures = let _op = "PostProductsProductFeatures"
     in
     Routes.route (Paths'.postProductsProductFeatures ())
-      (fun product (_uri:Uri.t) (_resp:_resp)
+      (fun product (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82631,7 +82704,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostProductsProductFeatures'")
            | _, None -> None in
-         match H.postProductsProductFeatures ~product _req
+         match Handlers.postProductsProductFeatures ~product _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_product_feature ~op:_op ~ctype:_resp_ctype content in
@@ -82652,7 +82725,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/products/\{product\}/features *)
   let getProductsProductFeatures = let _op = "GetProductsProductFeatures" in
     Routes.route (Paths'.getProductsProductFeatures ())
-      (fun product (_uri:Uri.t) (_resp:_resp)
+      (fun product (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82681,8 +82754,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetProductsProductFeatures'")
            | _, None -> None in 
-         match H.getProductsProductFeatures ~product ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getProductsProductFeatures ~product ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_7db760c7aa ~op:_op ~ctype:_resp_ctype content in
@@ -82706,7 +82779,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignDeactivate ())
-      (fun personalization_design (_uri:Uri.t) (_resp:_resp)
+      (fun personalization_design (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82720,7 +82793,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingPersonalizationDesignsPersonalizationDesignDeactivate'")
            | _, None -> None in
-         match H.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignDeactivate
+         match Handlers.postTestHelpersIssuingPersonalizationDesignsPersonalizationDesignDeactivate
            ~personalization_design _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -82756,7 +82829,7 @@ module Routes' (H : HANDLERS) = struct
   let postSetupIntentsIntentConfirm = let _op = "PostSetupIntentsIntentConfirm"
     in
     Routes.route (Paths'.postSetupIntentsIntentConfirm ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82770,7 +82843,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSetupIntentsIntentConfirm'")
            | _, None -> None in
-         match H.postSetupIntentsIntentConfirm ~intent _req
+         match Handlers.postSetupIntentsIntentConfirm ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_setup_intent ~op:_op ~ctype:_resp_ctype content in
@@ -82791,7 +82864,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/billing/meters/\{id\} *)
   let postBillingMetersId = let _op = "PostBillingMetersId" in
     Routes.route (Paths'.postBillingMetersId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82805,7 +82878,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostBillingMetersId'")
            | _, None -> None in
-         match H.postBillingMetersId ~id _req
+         match Handlers.postBillingMetersId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_meter ~op:_op ~ctype:_resp_ctype content in
@@ -82826,7 +82899,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/billing/meters/\{id\} *)
   let getBillingMetersId = let _op = "GetBillingMetersId" in
     Routes.route (Paths'.getBillingMetersId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82843,7 +82916,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBillingMetersId'")
            | _, None -> None in
-         match H.getBillingMetersId ~id ?expand _req
+         match Handlers.getBillingMetersId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_billing_meter ~op:_op ~ctype:_resp_ctype content in
@@ -82864,7 +82937,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/\{invoice\}/pay *)
   let postInvoicesInvoicePay = let _op = "PostInvoicesInvoicePay" in
     Routes.route (Paths'.postInvoicesInvoicePay ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82878,7 +82951,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesInvoicePay'")
            | _, None -> None in
-         match H.postInvoicesInvoicePay ~invoice _req
+         match Handlers.postInvoicesInvoicePay ~invoice _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -82899,7 +82972,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/tokens/\{token\} *)
   let postIssuingTokensToken = let _op = "PostIssuingTokensToken" in
     Routes.route (Paths'.postIssuingTokensToken ())
-      (fun token (_uri:Uri.t) (_resp:_resp)
+      (fun token (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82913,7 +82986,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingTokensToken'")
            | _, None -> None in
-         match H.postIssuingTokensToken ~token _req
+         match Handlers.postIssuingTokensToken ~token _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_token ~op:_op ~ctype:_resp_ctype content in
@@ -82934,7 +83007,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/tokens/\{token\} *)
   let getIssuingTokensToken = let _op = "GetIssuingTokensToken" in
     Routes.route (Paths'.getIssuingTokensToken ())
-      (fun token (_uri:Uri.t) (_resp:_resp)
+      (fun token (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82951,7 +83024,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingTokensToken'")
            | _, None -> None in
-         match H.getIssuingTokensToken ~token ?expand _req
+         match Handlers.getIssuingTokensToken ~token ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_token ~op:_op ~ctype:_resp_ctype content in
@@ -82974,7 +83047,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/refunds/\{refund\}/cancel *)
   let postRefundsRefundCancel = let _op = "PostRefundsRefundCancel" in
     Routes.route (Paths'.postRefundsRefundCancel ())
-      (fun refund (_uri:Uri.t) (_resp:_resp)
+      (fun refund (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -82988,7 +83061,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostRefundsRefundCancel'")
            | _, None -> None in
-         match H.postRefundsRefundCancel ~refund _req
+         match Handlers.postRefundsRefundCancel ~refund _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -83009,7 +83082,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/credit_notes/\{id\} *)
   let postCreditNotesId = let _op = "PostCreditNotesId" in
     Routes.route (Paths'.postCreditNotesId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83023,7 +83096,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCreditNotesId'")
            | _, None -> None in
-         match H.postCreditNotesId ~id _req
+         match Handlers.postCreditNotesId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_credit_note ~op:_op ~ctype:_resp_ctype content in
@@ -83044,7 +83117,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/credit_notes/\{id\} *)
   let getCreditNotesId = let _op = "GetCreditNotesId" in
     Routes.route (Paths'.getCreditNotesId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83061,7 +83134,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCreditNotesId'")
            | _, None -> None in
-         match H.getCreditNotesId ~id ?expand _req
+         match Handlers.getCreditNotesId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_credit_note ~op:_op ~ctype:_resp_ctype content in
@@ -83085,7 +83158,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersTreasuryOutboundTransfersOutboundTransferReturn ())
-      (fun outbound_transfer (_uri:Uri.t) (_resp:_resp)
+      (fun outbound_transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83099,7 +83172,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundTransfersOutboundTransferReturn'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundTransfersOutboundTransferReturn
+         match Handlers.postTestHelpersTreasuryOutboundTransfersOutboundTransferReturn
            ~outbound_transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -83122,7 +83195,7 @@ module Routes' (H : HANDLERS) = struct
   let getEntitlementsActiveEntitlementsId = let _op = "GetEntitlementsActiveEntitlementsId"
     in
     Routes.route (Paths'.getEntitlementsActiveEntitlementsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83139,7 +83212,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetEntitlementsActiveEntitlementsId'")
            | _, None -> None in
-         match H.getEntitlementsActiveEntitlementsId ~id ?expand _req
+         match Handlers.getEntitlementsActiveEntitlementsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_entitlements_active_entitlement ~op:_op ~ctype:_resp_ctype content in
@@ -83161,7 +83234,7 @@ module Routes' (H : HANDLERS) = struct
   let getAccountsAccountCapabilities = let _op = "GetAccountsAccountCapabilities"
     in
     Routes.route (Paths'.getAccountsAccountCapabilities ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83178,7 +83251,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountCapabilities'")
            | _, None -> None in
-         match H.getAccountsAccountCapabilities ~account ?expand _req
+         match Handlers.getAccountsAccountCapabilities ~account ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_05eeb89580 ~op:_op ~ctype:_resp_ctype content in
@@ -83200,7 +83273,7 @@ module Routes' (H : HANDLERS) = struct
   let getFinancialConnectionsAccountsAccountOwners = let _op = "GetFinancialConnectionsAccountsAccountOwners"
     in
     Routes.route (Paths'.getFinancialConnectionsAccountsAccountOwners ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83238,7 +83311,7 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'ownership' is required by operation 'GetFinancialConnectionsAccountsAccountOwners'")
          in 
-         match H.getFinancialConnectionsAccountsAccountOwners ~account
+         match Handlers.getFinancialConnectionsAccountsAccountOwners ~account
            ?ending_before ?expand ?limit ~ownership ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -83265,7 +83338,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentIntentsIntentCapture = let _op = "PostPaymentIntentsIntentCapture"
     in
     Routes.route (Paths'.postPaymentIntentsIntentCapture ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83279,7 +83352,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntentsIntentCapture'")
            | _, None -> None in
-         match H.postPaymentIntentsIntentCapture ~intent _req
+         match Handlers.postPaymentIntentsIntentCapture ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -83302,7 +83375,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/balance_transactions/\{id\} *)
   let getBalanceTransactionsId = let _op = "GetBalanceTransactionsId" in
     Routes.route (Paths'.getBalanceTransactionsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83319,7 +83392,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBalanceTransactionsId'")
            | _, None -> None in
-         match H.getBalanceTransactionsId ~id ?expand _req
+         match Handlers.getBalanceTransactionsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_balance_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -83342,7 +83415,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingTransactionsTransactionRefund ())
-      (fun transaction (_uri:Uri.t) (_resp:_resp)
+      (fun transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83356,7 +83429,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingTransactionsTransactionRefund'")
            | _, None -> None in
-         match H.postTestHelpersIssuingTransactionsTransactionRefund
+         match Handlers.postTestHelpersIssuingTransactionsTransactionRefund
            ~transaction _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -83379,7 +83452,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteCustomersCustomerDiscount = let _op = "DeleteCustomersCustomerDiscount"
     in
     Routes.route (Paths'.deleteCustomersCustomerDiscount ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83393,7 +83466,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomerDiscount'")
            | _, None -> None in
-         match H.deleteCustomersCustomerDiscount ~customer _req
+         match Handlers.deleteCustomersCustomerDiscount ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_discount ~op:_op ~ctype:_resp_ctype content in
@@ -83413,7 +83486,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerDiscount = let _op = "GetCustomersCustomerDiscount"
     in
     Routes.route (Paths'.getCustomersCustomerDiscount ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83430,7 +83503,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerDiscount'")
            | _, None -> None in
-         match H.getCustomersCustomerDiscount ~customer ?expand _req
+         match Handlers.getCustomersCustomerDiscount ~customer ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_discount ~op:_op ~ctype:_resp_ctype content in
@@ -83452,7 +83525,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingAuthorizationsAuthorization = let _op = "PostIssuingAuthorizationsAuthorization"
     in
     Routes.route (Paths'.postIssuingAuthorizationsAuthorization ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83466,7 +83539,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingAuthorizationsAuthorization'")
            | _, None -> None in
-         match H.postIssuingAuthorizationsAuthorization ~authorization _req
+         match Handlers.postIssuingAuthorizationsAuthorization ~authorization
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_authorization ~op:_op ~ctype:_resp_ctype content in
@@ -83488,7 +83562,7 @@ module Routes' (H : HANDLERS) = struct
   let getIssuingAuthorizationsAuthorization = let _op = "GetIssuingAuthorizationsAuthorization"
     in
     Routes.route (Paths'.getIssuingAuthorizationsAuthorization ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83505,8 +83579,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingAuthorizationsAuthorization'")
            | _, None -> None in
-         match H.getIssuingAuthorizationsAuthorization ~authorization ?expand
-           _req
+         match Handlers.getIssuingAuthorizationsAuthorization ~authorization
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_authorization ~op:_op ~ctype:_resp_ctype content in
@@ -83528,7 +83602,7 @@ module Routes' (H : HANDLERS) = struct
   let postTreasuryOutboundPaymentsIdCancel = let _op = "PostTreasuryOutboundPaymentsIdCancel"
     in
     Routes.route (Paths'.postTreasuryOutboundPaymentsIdCancel ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83542,7 +83616,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryOutboundPaymentsIdCancel'")
            | _, None -> None in
-         match H.postTreasuryOutboundPaymentsIdCancel ~id _req
+         match Handlers.postTreasuryOutboundPaymentsIdCancel ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_payment ~op:_op ~ctype:_resp_ctype content in
@@ -83563,7 +83637,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/disputes/\{dispute\} *)
   let postIssuingDisputesDispute = let _op = "PostIssuingDisputesDispute" in
     Routes.route (Paths'.postIssuingDisputesDispute ())
-      (fun dispute (_uri:Uri.t) (_resp:_resp)
+      (fun dispute (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83577,7 +83651,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingDisputesDispute'")
            | _, None -> None in
-         match H.postIssuingDisputesDispute ~dispute _req
+         match Handlers.postIssuingDisputesDispute ~dispute _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -83598,7 +83672,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/disputes/\{dispute\} *)
   let getIssuingDisputesDispute = let _op = "GetIssuingDisputesDispute" in
     Routes.route (Paths'.getIssuingDisputesDispute ())
-      (fun dispute (_uri:Uri.t) (_resp:_resp)
+      (fun dispute (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83615,7 +83689,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingDisputesDispute'")
            | _, None -> None in
-         match H.getIssuingDisputesDispute ~dispute ?expand _req
+         match Handlers.getIssuingDisputesDispute ~dispute ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -83637,7 +83711,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteTerminalLocationsLocation = let _op = "DeleteTerminalLocationsLocation"
     in
     Routes.route (Paths'.deleteTerminalLocationsLocation ())
-      (fun location (_uri:Uri.t) (_resp:_resp)
+      (fun location (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83651,7 +83725,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteTerminalLocationsLocation'")
            | _, None -> None in
-         match H.deleteTerminalLocationsLocation ~location _req
+         match Handlers.deleteTerminalLocationsLocation ~location _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_terminal_location ~op:_op ~ctype:_resp_ctype content in
@@ -83673,7 +83747,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalLocationsLocation = let _op = "PostTerminalLocationsLocation"
     in
     Routes.route (Paths'.postTerminalLocationsLocation ())
-      (fun location (_uri:Uri.t) (_resp:_resp)
+      (fun location (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83687,7 +83761,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalLocationsLocation'")
            | _, None -> None in
-         match H.postTerminalLocationsLocation ~location _req
+         match Handlers.postTerminalLocationsLocation ~location _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_5cf0bd6b40 ~op:_op ~ctype:_resp_ctype content in
@@ -83709,7 +83783,7 @@ module Routes' (H : HANDLERS) = struct
   let getTerminalLocationsLocation = let _op = "GetTerminalLocationsLocation"
     in
     Routes.route (Paths'.getTerminalLocationsLocation ())
-      (fun location (_uri:Uri.t) (_resp:_resp)
+      (fun location (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83726,7 +83800,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTerminalLocationsLocation'")
            | _, None -> None in
-         match H.getTerminalLocationsLocation ~location ?expand _req
+         match Handlers.getTerminalLocationsLocation ~location ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_9ea5160203 ~op:_op ~ctype:_resp_ctype content in
@@ -83748,7 +83822,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryInboundTransfersIdSucceed = let _op = "PostTestHelpersTreasuryInboundTransfersIdSucceed"
     in
     Routes.route (Paths'.postTestHelpersTreasuryInboundTransfersIdSucceed ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83762,7 +83836,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryInboundTransfersIdSucceed'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryInboundTransfersIdSucceed ~id _req
+         match Handlers.postTestHelpersTreasuryInboundTransfersIdSucceed ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_inbound_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -83782,7 +83857,7 @@ module Routes' (H : HANDLERS) = struct
   let postChargesChargeDisputeClose = let _op = "PostChargesChargeDisputeClose"
     in
     Routes.route (Paths'.postChargesChargeDisputeClose ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83796,7 +83871,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostChargesChargeDisputeClose'")
            | _, None -> None in
-         match H.postChargesChargeDisputeClose ~charge _req
+         match Handlers.postChargesChargeDisputeClose ~charge _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -83818,7 +83893,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentMethodConfigurationsConfiguration = let _op = "PostPaymentMethodConfigurationsConfiguration"
     in
     Routes.route (Paths'.postPaymentMethodConfigurationsConfiguration ())
-      (fun configuration (_uri:Uri.t) (_resp:_resp)
+      (fun configuration (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83832,8 +83907,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodConfigurationsConfiguration'")
            | _, None -> None in
-         match H.postPaymentMethodConfigurationsConfiguration ~configuration
-           _req
+         match Handlers.postPaymentMethodConfigurationsConfiguration
+           ~configuration _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -83855,7 +83930,7 @@ module Routes' (H : HANDLERS) = struct
   let getPaymentMethodConfigurationsConfiguration = let _op = "GetPaymentMethodConfigurationsConfiguration"
     in
     Routes.route (Paths'.getPaymentMethodConfigurationsConfiguration ())
-      (fun configuration (_uri:Uri.t) (_resp:_resp)
+      (fun configuration (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83872,8 +83947,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentMethodConfigurationsConfiguration'")
            | _, None -> None in
-         match H.getPaymentMethodConfigurationsConfiguration ~configuration
-           ?expand _req
+         match Handlers.getPaymentMethodConfigurationsConfiguration
+           ~configuration ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method_configuration ~op:_op ~ctype:_resp_ctype content in
@@ -83896,7 +83971,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax/registrations/\{id\} *)
   let postTaxRegistrationsId = let _op = "PostTaxRegistrationsId" in
     Routes.route (Paths'.postTaxRegistrationsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83910,7 +83985,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTaxRegistrationsId'")
            | _, None -> None in
-         match H.postTaxRegistrationsId ~id _req
+         match Handlers.postTaxRegistrationsId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_registration ~op:_op ~ctype:_resp_ctype content in
@@ -83931,7 +84006,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/tax/registrations/\{id\} *)
   let getTaxRegistrationsId = let _op = "GetTaxRegistrationsId" in
     Routes.route (Paths'.getTaxRegistrationsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83948,7 +84023,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxRegistrationsId'")
            | _, None -> None in
-         match H.getTaxRegistrationsId ~id ?expand _req
+         match Handlers.getTaxRegistrationsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_registration ~op:_op ~ctype:_resp_ctype content in
@@ -83969,7 +84044,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/exchange_rates/\{rate_id\} *)
   let getExchangeRatesRateId = let _op = "GetExchangeRatesRateId" in
     Routes.route (Paths'.getExchangeRatesRateId ())
-      (fun rate_id (_uri:Uri.t) (_resp:_resp)
+      (fun rate_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -83986,7 +84061,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetExchangeRatesRateId'")
            | _, None -> None in
-         match H.getExchangeRatesRateId ~rate_id ?expand _req
+         match Handlers.getExchangeRatesRateId ~rate_id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_exchange_rate ~op:_op ~ctype:_resp_ctype content in
@@ -84008,7 +84083,7 @@ module Routes' (H : HANDLERS) = struct
   let getLinkedAccountsAccountOwners = let _op = "GetLinkedAccountsAccountOwners"
     in
     Routes.route (Paths'.getLinkedAccountsAccountOwners ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84046,8 +84121,8 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'ownership' is required by operation 'GetLinkedAccountsAccountOwners'")
          in 
-         match H.getLinkedAccountsAccountOwners ~account ?ending_before
-           ?expand ?limit ~ownership ?starting_after _req
+         match Handlers.getLinkedAccountsAccountOwners ~account
+           ?ending_before ?expand ?limit ~ownership ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_606c2d05a7 ~op:_op ~ctype:_resp_ctype content in
@@ -84077,7 +84152,7 @@ module Routes' (H : HANDLERS) = struct
   let postApplicationFeesIdRefunds = let _op = "PostApplicationFeesIdRefunds"
     in
     Routes.route (Paths'.postApplicationFeesIdRefunds ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84091,7 +84166,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostApplicationFeesIdRefunds'")
            | _, None -> None in
-         match H.postApplicationFeesIdRefunds ~id _req
+         match Handlers.postApplicationFeesIdRefunds ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_fee_refund ~op:_op ~ctype:_resp_ctype content in
@@ -84113,7 +84188,7 @@ module Routes' (H : HANDLERS) = struct
   let getApplicationFeesIdRefunds = let _op = "GetApplicationFeesIdRefunds"
     in
     Routes.route (Paths'.getApplicationFeesIdRefunds ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84142,8 +84217,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetApplicationFeesIdRefunds'")
            | _, None -> None in 
-         match H.getApplicationFeesIdRefunds ~id ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getApplicationFeesIdRefunds ~id ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_b9e0aa198c ~op:_op ~ctype:_resp_ctype content in
@@ -84165,8 +84240,8 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersIssuingCardsCardShippingFail = let _op = "PostTestHelpersIssuingCardsCardShippingFail"
     in
     Routes.route (Paths'.postTestHelpersIssuingCardsCardShippingFail ())
-      (fun card (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun card (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -84179,7 +84254,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingCardsCardShippingFail'")
            | _, None -> None in
-         match H.postTestHelpersIssuingCardsCardShippingFail ~card _req
+         match Handlers.postTestHelpersIssuingCardsCardShippingFail ~card
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_card ~op:_op ~ctype:_resp_ctype content in
@@ -84200,7 +84276,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/prices/\{price\} *)
   let postPricesPrice = let _op = "PostPricesPrice" in
     Routes.route (Paths'.postPricesPrice ())
-      (fun price (_uri:Uri.t) (_resp:_resp)
+      (fun price (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84214,7 +84290,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPricesPrice'")
            | _, None -> None in
-         match H.postPricesPrice ~price _req
+         match Handlers.postPricesPrice ~price _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_price ~op:_op ~ctype:_resp_ctype content in
@@ -84235,7 +84311,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/prices/\{price\} *)
   let getPricesPrice = let _op = "GetPricesPrice" in
     Routes.route (Paths'.getPricesPrice ())
-      (fun price (_uri:Uri.t) (_resp:_resp)
+      (fun price (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84252,7 +84328,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPricesPrice'")
            | _, None -> None in
-         match H.getPricesPrice ~price ?expand _req
+         match Handlers.getPricesPrice ~price ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_price ~op:_op ~ctype:_resp_ctype content in
@@ -84278,7 +84354,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerBankAccounts = let _op = "PostCustomersCustomerBankAccounts"
     in
     Routes.route (Paths'.postCustomersCustomerBankAccounts ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84292,7 +84368,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerBankAccounts'")
            | _, None -> None in
-         match H.postCustomersCustomerBankAccounts ~customer _req
+         match Handlers.postCustomersCustomerBankAccounts ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_source ~op:_op ~ctype:_resp_ctype content in
@@ -84314,7 +84390,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerBankAccounts = let _op = "GetCustomersCustomerBankAccounts"
     in
     Routes.route (Paths'.getCustomersCustomerBankAccounts ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84343,8 +84419,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerBankAccounts'")
            | _, None -> None in 
-         match H.getCustomersCustomerBankAccounts ~customer ?ending_before
-           ?expand ?limit ?starting_after _req
+         match Handlers.getCustomersCustomerBankAccounts ~customer
+           ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_f21a0fa679 ~op:_op ~ctype:_resp_ctype content in
@@ -84366,7 +84442,7 @@ module Routes' (H : HANDLERS) = struct
   let postInvoicesInvoiceFinalize = let _op = "PostInvoicesInvoiceFinalize"
     in
     Routes.route (Paths'.postInvoicesInvoiceFinalize ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84380,7 +84456,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesInvoiceFinalize'")
            | _, None -> None in
-         match H.postInvoicesInvoiceFinalize ~invoice _req
+         match Handlers.postInvoicesInvoiceFinalize ~invoice _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -84402,7 +84478,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingTransactionsTransaction = let _op = "PostIssuingTransactionsTransaction"
     in
     Routes.route (Paths'.postIssuingTransactionsTransaction ())
-      (fun transaction (_uri:Uri.t) (_resp:_resp)
+      (fun transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84416,7 +84492,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingTransactionsTransaction'")
            | _, None -> None in
-         match H.postIssuingTransactionsTransaction ~transaction _req
+         match Handlers.postIssuingTransactionsTransaction ~transaction _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -84438,7 +84514,7 @@ module Routes' (H : HANDLERS) = struct
   let getIssuingTransactionsTransaction = let _op = "GetIssuingTransactionsTransaction"
     in
     Routes.route (Paths'.getIssuingTransactionsTransaction ())
-      (fun transaction (_uri:Uri.t) (_resp:_resp)
+      (fun transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84455,7 +84531,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingTransactionsTransaction'")
            | _, None -> None in
-         match H.getIssuingTransactionsTransaction ~transaction ?expand _req
+         match Handlers.getIssuingTransactionsTransaction ~transaction
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -84477,7 +84554,7 @@ module Routes' (H : HANDLERS) = struct
   let getReportingReportRunsReportRun = let _op = "GetReportingReportRunsReportRun"
     in
     Routes.route (Paths'.getReportingReportRunsReportRun ())
-      (fun report_run (_uri:Uri.t) (_resp:_resp)
+      (fun report_run (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84494,7 +84571,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetReportingReportRunsReportRun'")
            | _, None -> None in
-         match H.getReportingReportRunsReportRun ~report_run ?expand _req
+         match Handlers.getReportingReportRunsReportRun ~report_run ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_reporting_report_run ~op:_op ~ctype:_resp_ctype content in
@@ -84515,7 +84593,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/entitlements/features/\{id\} *)
   let postEntitlementsFeaturesId = let _op = "PostEntitlementsFeaturesId" in
     Routes.route (Paths'.postEntitlementsFeaturesId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84529,7 +84607,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostEntitlementsFeaturesId'")
            | _, None -> None in
-         match H.postEntitlementsFeaturesId ~id _req
+         match Handlers.postEntitlementsFeaturesId ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_entitlements_feature ~op:_op ~ctype:_resp_ctype content in
@@ -84550,7 +84628,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/entitlements/features/\{id\} *)
   let getEntitlementsFeaturesId = let _op = "GetEntitlementsFeaturesId" in
     Routes.route (Paths'.getEntitlementsFeaturesId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84567,7 +84645,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetEntitlementsFeaturesId'")
            | _, None -> None in
-         match H.getEntitlementsFeaturesId ~id ?expand _req
+         match Handlers.getEntitlementsFeaturesId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_entitlements_feature ~op:_op ~ctype:_resp_ctype content in
@@ -84588,7 +84666,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/payouts/\{payout\}/cancel *)
   let postPayoutsPayoutCancel = let _op = "PostPayoutsPayoutCancel" in
     Routes.route (Paths'.postPayoutsPayoutCancel ())
-      (fun payout (_uri:Uri.t) (_resp:_resp)
+      (fun payout (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84602,7 +84680,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPayoutsPayoutCancel'")
            | _, None -> None in
-         match H.postPayoutsPayoutCancel ~payout _req
+         match Handlers.postPayoutsPayoutCancel ~payout _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payout ~op:_op ~ctype:_resp_ctype content in
@@ -84628,7 +84706,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteSubscriptionsSubscriptionExposedId = let _op = "DeleteSubscriptionsSubscriptionExposedId"
     in
     Routes.route (Paths'.deleteSubscriptionsSubscriptionExposedId ())
-      (fun subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84642,7 +84720,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteSubscriptionsSubscriptionExposedId'")
            | _, None -> None in
-         match H.deleteSubscriptionsSubscriptionExposedId
+         match Handlers.deleteSubscriptionsSubscriptionExposedId
            ~subscription_exposed_id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -84685,7 +84763,7 @@ module Routes' (H : HANDLERS) = struct
   let postSubscriptionsSubscriptionExposedId = let _op = "PostSubscriptionsSubscriptionExposedId"
     in
     Routes.route (Paths'.postSubscriptionsSubscriptionExposedId ())
-      (fun subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84699,7 +84777,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionsSubscriptionExposedId'")
            | _, None -> None in
-         match H.postSubscriptionsSubscriptionExposedId
+         match Handlers.postSubscriptionsSubscriptionExposedId
            ~subscription_exposed_id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -84722,7 +84800,7 @@ module Routes' (H : HANDLERS) = struct
   let getSubscriptionsSubscriptionExposedId = let _op = "GetSubscriptionsSubscriptionExposedId"
     in
     Routes.route (Paths'.getSubscriptionsSubscriptionExposedId ())
-      (fun subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84739,7 +84817,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSubscriptionsSubscriptionExposedId'")
            | _, None -> None in
-         match H.getSubscriptionsSubscriptionExposedId
+         match Handlers.getSubscriptionsSubscriptionExposedId
            ~subscription_exposed_id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -84762,7 +84840,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountExternalAccounts = let _op = "PostAccountsAccountExternalAccounts"
     in
     Routes.route (Paths'.postAccountsAccountExternalAccounts ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84776,7 +84854,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountExternalAccounts'")
            | _, None -> None in
-         match H.postAccountsAccountExternalAccounts ~account _req
+         match Handlers.postAccountsAccountExternalAccounts ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -84798,7 +84876,7 @@ module Routes' (H : HANDLERS) = struct
   let getAccountsAccountExternalAccounts = let _op = "GetAccountsAccountExternalAccounts"
     in
     Routes.route (Paths'.getAccountsAccountExternalAccounts ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84831,8 +84909,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountExternalAccounts'")
            | _, None -> None in 
-         match H.getAccountsAccountExternalAccounts ~account ?ending_before
-           ?expand ?limit ?object_ ?starting_after _req
+         match Handlers.getAccountsAccountExternalAccounts ~account
+           ?ending_before ?expand ?limit ?object_ ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_ed7910ccf0 ~op:_op ~ctype:_resp_ctype content in
@@ -84855,7 +84933,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTreasuryFinancialAccountsFinancialAccountFeatures ())
-      (fun financial_account (_uri:Uri.t) (_resp:_resp)
+      (fun financial_account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84869,7 +84947,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTreasuryFinancialAccountsFinancialAccountFeatures'")
            | _, None -> None in
-         match H.postTreasuryFinancialAccountsFinancialAccountFeatures
+         match Handlers.postTreasuryFinancialAccountsFinancialAccountFeatures
            ~financial_account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -84893,7 +84971,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getTreasuryFinancialAccountsFinancialAccountFeatures ())
-      (fun financial_account (_uri:Uri.t) (_resp:_resp)
+      (fun financial_account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84910,7 +84988,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryFinancialAccountsFinancialAccountFeatures'")
            | _, None -> None in
-         match H.getTreasuryFinancialAccountsFinancialAccountFeatures
+         match Handlers.getTreasuryFinancialAccountsFinancialAccountFeatures
            ~financial_account ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -84933,7 +85011,7 @@ module Routes' (H : HANDLERS) = struct
   let postFinancialConnectionsAccountsAccountSubscribe = let _op = "PostFinancialConnectionsAccountsAccountSubscribe"
     in
     Routes.route (Paths'.postFinancialConnectionsAccountsAccountSubscribe ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -84947,8 +85025,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostFinancialConnectionsAccountsAccountSubscribe'")
            | _, None -> None in
-         match H.postFinancialConnectionsAccountsAccountSubscribe ~account
-           _req
+         match Handlers.postFinancialConnectionsAccountsAccountSubscribe
+           ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -84993,7 +85071,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentIntentsIntentIncrementAuthorization = let _op = "PostPaymentIntentsIntentIncrementAuthorization"
     in
     Routes.route (Paths'.postPaymentIntentsIntentIncrementAuthorization ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85007,7 +85085,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntentsIntentIncrementAuthorization'")
            | _, None -> None in
-         match H.postPaymentIntentsIntentIncrementAuthorization ~intent _req
+         match Handlers.postPaymentIntentsIntentIncrementAuthorization
+           ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -85032,7 +85111,7 @@ module Routes' (H : HANDLERS) = struct
   let postClimateOrdersOrderCancel = let _op = "PostClimateOrdersOrderCancel"
     in
     Routes.route (Paths'.postClimateOrdersOrderCancel ())
-      (fun order (_uri:Uri.t) (_resp:_resp)
+      (fun order (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85046,7 +85125,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostClimateOrdersOrderCancel'")
            | _, None -> None in
-         match H.postClimateOrdersOrderCancel ~order _req
+         match Handlers.postClimateOrdersOrderCancel ~order _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_climate_order ~op:_op ~ctype:_resp_ctype content in
@@ -85069,7 +85148,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersTerminalReadersReaderPresentPaymentMethod ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85083,7 +85162,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTerminalReadersReaderPresentPaymentMethod'")
            | _, None -> None in
-         match H.postTestHelpersTerminalReadersReaderPresentPaymentMethod
+         match Handlers.postTestHelpersTerminalReadersReaderPresentPaymentMethod
            ~reader _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -85105,7 +85184,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes/\{quote\}/accept *)
   let postQuotesQuoteAccept = let _op = "PostQuotesQuoteAccept" in
     Routes.route (Paths'.postQuotesQuoteAccept ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85119,7 +85198,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostQuotesQuoteAccept'")
            | _, None -> None in
-         match H.postQuotesQuoteAccept ~quote _req
+         match Handlers.postQuotesQuoteAccept ~quote _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_quote ~op:_op ~ctype:_resp_ctype content in
@@ -85141,7 +85220,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerPaymentMethods = let _op = "GetCustomersCustomerPaymentMethods"
     in
     Routes.route (Paths'.getCustomersCustomerPaymentMethods ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85178,7 +85257,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerPaymentMethods'")
            | _, None -> None in 
-         match H.getCustomersCustomerPaymentMethods ~customer
+         match Handlers.getCustomersCustomerPaymentMethods ~customer
            ?allow_redisplay ?ending_before ?expand ?limit ?starting_after
            ?type_ _req
          with
@@ -85203,7 +85282,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingAuthorizationsAuthorizationDecline = let _op = "PostIssuingAuthorizationsAuthorizationDecline"
     in
     Routes.route (Paths'.postIssuingAuthorizationsAuthorizationDecline ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85217,8 +85296,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingAuthorizationsAuthorizationDecline'")
            | _, None -> None in
-         match H.postIssuingAuthorizationsAuthorizationDecline ~authorization
-           _req
+         match Handlers.postIssuingAuthorizationsAuthorizationDecline
+           ~authorization _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_authorization ~op:_op ~ctype:_resp_ctype content in
@@ -85240,7 +85319,7 @@ module Routes' (H : HANDLERS) = struct
   let getTreasuryOutboundTransfersOutboundTransfer = let _op = "GetTreasuryOutboundTransfersOutboundTransfer"
     in
     Routes.route (Paths'.getTreasuryOutboundTransfersOutboundTransfer ())
-      (fun outbound_transfer (_uri:Uri.t) (_resp:_resp)
+      (fun outbound_transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85257,7 +85336,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTreasuryOutboundTransfersOutboundTransfer'")
            | _, None -> None in
-         match H.getTreasuryOutboundTransfersOutboundTransfer
+         match Handlers.getTreasuryOutboundTransfersOutboundTransfer
            ~outbound_transfer ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -85280,7 +85359,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteTerminalReadersReader = let _op = "DeleteTerminalReadersReader"
     in
     Routes.route (Paths'.deleteTerminalReadersReader ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85294,7 +85373,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteTerminalReadersReader'")
            | _, None -> None in
-         match H.deleteTerminalReadersReader ~reader _req
+         match Handlers.deleteTerminalReadersReader ~reader _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_terminal_reader ~op:_op ~ctype:_resp_ctype content in
@@ -85315,7 +85394,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/readers/\{reader\} *)
   let postTerminalReadersReader = let _op = "PostTerminalReadersReader" in
     Routes.route (Paths'.postTerminalReadersReader ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85329,7 +85408,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalReadersReader'")
            | _, None -> None in
-         match H.postTerminalReadersReader ~reader _req
+         match Handlers.postTerminalReadersReader ~reader _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_d2ba7ca387 ~op:_op ~ctype:_resp_ctype content in
@@ -85350,7 +85429,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/terminal/readers/\{reader\} *)
   let getTerminalReadersReader = let _op = "GetTerminalReadersReader" in
     Routes.route (Paths'.getTerminalReadersReader ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85367,7 +85446,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTerminalReadersReader'")
            | _, None -> None in
-         match H.getTerminalReadersReader ~reader ?expand _req
+         match Handlers.getTerminalReadersReader ~reader ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2ca1ba2569 ~op:_op ~ctype:_resp_ctype content in
@@ -85389,7 +85468,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerTaxIds = let _op = "PostCustomersCustomerTaxIds"
     in
     Routes.route (Paths'.postCustomersCustomerTaxIds ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85403,7 +85482,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerTaxIds'")
            | _, None -> None in
-         match H.postCustomersCustomerTaxIds ~customer _req
+         match Handlers.postCustomersCustomerTaxIds ~customer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_id ~op:_op ~ctype:_resp_ctype content in
@@ -85424,7 +85503,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/customers/\{customer\}/tax_ids *)
   let getCustomersCustomerTaxIds = let _op = "GetCustomersCustomerTaxIds" in
     Routes.route (Paths'.getCustomersCustomerTaxIds ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85453,8 +85532,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerTaxIds'")
            | _, None -> None in 
-         match H.getCustomersCustomerTaxIds ~customer ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getCustomersCustomerTaxIds ~customer ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_38c8f764f1 ~op:_op ~ctype:_resp_ctype content in
@@ -85476,7 +85555,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryOutboundPaymentsIdFail = let _op = "PostTestHelpersTreasuryOutboundPaymentsIdFail"
     in
     Routes.route (Paths'.postTestHelpersTreasuryOutboundPaymentsIdFail ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85490,7 +85569,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundPaymentsIdFail'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundPaymentsIdFail ~id _req
+         match Handlers.postTestHelpersTreasuryOutboundPaymentsIdFail ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_outbound_payment ~op:_op ~ctype:_resp_ctype content in
@@ -85512,7 +85592,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentMethodDomainsPaymentMethodDomain = let _op = "PostPaymentMethodDomainsPaymentMethodDomain"
     in
     Routes.route (Paths'.postPaymentMethodDomainsPaymentMethodDomain ())
-      (fun payment_method_domain (_uri:Uri.t) (_resp:_resp)
+      (fun payment_method_domain (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85526,7 +85606,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodDomainsPaymentMethodDomain'")
            | _, None -> None in
-         match H.postPaymentMethodDomainsPaymentMethodDomain
+         match Handlers.postPaymentMethodDomainsPaymentMethodDomain
            ~payment_method_domain _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -85549,7 +85629,7 @@ module Routes' (H : HANDLERS) = struct
   let getPaymentMethodDomainsPaymentMethodDomain = let _op = "GetPaymentMethodDomainsPaymentMethodDomain"
     in
     Routes.route (Paths'.getPaymentMethodDomainsPaymentMethodDomain ())
-      (fun payment_method_domain (_uri:Uri.t) (_resp:_resp)
+      (fun payment_method_domain (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85566,7 +85646,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentMethodDomainsPaymentMethodDomain'")
            | _, None -> None in
-         match H.getPaymentMethodDomainsPaymentMethodDomain
+         match Handlers.getPaymentMethodDomainsPaymentMethodDomain
            ~payment_method_domain ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -85592,7 +85672,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getSubscriptionItemsSubscriptionItemUsageRecordSummaries ())
-      (fun subscription_item (_uri:Uri.t) (_resp:_resp)
+      (fun subscription_item (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85621,7 +85701,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSubscriptionItemsSubscriptionItemUsageRecordSummaries'")
            | _, None -> None in 
-         match H.getSubscriptionItemsSubscriptionItemUsageRecordSummaries
+         match Handlers.getSubscriptionItemsSubscriptionItemUsageRecordSummaries
            ~subscription_item ?ending_before ?expand ?limit ?starting_after
            _req
          with
@@ -85645,7 +85725,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountBankAccounts = let _op = "PostAccountsAccountBankAccounts"
     in
     Routes.route (Paths'.postAccountsAccountBankAccounts ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85659,7 +85739,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountBankAccounts'")
            | _, None -> None in
-         match H.postAccountsAccountBankAccounts ~account _req
+         match Handlers.postAccountsAccountBankAccounts ~account _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -85682,7 +85762,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/transfers/\{transfer\} *)
   let postTransfersTransfer = let _op = "PostTransfersTransfer" in
     Routes.route (Paths'.postTransfersTransfer ())
-      (fun transfer (_uri:Uri.t) (_resp:_resp)
+      (fun transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85696,7 +85776,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTransfersTransfer'")
            | _, None -> None in
-         match H.postTransfersTransfer ~transfer _req
+         match Handlers.postTransfersTransfer ~transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -85717,7 +85797,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/transfers/\{transfer\} *)
   let getTransfersTransfer = let _op = "GetTransfersTransfer" in
     Routes.route (Paths'.getTransfersTransfer ())
-      (fun transfer (_uri:Uri.t) (_resp:_resp)
+      (fun transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85734,7 +85814,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTransfersTransfer'")
            | _, None -> None in
-         match H.getTransfersTransfer ~transfer ?expand _req
+         match Handlers.getTransfersTransfer ~transfer ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -85755,7 +85835,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/mandates/\{mandate\} *)
   let getMandatesMandate = let _op = "GetMandatesMandate" in
     Routes.route (Paths'.getMandatesMandate ())
-      (fun mandate (_uri:Uri.t) (_resp:_resp)
+      (fun mandate (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85772,7 +85852,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetMandatesMandate'")
            | _, None -> None in
-         match H.getMandatesMandate ~mandate ?expand _req
+         match Handlers.getMandatesMandate ~mandate ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_mandate ~op:_op ~ctype:_resp_ctype content in
@@ -85794,8 +85874,8 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersIssuingCardsCardShippingShip = let _op = "PostTestHelpersIssuingCardsCardShippingShip"
     in
     Routes.route (Paths'.postTestHelpersIssuingCardsCardShippingShip ())
-      (fun card (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun card (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -85808,7 +85888,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingCardsCardShippingShip'")
            | _, None -> None in
-         match H.postTestHelpersIssuingCardsCardShippingShip ~card _req
+         match Handlers.postTestHelpersIssuingCardsCardShippingShip ~card
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_card ~op:_op ~ctype:_resp_ctype content in
@@ -85829,7 +85910,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/setup_intents/\{intent\} *)
   let postSetupIntentsIntent = let _op = "PostSetupIntentsIntent" in
     Routes.route (Paths'.postSetupIntentsIntent ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85843,7 +85924,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSetupIntentsIntent'")
            | _, None -> None in
-         match H.postSetupIntentsIntent ~intent _req
+         match Handlers.postSetupIntentsIntent ~intent _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_setup_intent ~op:_op ~ctype:_resp_ctype content in
@@ -85868,7 +85949,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/setup_intents/\{intent\} *)
   let getSetupIntentsIntent = let _op = "GetSetupIntentsIntent" in
     Routes.route (Paths'.getSetupIntentsIntent ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85889,7 +85970,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSetupIntentsIntent'")
            | _, None -> None in 
-         match H.getSetupIntentsIntent ~intent ?client_secret ?expand _req
+         match Handlers.getSetupIntentsIntent ~intent ?client_secret ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_setup_intent ~op:_op ~ctype:_resp_ctype content in
@@ -85920,7 +86002,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\}/refunds *)
   let postChargesChargeRefunds = let _op = "PostChargesChargeRefunds" in
     Routes.route (Paths'.postChargesChargeRefunds ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85934,7 +86016,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostChargesChargeRefunds'")
            | _, None -> None in
-         match H.postChargesChargeRefunds ~charge _req
+         match Handlers.postChargesChargeRefunds ~charge _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -85955,7 +86037,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\}/refunds *)
   let getChargesChargeRefunds = let _op = "GetChargesChargeRefunds" in
     Routes.route (Paths'.getChargesChargeRefunds ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -85984,8 +86066,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetChargesChargeRefunds'")
            | _, None -> None in 
-         match H.getChargesChargeRefunds ~charge ?ending_before ?expand
-           ?limit ?starting_after _req
+         match Handlers.getChargesChargeRefunds ~charge ?ending_before
+           ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_0fc9eda318 ~op:_op ~ctype:_resp_ctype content in
@@ -86006,8 +86088,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/file_links/\{link\} *)
   let postFileLinksLink = let _op = "PostFileLinksLink" in
     Routes.route (Paths'.postFileLinksLink ())
-      (fun link (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun link (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -86020,7 +86102,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostFileLinksLink'")
            | _, None -> None in
-         match H.postFileLinksLink ~link _req
+         match Handlers.postFileLinksLink ~link _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_file_link ~op:_op ~ctype:_resp_ctype content in
@@ -86041,8 +86123,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/file_links/\{link\} *)
   let getFileLinksLink = let _op = "GetFileLinksLink" in
     Routes.route (Paths'.getFileLinksLink ())
-      (fun link (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun link (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let expand = let _nvs = _queries in
@@ -86058,7 +86140,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFileLinksLink'")
            | _, None -> None in
-         match H.getFileLinksLink ~link ?expand _req
+         match Handlers.getFileLinksLink ~link ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_file_link ~op:_op ~ctype:_resp_ctype content in
@@ -86080,7 +86162,7 @@ module Routes' (H : HANDLERS) = struct
   let postTerminalReadersReaderRefundPayment = let _op = "PostTerminalReadersReaderRefundPayment"
     in
     Routes.route (Paths'.postTerminalReadersReaderRefundPayment ())
-      (fun reader (_uri:Uri.t) (_resp:_resp)
+      (fun reader (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86094,7 +86176,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTerminalReadersReaderRefundPayment'")
            | _, None -> None in
-         match H.postTerminalReadersReaderRefundPayment ~reader _req
+         match Handlers.postTerminalReadersReaderRefundPayment ~reader _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_terminal_reader ~op:_op ~ctype:_resp_ctype content in
@@ -86116,7 +86198,7 @@ module Routes' (H : HANDLERS) = struct
   let getFinancialConnectionsAccountsAccount = let _op = "GetFinancialConnectionsAccountsAccount"
     in
     Routes.route (Paths'.getFinancialConnectionsAccountsAccount ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86133,7 +86215,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetFinancialConnectionsAccountsAccount'")
            | _, None -> None in
-         match H.getFinancialConnectionsAccountsAccount ~account ?expand _req
+         match Handlers.getFinancialConnectionsAccountsAccount ~account
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -86155,7 +86238,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentIntentsIntentApplyCustomerBalance = let _op = "PostPaymentIntentsIntentApplyCustomerBalance"
     in
     Routes.route (Paths'.postPaymentIntentsIntentApplyCustomerBalance ())
-      (fun intent (_uri:Uri.t) (_resp:_resp)
+      (fun intent (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86169,7 +86252,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentIntentsIntentApplyCustomerBalance'")
            | _, None -> None in
-         match H.postPaymentIntentsIntentApplyCustomerBalance ~intent _req
+         match Handlers.postPaymentIntentsIntentApplyCustomerBalance ~intent
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_intent ~op:_op ~ctype:_resp_ctype content in
@@ -86194,7 +86278,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/charges/\{charge\}/capture *)
   let postChargesChargeCapture = let _op = "PostChargesChargeCapture" in
     Routes.route (Paths'.postChargesChargeCapture ())
-      (fun charge (_uri:Uri.t) (_resp:_resp)
+      (fun charge (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86208,7 +86292,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostChargesChargeCapture'")
            | _, None -> None in
-         match H.postChargesChargeCapture ~charge _req
+         match Handlers.postChargesChargeCapture ~charge _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_charge ~op:_op ~ctype:_resp_ctype content in
@@ -86232,7 +86316,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersTreasuryOutboundTransfersOutboundTransferFail ())
-      (fun outbound_transfer (_uri:Uri.t) (_resp:_resp)
+      (fun outbound_transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86246,7 +86330,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryOutboundTransfersOutboundTransferFail'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryOutboundTransfersOutboundTransferFail
+         match Handlers.postTestHelpersTreasuryOutboundTransfersOutboundTransferFail
            ~outbound_transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -86269,7 +86353,7 @@ module Routes' (H : HANDLERS) = struct
   let postSubscriptionSchedulesScheduleCancel = let _op = "PostSubscriptionSchedulesScheduleCancel"
     in
     Routes.route (Paths'.postSubscriptionSchedulesScheduleCancel ())
-      (fun schedule (_uri:Uri.t) (_resp:_resp)
+      (fun schedule (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86283,7 +86367,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostSubscriptionSchedulesScheduleCancel'")
            | _, None -> None in
-         match H.postSubscriptionSchedulesScheduleCancel ~schedule _req
+         match Handlers.postSubscriptionSchedulesScheduleCancel ~schedule
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_subscription_schedule ~op:_op ~ctype:_resp_ctype content in
@@ -86305,7 +86390,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerCashBalanceTransactions = let _op = "GetCustomersCustomerCashBalanceTransactions"
     in
     Routes.route (Paths'.getCustomersCustomerCashBalanceTransactions ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86334,7 +86419,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerCashBalanceTransactions'")
            | _, None -> None in 
-         match H.getCustomersCustomerCashBalanceTransactions ~customer
+         match Handlers.getCustomersCustomerCashBalanceTransactions ~customer
            ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -86358,7 +86443,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/invoices/\{invoice\}/void *)
   let postInvoicesInvoiceVoid = let _op = "PostInvoicesInvoiceVoid" in
     Routes.route (Paths'.postInvoicesInvoiceVoid ())
-      (fun invoice (_uri:Uri.t) (_resp:_resp)
+      (fun invoice (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86372,7 +86457,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesInvoiceVoid'")
            | _, None -> None in
-         match H.postInvoicesInvoiceVoid ~invoice _req
+         match Handlers.postInvoicesInvoiceVoid ~invoice _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_invoice ~op:_op ~ctype:_resp_ctype content in
@@ -86395,7 +86480,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/disputes/\{dispute\}/close *)
   let postDisputesDisputeClose = let _op = "PostDisputesDisputeClose" in
     Routes.route (Paths'.postDisputesDisputeClose ())
-      (fun dispute (_uri:Uri.t) (_resp:_resp)
+      (fun dispute (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86409,7 +86494,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostDisputesDisputeClose'")
            | _, None -> None in
-         match H.postDisputesDisputeClose ~dispute _req
+         match Handlers.postDisputesDisputeClose ~dispute _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_dispute ~op:_op ~ctype:_resp_ctype content in
@@ -86431,7 +86516,7 @@ module Routes' (H : HANDLERS) = struct
   let postIssuingSettlementsSettlement = let _op = "PostIssuingSettlementsSettlement"
     in
     Routes.route (Paths'.postIssuingSettlementsSettlement ())
-      (fun settlement (_uri:Uri.t) (_resp:_resp)
+      (fun settlement (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86445,7 +86530,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingSettlementsSettlement'")
            | _, None -> None in
-         match H.postIssuingSettlementsSettlement ~settlement _req
+         match Handlers.postIssuingSettlementsSettlement ~settlement _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_settlement ~op:_op ~ctype:_resp_ctype content in
@@ -86467,7 +86552,7 @@ module Routes' (H : HANDLERS) = struct
   let getIssuingSettlementsSettlement = let _op = "GetIssuingSettlementsSettlement"
     in
     Routes.route (Paths'.getIssuingSettlementsSettlement ())
-      (fun settlement (_uri:Uri.t) (_resp:_resp)
+      (fun settlement (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86484,7 +86569,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingSettlementsSettlement'")
            | _, None -> None in
-         match H.getIssuingSettlementsSettlement ~settlement ?expand _req
+         match Handlers.getIssuingSettlementsSettlement ~settlement ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_settlement ~op:_op ~ctype:_resp_ctype content in
@@ -86507,7 +86593,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/balance/history/\{id\} *)
   let getBalanceHistoryId = let _op = "GetBalanceHistoryId" in
     Routes.route (Paths'.getBalanceHistoryId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86524,7 +86610,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetBalanceHistoryId'")
            | _, None -> None in
-         match H.getBalanceHistoryId ~id ?expand _req
+         match Handlers.getBalanceHistoryId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_balance_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -86558,7 +86644,7 @@ module Routes' (H : HANDLERS) = struct
   let postPaymentMethodsPaymentMethodAttach = let _op = "PostPaymentMethodsPaymentMethodAttach"
     in
     Routes.route (Paths'.postPaymentMethodsPaymentMethodAttach ())
-      (fun payment_method (_uri:Uri.t) (_resp:_resp)
+      (fun payment_method (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86572,7 +86658,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostPaymentMethodsPaymentMethodAttach'")
            | _, None -> None in
-         match H.postPaymentMethodsPaymentMethodAttach ~payment_method _req
+         match Handlers.postPaymentMethodsPaymentMethodAttach ~payment_method
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method ~op:_op ~ctype:_resp_ctype content in
@@ -86594,7 +86681,7 @@ module Routes' (H : HANDLERS) = struct
   let getClimateSuppliersSupplier = let _op = "GetClimateSuppliersSupplier"
     in
     Routes.route (Paths'.getClimateSuppliersSupplier ())
-      (fun supplier (_uri:Uri.t) (_resp:_resp)
+      (fun supplier (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86611,7 +86698,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetClimateSuppliersSupplier'")
            | _, None -> None in
-         match H.getClimateSuppliersSupplier ~supplier ?expand _req
+         match Handlers.getClimateSuppliersSupplier ~supplier ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_climate_supplier ~op:_op ~ctype:_resp_ctype content in
@@ -86635,7 +86722,7 @@ module Routes' (H : HANDLERS) = struct
   let postIdentityVerificationSessionsSessionCancel = let _op = "PostIdentityVerificationSessionsSessionCancel"
     in
     Routes.route (Paths'.postIdentityVerificationSessionsSessionCancel ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86649,7 +86736,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIdentityVerificationSessionsSessionCancel'")
            | _, None -> None in
-         match H.postIdentityVerificationSessionsSessionCancel ~session _req
+         match Handlers.postIdentityVerificationSessionsSessionCancel
+           ~session _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_identity_verification_session ~op:_op ~ctype:_resp_ctype content in
@@ -86670,7 +86758,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/quotes/\{quote\}/line_items *)
   let getQuotesQuoteLineItems = let _op = "GetQuotesQuoteLineItems" in
     Routes.route (Paths'.getQuotesQuoteLineItems ())
-      (fun quote (_uri:Uri.t) (_resp:_resp)
+      (fun quote (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86699,8 +86787,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetQuotesQuoteLineItems'")
            | _, None -> None in 
-         match H.getQuotesQuoteLineItems ~quote ?ending_before ?expand ?limit
-           ?starting_after _req
+         match Handlers.getQuotesQuoteLineItems ~quote ?ending_before ?expand
+           ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_b05b9010db ~op:_op ~ctype:_resp_ctype content in
@@ -86721,7 +86809,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/events/\{id\} *)
   let getEventsId = let _op = "GetEventsId" in
     Routes.route (Paths'.getEventsId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86738,7 +86826,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetEventsId'")
            | _, None -> None in
-         match H.getEventsId ~id ?expand _req
+         match Handlers.getEventsId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_event ~op:_op ~ctype:_resp_ctype content in
@@ -86760,7 +86848,7 @@ module Routes' (H : HANDLERS) = struct
   let getPaymentLinksPaymentLinkLineItems = let _op = "GetPaymentLinksPaymentLinkLineItems"
     in
     Routes.route (Paths'.getPaymentLinksPaymentLinkLineItems ())
-      (fun payment_link (_uri:Uri.t) (_resp:_resp)
+      (fun payment_link (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86789,7 +86877,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetPaymentLinksPaymentLinkLineItems'")
            | _, None -> None in 
-         match H.getPaymentLinksPaymentLinkLineItems ~payment_link
+         match Handlers.getPaymentLinksPaymentLinkLineItems ~payment_link
            ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -86812,7 +86900,7 @@ module Routes' (H : HANDLERS) = struct
   let postTestHelpersTreasuryInboundTransfersIdFail = let _op = "PostTestHelpersTreasuryInboundTransfersIdFail"
     in
     Routes.route (Paths'.postTestHelpersTreasuryInboundTransfersIdFail ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86826,7 +86914,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersTreasuryInboundTransfersIdFail'")
            | _, None -> None in
-         match H.postTestHelpersTreasuryInboundTransfersIdFail ~id _req
+         match Handlers.postTestHelpersTreasuryInboundTransfersIdFail ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_treasury_inbound_transfer ~op:_op ~ctype:_resp_ctype content in
@@ -86847,8 +86936,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/cards/\{card\} *)
   let postIssuingCardsCard = let _op = "PostIssuingCardsCard" in
     Routes.route (Paths'.postIssuingCardsCard ())
-      (fun card (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun card (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let exception Invalid_request of string in
@@ -86861,7 +86950,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostIssuingCardsCard'")
            | _, None -> None in
-         match H.postIssuingCardsCard ~card _req
+         match Handlers.postIssuingCardsCard ~card _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_card ~op:_op ~ctype:_resp_ctype content in
@@ -86882,8 +86971,8 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/issuing/cards/\{card\} *)
   let getIssuingCardsCard = let _op = "GetIssuingCardsCard" in
     Routes.route (Paths'.getIssuingCardsCard ())
-      (fun card (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
-       _resp_ctype _req_hdrs _body ->
+      (fun card (_uri:Uri.t) (_resp:respond)
+       (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
        let expand = let _nvs = _queries in
@@ -86899,7 +86988,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetIssuingCardsCard'")
            | _, None -> None in
-         match H.getIssuingCardsCard ~card ?expand _req
+         match Handlers.getIssuingCardsCard ~card ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_issuing_card ~op:_op ~ctype:_resp_ctype content in
@@ -86921,7 +87010,7 @@ module Routes' (H : HANDLERS) = struct
   let getBillingMetersIdEventSummaries = let _op = "GetBillingMetersIdEventSummaries"
     in
     Routes.route (Paths'.getBillingMetersIdEventSummaries ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -86981,9 +87070,9 @@ module Routes' (H : HANDLERS) = struct
            | None -> raise
                        (Invalid_request "Parameter 'start_time' is required by operation 'GetBillingMetersIdEventSummaries'")
          in 
-         match H.getBillingMetersIdEventSummaries ~id ~customer ~end_time
-           ?ending_before ?expand ?limit ~start_time ?starting_after
-           ?value_grouping_window _req
+         match Handlers.getBillingMetersIdEventSummaries ~id ~customer
+           ~end_time ?ending_before ?expand ?limit ~start_time
+           ?starting_after ?value_grouping_window _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_d9b8cfd01d ~op:_op ~ctype:_resp_ctype content in
@@ -87004,7 +87093,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/topups/\{topup\} *)
   let postTopupsTopup = let _op = "PostTopupsTopup" in
     Routes.route (Paths'.postTopupsTopup ())
-      (fun topup (_uri:Uri.t) (_resp:_resp)
+      (fun topup (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87018,7 +87107,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTopupsTopup'")
            | _, None -> None in
-         match H.postTopupsTopup ~topup _req
+         match Handlers.postTopupsTopup ~topup _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_topup ~op:_op ~ctype:_resp_ctype content in
@@ -87039,7 +87128,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/topups/\{topup\} *)
   let getTopupsTopup = let _op = "GetTopupsTopup" in
     Routes.route (Paths'.getTopupsTopup ())
-      (fun topup (_uri:Uri.t) (_resp:_resp)
+      (fun topup (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87056,7 +87145,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTopupsTopup'")
            | _, None -> None in
-         match H.getTopupsTopup ~topup ?expand _req
+         match Handlers.getTopupsTopup ~topup ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_topup ~op:_op ~ctype:_resp_ctype content in
@@ -87078,7 +87167,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerBalanceTransactions = let _op = "PostCustomersCustomerBalanceTransactions"
     in
     Routes.route (Paths'.postCustomersCustomerBalanceTransactions ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87092,7 +87181,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerBalanceTransactions'")
            | _, None -> None in
-         match H.postCustomersCustomerBalanceTransactions ~customer _req
+         match Handlers.postCustomersCustomerBalanceTransactions ~customer
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_customer_balance_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -87114,7 +87204,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerBalanceTransactions = let _op = "GetCustomersCustomerBalanceTransactions"
     in
     Routes.route (Paths'.getCustomersCustomerBalanceTransactions ())
-      (fun customer (_uri:Uri.t) (_resp:_resp)
+      (fun customer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87143,7 +87233,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerBalanceTransactions'")
            | _, None -> None in 
-         match H.getCustomersCustomerBalanceTransactions ~customer
+         match Handlers.getCustomersCustomerBalanceTransactions ~customer
            ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -87166,7 +87256,7 @@ module Routes' (H : HANDLERS) = struct
   let getTaxCalculationsCalculationLineItems = let _op = "GetTaxCalculationsCalculationLineItems"
     in
     Routes.route (Paths'.getTaxCalculationsCalculationLineItems ())
-      (fun calculation (_uri:Uri.t) (_resp:_resp)
+      (fun calculation (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87195,7 +87285,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTaxCalculationsCalculationLineItems'")
            | _, None -> None in 
-         match H.getTaxCalculationsCalculationLineItems ~calculation
+         match Handlers.getTaxCalculationsCalculationLineItems ~calculation
            ?ending_before ?expand ?limit ?starting_after _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -87217,7 +87307,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/application_fees/\{id\} *)
   let getApplicationFeesId = let _op = "GetApplicationFeesId" in
     Routes.route (Paths'.getApplicationFeesId ())
-      (fun id (_uri:Uri.t) (_resp:_resp) (_req_ctype:BodySerDe'._body_type)
+      (fun id (_uri:Uri.t) (_resp:respond) (_req_ctype:BodySerDe'._body_type)
        _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87234,7 +87324,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetApplicationFeesId'")
            | _, None -> None in
-         match H.getApplicationFeesId ~id ?expand _req
+         match Handlers.getApplicationFeesId ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_application_fee ~op:_op ~ctype:_resp_ctype content in
@@ -87257,7 +87347,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postTestHelpersIssuingAuthorizationsAuthorizationReverse ())
-      (fun authorization (_uri:Uri.t) (_resp:_resp)
+      (fun authorization (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87271,7 +87361,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTestHelpersIssuingAuthorizationsAuthorizationReverse'")
            | _, None -> None in
-         match H.postTestHelpersIssuingAuthorizationsAuthorizationReverse
+         match Handlers.postTestHelpersIssuingAuthorizationsAuthorizationReverse
            ~authorization _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -87293,7 +87383,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/reviews/\{review\} *)
   let getReviewsReview = let _op = "GetReviewsReview" in
     Routes.route (Paths'.getReviewsReview ())
-      (fun review (_uri:Uri.t) (_resp:_resp)
+      (fun review (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87310,7 +87400,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetReviewsReview'")
            | _, None -> None in
-         match H.getReviewsReview ~review ?expand _req
+         match Handlers.getReviewsReview ~review ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_review ~op:_op ~ctype:_resp_ctype content in
@@ -87334,7 +87424,7 @@ module Routes' (H : HANDLERS) = struct
   let postCheckoutSessionsSessionExpire = let _op = "PostCheckoutSessionsSessionExpire"
     in
     Routes.route (Paths'.postCheckoutSessionsSessionExpire ())
-      (fun session (_uri:Uri.t) (_resp:_resp)
+      (fun session (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87348,7 +87438,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCheckoutSessionsSessionExpire'")
            | _, None -> None in
-         match H.postCheckoutSessionsSessionExpire ~session _req
+         match Handlers.postCheckoutSessionsSessionExpire ~session _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_checkout_session ~op:_op ~ctype:_resp_ctype content in
@@ -87369,7 +87459,7 @@ module Routes' (H : HANDLERS) = struct
       @see "openapi/spec3.json" /v1/linked_accounts/\{account\} *)
   let getLinkedAccountsAccount = let _op = "GetLinkedAccountsAccount" in
     Routes.route (Paths'.getLinkedAccountsAccount ())
-      (fun account (_uri:Uri.t) (_resp:_resp)
+      (fun account (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87386,7 +87476,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetLinkedAccountsAccount'")
            | _, None -> None in
-         match H.getLinkedAccountsAccount ~account ?expand _req
+         match Handlers.getLinkedAccountsAccount ~account ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_financial_connections_account ~op:_op ~ctype:_resp_ctype content in
@@ -87409,7 +87499,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteCustomersCustomerSourcesId = let _op = "DeleteCustomersCustomerSourcesId"
     in
     Routes.route (Paths'.deleteCustomersCustomerSourcesId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87423,7 +87513,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomerSourcesId'")
            | _, None -> None in
-         match H.deleteCustomersCustomerSourcesId ~customer ~id _req
+         match Handlers.deleteCustomersCustomerSourcesId ~customer ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_856459704a ~op:_op ~ctype:_resp_ctype content in
@@ -87446,7 +87536,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerSourcesId = let _op = "PostCustomersCustomerSourcesId"
     in
     Routes.route (Paths'.postCustomersCustomerSourcesId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87460,7 +87550,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerSourcesId'")
            | _, None -> None in
-         match H.postCustomersCustomerSourcesId ~customer ~id _req
+         match Handlers.postCustomersCustomerSourcesId ~customer ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_7f9b4fe25c ~op:_op ~ctype:_resp_ctype content in
@@ -87483,7 +87573,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerSourcesId = let _op = "GetCustomersCustomerSourcesId"
     in
     Routes.route (Paths'.getCustomersCustomerSourcesId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87500,7 +87590,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerSourcesId'")
            | _, None -> None in
-         match H.getCustomersCustomerSourcesId ~customer ~id ?expand _req
+         match Handlers.getCustomersCustomerSourcesId ~customer ~id ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_source ~op:_op ~ctype:_resp_ctype content in
@@ -87525,7 +87616,7 @@ module Routes' (H : HANDLERS) = struct
   let postApplicationFeesFeeRefundsId = let _op = "PostApplicationFeesFeeRefundsId"
     in
     Routes.route (Paths'.postApplicationFeesFeeRefundsId ())
-      (fun fee id (_uri:Uri.t) (_resp:_resp)
+      (fun fee id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87539,7 +87630,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostApplicationFeesFeeRefundsId'")
            | _, None -> None in
-         match H.postApplicationFeesFeeRefundsId ~fee ~id _req
+         match Handlers.postApplicationFeesFeeRefundsId ~fee ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_fee_refund ~op:_op ~ctype:_resp_ctype content in
@@ -87562,7 +87653,7 @@ module Routes' (H : HANDLERS) = struct
   let getApplicationFeesFeeRefundsId = let _op = "GetApplicationFeesFeeRefundsId"
     in
     Routes.route (Paths'.getApplicationFeesFeeRefundsId ())
-      (fun fee id (_uri:Uri.t) (_resp:_resp)
+      (fun fee id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87579,7 +87670,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetApplicationFeesFeeRefundsId'")
            | _, None -> None in
-         match H.getApplicationFeesFeeRefundsId ~fee ~id ?expand _req
+         match Handlers.getApplicationFeesFeeRefundsId ~fee ~id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_fee_refund ~op:_op ~ctype:_resp_ctype content in
@@ -87602,7 +87693,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteProductsProductFeaturesId = let _op = "DeleteProductsProductFeaturesId"
     in
     Routes.route (Paths'.deleteProductsProductFeaturesId ())
-      (fun id product (_uri:Uri.t) (_resp:_resp)
+      (fun id product (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87616,7 +87707,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteProductsProductFeaturesId'")
            | _, None -> None in
-         match H.deleteProductsProductFeaturesId ~id ~product _req
+         match Handlers.deleteProductsProductFeaturesId ~id ~product _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_product_feature ~op:_op ~ctype:_resp_ctype content in
@@ -87639,7 +87730,7 @@ module Routes' (H : HANDLERS) = struct
   let getProductsProductFeaturesId = let _op = "GetProductsProductFeaturesId"
     in
     Routes.route (Paths'.getProductsProductFeaturesId ())
-      (fun id product (_uri:Uri.t) (_resp:_resp)
+      (fun id product (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87656,7 +87747,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetProductsProductFeaturesId'")
            | _, None -> None in
-         match H.getProductsProductFeaturesId ~id ~product ?expand _req
+         match Handlers.getProductsProductFeaturesId ~id ~product ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_product_feature ~op:_op ~ctype:_resp_ctype content in
@@ -87681,7 +87773,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.deleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount ())
-      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87695,7 +87787,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount'")
            | _, None -> None in
-         match H.deleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount
+         match Handlers.deleteCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount
            ~customer ~subscription_exposed_id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -87719,7 +87811,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount ())
-      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87736,7 +87828,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount'")
            | _, None -> None in
-         match H.getCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount
+         match Handlers.getCustomersCustomerSubscriptionsSubscriptionExposedIdDiscount
            ~customer ~subscription_exposed_id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -87760,7 +87852,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountCapabilitiesCapability = let _op = "PostAccountsAccountCapabilitiesCapability"
     in
     Routes.route (Paths'.postAccountsAccountCapabilitiesCapability ())
-      (fun account capability (_uri:Uri.t) (_resp:_resp)
+      (fun account capability (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87774,7 +87866,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountCapabilitiesCapability'")
            | _, None -> None in
-         match H.postAccountsAccountCapabilitiesCapability ~account
+         match Handlers.postAccountsAccountCapabilitiesCapability ~account
            ~capability _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -87798,7 +87890,7 @@ module Routes' (H : HANDLERS) = struct
   let getAccountsAccountCapabilitiesCapability = let _op = "GetAccountsAccountCapabilitiesCapability"
     in
     Routes.route (Paths'.getAccountsAccountCapabilitiesCapability ())
-      (fun account capability (_uri:Uri.t) (_resp:_resp)
+      (fun account capability (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87815,7 +87907,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountCapabilitiesCapability'")
            | _, None -> None in
-         match H.getAccountsAccountCapabilitiesCapability ~account
+         match Handlers.getAccountsAccountCapabilitiesCapability ~account
            ~capability ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -87839,7 +87931,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteCustomersCustomerBankAccountsId = let _op = "DeleteCustomersCustomerBankAccountsId"
     in
     Routes.route (Paths'.deleteCustomersCustomerBankAccountsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87853,7 +87945,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomerBankAccountsId'")
            | _, None -> None in
-         match H.deleteCustomersCustomerBankAccountsId ~customer ~id _req
+         match Handlers.deleteCustomersCustomerBankAccountsId ~customer ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_f45fcafdae ~op:_op ~ctype:_resp_ctype content in
@@ -87876,7 +87969,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerBankAccountsId = let _op = "PostCustomersCustomerBankAccountsId"
     in
     Routes.route (Paths'.postCustomersCustomerBankAccountsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87890,7 +87983,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerBankAccountsId'")
            | _, None -> None in
-         match H.postCustomersCustomerBankAccountsId ~customer ~id _req
+         match Handlers.postCustomersCustomerBankAccountsId ~customer ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_2bc92fc692 ~op:_op ~ctype:_resp_ctype content in
@@ -87913,7 +88007,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerBankAccountsId = let _op = "GetCustomersCustomerBankAccountsId"
     in
     Routes.route (Paths'.getCustomersCustomerBankAccountsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87930,8 +88024,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerBankAccountsId'")
            | _, None -> None in
-         match H.getCustomersCustomerBankAccountsId ~customer ~id ?expand
-           _req
+         match Handlers.getCustomersCustomerBankAccountsId ~customer ~id
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_bank_account ~op:_op ~ctype:_resp_ctype content in
@@ -87954,7 +88048,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerPaymentMethodsPaymentMethod = let _op = "GetCustomersCustomerPaymentMethodsPaymentMethod"
     in
     Routes.route (Paths'.getCustomersCustomerPaymentMethodsPaymentMethod ())
-      (fun customer payment_method (_uri:Uri.t) (_resp:_resp)
+      (fun customer payment_method (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -87971,8 +88065,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerPaymentMethodsPaymentMethod'")
            | _, None -> None in
-         match H.getCustomersCustomerPaymentMethodsPaymentMethod ~customer
-           ~payment_method ?expand _req
+         match Handlers.getCustomersCustomerPaymentMethodsPaymentMethod
+           ~customer ~payment_method ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_payment_method ~op:_op ~ctype:_resp_ctype content in
@@ -87995,7 +88089,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteCustomersCustomerTaxIdsId = let _op = "DeleteCustomersCustomerTaxIdsId"
     in
     Routes.route (Paths'.deleteCustomersCustomerTaxIdsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88009,7 +88103,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomerTaxIdsId'")
            | _, None -> None in
-         match H.deleteCustomersCustomerTaxIdsId ~customer ~id _req
+         match Handlers.deleteCustomersCustomerTaxIdsId ~customer ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_tax_id ~op:_op ~ctype:_resp_ctype content in
@@ -88032,7 +88126,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerTaxIdsId = let _op = "GetCustomersCustomerTaxIdsId"
     in
     Routes.route (Paths'.getCustomersCustomerTaxIdsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88049,7 +88143,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerTaxIdsId'")
            | _, None -> None in
-         match H.getCustomersCustomerTaxIdsId ~customer ~id ?expand _req
+         match Handlers.getCustomersCustomerTaxIdsId ~customer ~id ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_tax_id ~op:_op ~ctype:_resp_ctype content in
@@ -88072,7 +88167,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteAccountsAccountBankAccountsId = let _op = "DeleteAccountsAccountBankAccountsId"
     in
     Routes.route (Paths'.deleteAccountsAccountBankAccountsId ())
-      (fun account id (_uri:Uri.t) (_resp:_resp)
+      (fun account id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88086,7 +88181,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteAccountsAccountBankAccountsId'")
            | _, None -> None in
-         match H.deleteAccountsAccountBankAccountsId ~account ~id _req
+         match Handlers.deleteAccountsAccountBankAccountsId ~account ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -88116,7 +88211,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountBankAccountsId = let _op = "PostAccountsAccountBankAccountsId"
     in
     Routes.route (Paths'.postAccountsAccountBankAccountsId ())
-      (fun account id (_uri:Uri.t) (_resp:_resp)
+      (fun account id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88130,7 +88225,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountBankAccountsId'")
            | _, None -> None in
-         match H.postAccountsAccountBankAccountsId ~account ~id _req
+         match Handlers.postAccountsAccountBankAccountsId ~account ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -88153,7 +88248,7 @@ module Routes' (H : HANDLERS) = struct
   let getAccountsAccountBankAccountsId = let _op = "GetAccountsAccountBankAccountsId"
     in
     Routes.route (Paths'.getAccountsAccountBankAccountsId ())
-      (fun account id (_uri:Uri.t) (_resp:_resp)
+      (fun account id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88170,7 +88265,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountBankAccountsId'")
            | _, None -> None in
-         match H.getAccountsAccountBankAccountsId ~account ~id ?expand _req
+         match Handlers.getAccountsAccountBankAccountsId ~account ~id ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -88195,7 +88291,7 @@ module Routes' (H : HANDLERS) = struct
   let postTransfersTransferReversalsId = let _op = "PostTransfersTransferReversalsId"
     in
     Routes.route (Paths'.postTransfersTransferReversalsId ())
-      (fun id transfer (_uri:Uri.t) (_resp:_resp)
+      (fun id transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88209,7 +88305,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostTransfersTransferReversalsId'")
            | _, None -> None in
-         match H.postTransfersTransferReversalsId ~id ~transfer _req
+         match Handlers.postTransfersTransferReversalsId ~id ~transfer _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_transfer_reversal ~op:_op ~ctype:_resp_ctype content in
@@ -88232,7 +88328,7 @@ module Routes' (H : HANDLERS) = struct
   let getTransfersTransferReversalsId = let _op = "GetTransfersTransferReversalsId"
     in
     Routes.route (Paths'.getTransfersTransferReversalsId ())
-      (fun id transfer (_uri:Uri.t) (_resp:_resp)
+      (fun id transfer (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88249,7 +88345,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetTransfersTransferReversalsId'")
            | _, None -> None in
-         match H.getTransfersTransferReversalsId ~id ~transfer ?expand _req
+         match Handlers.getTransfersTransferReversalsId ~id ~transfer ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_transfer_reversal ~op:_op ~ctype:_resp_ctype content in
@@ -88272,7 +88369,7 @@ module Routes' (H : HANDLERS) = struct
   let postChargesChargeRefundsRefund = let _op = "PostChargesChargeRefundsRefund"
     in
     Routes.route (Paths'.postChargesChargeRefundsRefund ())
-      (fun charge refund (_uri:Uri.t) (_resp:_resp)
+      (fun charge refund (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88286,7 +88383,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostChargesChargeRefundsRefund'")
            | _, None -> None in
-         match H.postChargesChargeRefundsRefund ~charge ~refund _req
+         match Handlers.postChargesChargeRefundsRefund ~charge ~refund _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -88309,7 +88406,7 @@ module Routes' (H : HANDLERS) = struct
   let getChargesChargeRefundsRefund = let _op = "GetChargesChargeRefundsRefund"
     in
     Routes.route (Paths'.getChargesChargeRefundsRefund ())
-      (fun charge refund (_uri:Uri.t) (_resp:_resp)
+      (fun charge refund (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88326,7 +88423,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetChargesChargeRefundsRefund'")
            | _, None -> None in
-         match H.getChargesChargeRefundsRefund ~charge ~refund ?expand _req
+         match Handlers.getChargesChargeRefundsRefund ~charge ~refund ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_refund ~op:_op ~ctype:_resp_ctype content in
@@ -88349,7 +88447,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteAccountsAccountExternalAccountsId = let _op = "DeleteAccountsAccountExternalAccountsId"
     in
     Routes.route (Paths'.deleteAccountsAccountExternalAccountsId ())
-      (fun account id (_uri:Uri.t) (_resp:_resp)
+      (fun account id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88363,7 +88461,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteAccountsAccountExternalAccountsId'")
            | _, None -> None in
-         match H.deleteAccountsAccountExternalAccountsId ~account ~id _req
+         match Handlers.deleteAccountsAccountExternalAccountsId ~account ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -88393,7 +88492,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountExternalAccountsId = let _op = "PostAccountsAccountExternalAccountsId"
     in
     Routes.route (Paths'.postAccountsAccountExternalAccountsId ())
-      (fun account id (_uri:Uri.t) (_resp:_resp)
+      (fun account id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88407,7 +88506,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountExternalAccountsId'")
            | _, None -> None in
-         match H.postAccountsAccountExternalAccountsId ~account ~id _req
+         match Handlers.postAccountsAccountExternalAccountsId ~account ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -88430,7 +88530,7 @@ module Routes' (H : HANDLERS) = struct
   let getAccountsAccountExternalAccountsId = let _op = "GetAccountsAccountExternalAccountsId"
     in
     Routes.route (Paths'.getAccountsAccountExternalAccountsId ())
-      (fun account id (_uri:Uri.t) (_resp:_resp)
+      (fun account id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88447,8 +88547,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountExternalAccountsId'")
            | _, None -> None in
-         match H.getAccountsAccountExternalAccountsId ~account ~id ?expand
-           _req
+         match Handlers.getAccountsAccountExternalAccountsId ~account ~id
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_external_account ~op:_op ~ctype:_resp_ctype content in
@@ -88472,7 +88572,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getCustomersCustomerCashBalanceTransactionsTransaction ())
-      (fun customer transaction (_uri:Uri.t) (_resp:_resp)
+      (fun customer transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88489,7 +88589,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerCashBalanceTransactionsTransaction'")
            | _, None -> None in
-         match H.getCustomersCustomerCashBalanceTransactionsTransaction
+         match Handlers.getCustomersCustomerCashBalanceTransactionsTransaction
            ~customer ~transaction ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -88514,7 +88614,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postCustomersCustomerBalanceTransactionsTransaction ())
-      (fun customer transaction (_uri:Uri.t) (_resp:_resp)
+      (fun customer transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88528,7 +88628,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerBalanceTransactionsTransaction'")
            | _, None -> None in
-         match H.postCustomersCustomerBalanceTransactionsTransaction
+         match Handlers.postCustomersCustomerBalanceTransactionsTransaction
            ~customer ~transaction _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -88553,7 +88653,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getCustomersCustomerBalanceTransactionsTransaction ())
-      (fun customer transaction (_uri:Uri.t) (_resp:_resp)
+      (fun customer transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88570,8 +88670,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerBalanceTransactionsTransaction'")
            | _, None -> None in
-         match H.getCustomersCustomerBalanceTransactionsTransaction ~customer
-           ~transaction ?expand _req
+         match Handlers.getCustomersCustomerBalanceTransactionsTransaction
+           ~customer ~transaction ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_customer_balance_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -88595,7 +88695,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getSourcesSourceMandateNotificationsMandateNotification ())
-      (fun mandate_notification source (_uri:Uri.t) (_resp:_resp)
+      (fun mandate_notification source (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88612,7 +88712,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSourcesSourceMandateNotificationsMandateNotification'")
            | _, None -> None in
-         match H.getSourcesSourceMandateNotificationsMandateNotification
+         match Handlers.getSourcesSourceMandateNotificationsMandateNotification
            ~mandate_notification ~source ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -88636,7 +88736,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteCustomersCustomerCardsId = let _op = "DeleteCustomersCustomerCardsId"
     in
     Routes.route (Paths'.deleteCustomersCustomerCardsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88650,7 +88750,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomerCardsId'")
            | _, None -> None in
-         match H.deleteCustomersCustomerCardsId ~customer ~id _req
+         match Handlers.deleteCustomersCustomerCardsId ~customer ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_d58cff0cff ~op:_op ~ctype:_resp_ctype content in
@@ -88673,7 +88773,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerCardsId = let _op = "PostCustomersCustomerCardsId"
     in
     Routes.route (Paths'.postCustomersCustomerCardsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88687,7 +88787,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerCardsId'")
            | _, None -> None in
-         match H.postCustomersCustomerCardsId ~customer ~id _req
+         match Handlers.postCustomersCustomerCardsId ~customer ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_t_8bf295c604 ~op:_op ~ctype:_resp_ctype content in
@@ -88710,7 +88810,7 @@ module Routes' (H : HANDLERS) = struct
   let getCustomersCustomerCardsId = let _op = "GetCustomersCustomerCardsId"
     in
     Routes.route (Paths'.getCustomersCustomerCardsId ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88727,7 +88827,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerCardsId'")
            | _, None -> None in
-         match H.getCustomersCustomerCardsId ~customer ~id ?expand _req
+         match Handlers.getCustomersCustomerCardsId ~customer ~id ?expand
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_card ~op:_op ~ctype:_resp_ctype content in
@@ -88755,7 +88856,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.deleteCustomersCustomerSubscriptionsSubscriptionExposedId ())
-      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88769,7 +88870,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteCustomersCustomerSubscriptionsSubscriptionExposedId'")
            | _, None -> None in
-         match H.deleteCustomersCustomerSubscriptionsSubscriptionExposedId
+         match Handlers.deleteCustomersCustomerSubscriptionsSubscriptionExposedId
            ~customer ~subscription_exposed_id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -88794,7 +88895,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.postCustomersCustomerSubscriptionsSubscriptionExposedId ())
-      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88808,7 +88909,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerSubscriptionsSubscriptionExposedId'")
            | _, None -> None in
-         match H.postCustomersCustomerSubscriptionsSubscriptionExposedId
+         match Handlers.postCustomersCustomerSubscriptionsSubscriptionExposedId
            ~customer ~subscription_exposed_id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -88833,7 +88934,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getCustomersCustomerSubscriptionsSubscriptionExposedId ())
-      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:_resp)
+      (fun customer subscription_exposed_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88850,7 +88951,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetCustomersCustomerSubscriptionsSubscriptionExposedId'")
            | _, None -> None in
-         match H.getCustomersCustomerSubscriptionsSubscriptionExposedId
+         match Handlers.getCustomersCustomerSubscriptionsSubscriptionExposedId
            ~customer ~subscription_exposed_id ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
@@ -88874,7 +88975,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteAccountsAccountPersonsPerson = let _op = "DeleteAccountsAccountPersonsPerson"
     in
     Routes.route (Paths'.deleteAccountsAccountPersonsPerson ())
-      (fun account person (_uri:Uri.t) (_resp:_resp)
+      (fun account person (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88888,7 +88989,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteAccountsAccountPersonsPerson'")
            | _, None -> None in
-         match H.deleteAccountsAccountPersonsPerson ~account ~person _req
+         match Handlers.deleteAccountsAccountPersonsPerson ~account ~person
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_person ~op:_op ~ctype:_resp_ctype content in
@@ -88911,7 +89013,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountPersonsPerson = let _op = "PostAccountsAccountPersonsPerson"
     in
     Routes.route (Paths'.postAccountsAccountPersonsPerson ())
-      (fun account person (_uri:Uri.t) (_resp:_resp)
+      (fun account person (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88925,7 +89027,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountPersonsPerson'")
            | _, None -> None in
-         match H.postAccountsAccountPersonsPerson ~account ~person _req
+         match Handlers.postAccountsAccountPersonsPerson ~account ~person
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_person ~op:_op ~ctype:_resp_ctype content in
@@ -88948,7 +89051,7 @@ module Routes' (H : HANDLERS) = struct
   let getAccountsAccountPersonsPerson = let _op = "GetAccountsAccountPersonsPerson"
     in
     Routes.route (Paths'.getAccountsAccountPersonsPerson ())
-      (fun account person (_uri:Uri.t) (_resp:_resp)
+      (fun account person (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -88965,8 +89068,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountPersonsPerson'")
            | _, None -> None in
-         match H.getAccountsAccountPersonsPerson ~account ~person ?expand
-           _req
+         match Handlers.getAccountsAccountPersonsPerson ~account ~person
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_person ~op:_op ~ctype:_resp_ctype content in
@@ -88992,7 +89095,7 @@ module Routes' (H : HANDLERS) = struct
   let postInvoicesInvoiceLinesLineItemId = let _op = "PostInvoicesInvoiceLinesLineItemId"
     in
     Routes.route (Paths'.postInvoicesInvoiceLinesLineItemId ())
-      (fun invoice line_item_id (_uri:Uri.t) (_resp:_resp)
+      (fun invoice line_item_id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -89006,8 +89109,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostInvoicesInvoiceLinesLineItemId'")
            | _, None -> None in
-         match H.postInvoicesInvoiceLinesLineItemId ~invoice ~line_item_id
-           _req
+         match Handlers.postInvoicesInvoiceLinesLineItemId ~invoice
+           ~line_item_id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_line_item ~op:_op ~ctype:_resp_ctype content in
@@ -89030,7 +89133,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerBankAccountsIdVerify = let _op = "PostCustomersCustomerBankAccountsIdVerify"
     in
     Routes.route (Paths'.postCustomersCustomerBankAccountsIdVerify ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -89044,7 +89147,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerBankAccountsIdVerify'")
            | _, None -> None in
-         match H.postCustomersCustomerBankAccountsIdVerify ~customer ~id _req
+         match Handlers.postCustomersCustomerBankAccountsIdVerify ~customer
+           ~id _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_bank_account ~op:_op ~ctype:_resp_ctype content in
@@ -89067,7 +89171,7 @@ module Routes' (H : HANDLERS) = struct
   let deleteAccountsAccountPeoplePerson = let _op = "DeleteAccountsAccountPeoplePerson"
     in
     Routes.route (Paths'.deleteAccountsAccountPeoplePerson ())
-      (fun account person (_uri:Uri.t) (_resp:_resp)
+      (fun account person (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -89081,7 +89185,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'DeleteAccountsAccountPeoplePerson'")
            | _, None -> None in
-         match H.deleteAccountsAccountPeoplePerson ~account ~person _req
+         match Handlers.deleteAccountsAccountPeoplePerson ~account ~person
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_deleted_person ~op:_op ~ctype:_resp_ctype content in
@@ -89104,7 +89209,7 @@ module Routes' (H : HANDLERS) = struct
   let postAccountsAccountPeoplePerson = let _op = "PostAccountsAccountPeoplePerson"
     in
     Routes.route (Paths'.postAccountsAccountPeoplePerson ())
-      (fun account person (_uri:Uri.t) (_resp:_resp)
+      (fun account person (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -89118,7 +89223,7 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostAccountsAccountPeoplePerson'")
            | _, None -> None in
-         match H.postAccountsAccountPeoplePerson ~account ~person _req
+         match Handlers.postAccountsAccountPeoplePerson ~account ~person _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_person ~op:_op ~ctype:_resp_ctype content in
@@ -89141,7 +89246,7 @@ module Routes' (H : HANDLERS) = struct
   let getAccountsAccountPeoplePerson = let _op = "GetAccountsAccountPeoplePerson"
     in
     Routes.route (Paths'.getAccountsAccountPeoplePerson ())
-      (fun account person (_uri:Uri.t) (_resp:_resp)
+      (fun account person (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -89158,7 +89263,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetAccountsAccountPeoplePerson'")
            | _, None -> None in
-         match H.getAccountsAccountPeoplePerson ~account ~person ?expand _req
+         match Handlers.getAccountsAccountPeoplePerson ~account ~person
+           ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_person ~op:_op ~ctype:_resp_ctype content in
@@ -89181,7 +89287,7 @@ module Routes' (H : HANDLERS) = struct
   let postCustomersCustomerSourcesIdVerify = let _op = "PostCustomersCustomerSourcesIdVerify"
     in
     Routes.route (Paths'.postCustomersCustomerSourcesIdVerify ())
-      (fun customer id (_uri:Uri.t) (_resp:_resp)
+      (fun customer id (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -89195,7 +89301,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'PostCustomersCustomerSourcesIdVerify'")
            | _, None -> None in
-         match H.postCustomersCustomerSourcesIdVerify ~customer ~id _req
+         match Handlers.postCustomersCustomerSourcesIdVerify ~customer ~id
+           _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_bank_account ~op:_op ~ctype:_resp_ctype content in
@@ -89219,7 +89326,7 @@ module Routes' (H : HANDLERS) = struct
     in
     Routes.route
       (Paths'.getSourcesSourceSourceTransactionsSourceTransaction ())
-      (fun source source_transaction (_uri:Uri.t) (_resp:_resp)
+      (fun source source_transaction (_uri:Uri.t) (_resp:respond)
        (_req_ctype:BodySerDe'._body_type) _resp_ctype _req_hdrs _body ->
        let _queries, _cookies, _headers =
          EncBase'.query_cookie_header_nvs _uri _req_hdrs in
@@ -89236,8 +89343,8 @@ module Routes' (H : HANDLERS) = struct
              raise
                (Invalid_request "The Content-Type 'application/json' is not valid for operation 'GetSourcesSourceSourceTransactionsSourceTransaction'")
            | _, None -> None in
-         match H.getSourcesSourceSourceTransactionsSourceTransaction ~source
-           ~source_transaction ?expand _req
+         match Handlers.getSourcesSourceSourceTransactionsSourceTransaction
+           ~source ~source_transaction ?expand _req
          with
          | Ok (`CH_OK (content,_headers)) -> let code = 200 in
            let body = BodySerDe'.body_of_source_transaction ~op:_op ~ctype:_resp_ctype content in
@@ -89251,62 +89358,4 @@ module Routes' (H : HANDLERS) = struct
        with | Invalid_request msg ->  _resp ~code:400 ~headers:[] msg
        | BodySerDe'.Invalid_body msg -> _resp ~code:400 ~headers:[] msg
        | ParamSerDe'.Invalid_parameter msg -> _resp ~code:400 ~headers:[] msg)
-end
-
-(** Maker of REST servers.
-
-    A server backend is a low-level actor that receives web
-    requests and sends responses on your behalf.
-
-    You provide an [Backend] module as the functor parameter.
-    The [Backend] module must be able to receive web requests
-    in [Backend.receive], and interfaces to the web backend's
-    concurrency and notification model in [Backend.bind] and
-    [Backend.return].
-
-    An [Backend] is available that uses the cohttp curl web client.
-
-    Regardless of which [Backend] you use, when you receive
-    a web request from a server backend you can response with a
-    [Error (`Nonconforming_request ("error message", Some loc))]
-    when the request does not match its OpenAPI specification.
-    For example, the [not] composition operator can not be handled
-    by the OCaml type system, and is best handled at runtime during
-    the web request.
-    [Some loc] should be the JSON pointer location in the OpenAPI
-    specification of the Schema Object that could not be matched.
-    If the JSON pointer is not known then [None] can be used. *)
-module Server (Backend : sig
-  type 'a thread
-
-  val receive :
-       [ `Headers of (string * string) list
-       | `HttpVersion_1_1
-       | `Method of
-         [`DELETE | `GET | `HEAD | `OPTIONS | `PATCH | `POST | `PUT | `TRACE]
-       | `Path of string
-       | `RequestBody of string * string
-       | `Server of string ]
-       list
-    -> ( [> `Headers of (string * string) list
-         | `HttpStatus of int
-         | `ResponseBody of string ]
-         list
-       , [> `Nonconforming_request of string * string option] )
-       result
-       thread
-
-  val bind : 'a thread -> ('a -> 'b thread) -> 'b thread
-
-  val return : 'c -> 'c thread
-end)
- =
-struct
-
-  open StripeTypes
-  open StripeBodies
-  open StripeEncdrs
-  open StripeParams
-  open StripePaths
-  
-end [@@warning "-unused-open"] [@@warning "-unused-value-declaration"] 
+end [@@warning "-unused-value-declaration"] 
