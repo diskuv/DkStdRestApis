@@ -13,8 +13,9 @@ jobs:
     #   **************************************************************
     #
     #   Error: The operation was canceled.
-    # runs-on: macos-latest
-    runs-on: ubuntu-22.04
+    # runs-on: macos-latest (still gets killed during odoc -link)
+    # runs-on: ubuntu-22.04
+    runs-on: Ubuntu22-8core-32GB
     permissions:
       # Needed for peaceiris/actions-gh-pages@v3
       contents: write
