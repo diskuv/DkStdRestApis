@@ -4,7 +4,7 @@
  (modules (:standard \ open__ Curl2 CurlCmd ServerTiny))
  ; (ocamlopt_flags (:standard -verbose -compact -inline 0 -linscan -match-context-rows 8))
  (ocamlopt_flags (:standard -verbose))
- (libraries ezjsonm json-data-encoding ptime routes))
+ (libraries ezjsonm json-data-encoding ptime ptime.clock.os routes))
 
 (library
  (name DkStdRestApis_NotStripe_C)

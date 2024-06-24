@@ -31,8 +31,8 @@ cd DkStdRestApis
 and create an exploratory opam switch:
 
 ```sh
-# Tr1RestApis requires OCaml 5.2.0+ until OCaml 4.12.3
-# (https://github.com/ocaml/ocaml/pull/13204) is released. Tr1RestApis will be
+# DkStdRestApis requires OCaml 5.2.0+ until OCaml 4.12.3
+# (https://github.com/ocaml/ocaml/pull/13204) is released. DkStdRestApis will be
 # published to opam once APIs + dependencies stabilize.
 opam switch create . 5.2.0 --no-install
 
@@ -59,22 +59,48 @@ from its [OpenAPI 3.0.0 specification](https://github.com/stripe/openapi#readme)
 $ opam exec dune utop
 
 #require "DkStdRestApis_NotStripe" ;;
-#require "DkStdRestApis_NotStripe.X" ;;
+#require "DkStdRestApis_NotStripe.Clients" ;;
 open DkStdRestApis_NotStripe ;;
-open DkStdRestApis_NotStripe_X ;;
+open DkStdRestApis_NotStripe_C ;;
 
-(* Add ~cacerts="/etc/ssl/certs/ca-certificates.crt" on Linux; aka. ca-build.crt. *)
+(* Do you have a Stripe account? Then:
+   1. Replace the [bearer].
+   2. Add ~cacerts="/etc/ssl/certs/ca-certificates.crt" on Linux; aka. ca-build.crt.
+
+   Otherwise skip to the "Print Curl" section! *)
 module Agent = (val Curl2.create_cohttp_curl_lwt_agent ~server_url:"https://api.stripe.com" ~bearer:"YOUR_STRIPE_API_TEST_SECRET_KEY" ~headers:[("stripe-version", "2024-04-10")] ()) ;;
 module StripeClient = Stripe.Client (Agent) ;;
 
 StripeClient.getCustomers ~limit:1 None ;;
 
-(* Print 'curl ...' commands. *)
+(* Print Curl: Print 'curl ...' commands rather than trying to execute the web request. *)
 
 module Agent = (val CurlCmd.create_agent ~server_url:"https://api.stripe.com" ~bearer:"YOUR_STRIPE_API_TEST_SECRET_KEY" ~headers:[("stripe-version", "2024-04-10")] ()) ;;
 module StripeClient = Stripe.Client (Agent) ;;
 
-match StripeClient.getCustomers ~limit:1 None with 
-| `Curl_command s -> print_endline s
-| `Never _ -> assert false ;;
+CurlCmd.print @@ StripeClient.getCustomers ~limit:1 None ;;
+
+#quit ;;
+```
+
+Okay, we have a way to print Curl commands.
+
+Let's start the server in [ServerTiny.ml](src/DkStdRestApis_NotStripe/ServerTiny.ml):
+
+```sh
+$ opam exec -- dune exec src/DkStdRestApis_NotStripe/ServerTiny.exe
+listening on http://127.0.0.1:8080
+```
+
+and run a couple Curl commands in **another terminal**:
+
+```sh
+$ curl -H "Content-Type: application/x-www-form-urlencoded" http://127.0.0.1:8080/v1/customers/123
+{"error":{"message":"Customer 123 not found.","type":"api_error"}}
+
+$ curl -d "email=elves@northpole.ca" -d "name=Santa Claus" http://127.0.0.1:8080/v1/customers/123
+{"created":1719209196,"email":"elves@northpole.ca","id":"123","livemode":false,"name":"Santa Claus","object":"customer"}
+
+$ curl -H "Content-Type: application/x-www-form-urlencoded" http://127.0.0.1:8080/v1/customers/123
+{"created":1719209196,"email":"elves@northpole.ca","id":"123","livemode":false,"name":"Santa Claus","object":"customer"}
 ```

@@ -1,3 +1,10 @@
+let print v =
+  match v with
+  | `Curl_command s ->
+      print_newline () ; print_endline s ; print_newline ()
+  | `Never _ ->
+      assert false
+
 module type AGENT = sig
   type 'a thread = [`Curl_command of string | `Never of 'a]
 
@@ -111,7 +118,7 @@ let create_agent ?server_url ?cacerts ?verbose ?bearer ?(headers = []) () =
     (* [curl] *)
     a (S "curl") ;
     (* [https://...] *)
-    a (S uri) ;
+    a (S (Filename.quote uri)) ;
     (* [-v] *)
     ( match verbose with
     | Some 1 ->
