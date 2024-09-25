@@ -2,9 +2,17 @@ module String = Tr1Stdlib_V414Base.String
 module Map = Tr1Stdlib_V414Base.Map
 module Printf = Tr1Stdlib_V414CRuntime.Printf
 module List = Tr1Stdlib_V414Base.List
+module Sys = Tr1Stdlib_V414CRuntime.Sys
 
 (* STEP 1: Module imports and aliases. *)
 open DkStdRestApis_NotStripe
+
+(* module Stripe = DkStdRestApis_NotStripe.Stripe
+   module StripeBodies = DkStdRestApis_NotStripe.StripeBodies
+   module StripeEncdrs = DkStdRestApis_NotStripe.StripeEncdrs
+   module StripeParams = DkStdRestApis_NotStripe.StripeParams
+   module StripePaths = DkStdRestApis_NotStripe.StripePaths
+   module StripeTypes = DkStdRestApis_NotStripe.StripeTypes *)
 module BodySerDe' = StripeBodies.BodySerDe'
 module Paths' = StripePaths.Paths'
 module Encoders' = StripeEncdrs.Encoders'
@@ -159,8 +167,12 @@ let handler (req : Tiny_httpd.IO.Input.t Tiny_httpd.Request.t) =
       Tiny_httpd.Response.fail ~code:404 "Route not found in API specification."
 
 let () =
-  let server = Tiny_httpd.create () in
-  Tiny_httpd.set_top_handler server handler ;
-  Printf.printf "listening on http://%s:%d\n%!" (Tiny_httpd.addr server)
-    (Tiny_httpd.port server) ;
-  match Tiny_httpd.run server with Ok () -> () | Error e -> raise e
+  match Sys.argv with
+  | [|_; "--usage"|] ->
+      Printf.printf "./dk DkStdRestApis_NotStripe_Tiny.Server [--usage]\n%!"
+  | _ -> (
+      let server = Tiny_httpd.create () in
+      Tiny_httpd.set_top_handler server handler ;
+      Printf.printf "listening on http://%s:%d\n%!" (Tiny_httpd.addr server)
+        (Tiny_httpd.port server) ;
+      match Tiny_httpd.run server with Ok () -> () | Error e -> raise e )
