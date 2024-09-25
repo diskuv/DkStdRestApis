@@ -3,33 +3,25 @@
 
 (library
  ; ... Simulate DkCoder [open__.ml] file in regular ocaml
- (name notstripe_o)
- (public_name DkStdRestApis_NotStripe.O)
+ (name notstripe_curl_o)
+ (public_name DkStdRestApis_NotStripe.Curl.O)
  (modules open__)
  (libraries
+  Tr1Http_Std
   Tr1Stdlib_V414Base
-  Tr1Routes_Std
-  Tr1Uri_Std
   Tr1Stdlib_V414CRuntime
-  Tr1String_Ext
-  Tr1Http_Std))
+  Tr1Stdlib_V414Io))
 
 (library
- (name DkStdRestApis_NotStripe)
- (public_name DkStdRestApis_NotStripe)
- (modules
-  (:standard \ open__))
- ; (ocamlopt_flags (:standard -verbose -compact -inline 0 -linscan -match-context-rows 8))
- (ocamlopt_flags
-  (:standard -verbose))
+ (name DkStdRestApis_NotStripe_C)
+ (public_name DkStdRestApis_NotStripe.Curl)
+ (modules Curl2 CurlCmd)
  (libraries
-  Stdlib414Shadow
-  notstripe_o
-  ezjsonm
-  json-data-encoding
-  ptime
-  ptime.clock.os
-  routes)
+  notstripe_curl_o
+  DkStdRestApis_NotStripe
+  cohttp-curl-lwt
+  http
+  lwt)
  (flags
   (:standard
    ; @32: error on unused-value-declaration
@@ -45,7 +37,7 @@
    Stdlib414Shadow
    ; ... Simulate DkCoder [open__.ml] file in regular ocaml
    -open
-   Notstripe_o.Open__
+   Notstripe_curl_o.Open__
    ; .... need_dkcoder_stdlib: Turn the above uses of Stdlib into fatal alerts.
    -alert
    @need_dkcoder_stdlib)))

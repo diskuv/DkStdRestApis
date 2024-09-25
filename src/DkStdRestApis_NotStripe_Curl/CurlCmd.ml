@@ -1,7 +1,7 @@
 let print v =
   match v with
   | `Curl_command s ->
-      print_newline () ; print_endline s ; print_newline ()
+      StdIo.print_newline () ; StdIo.print_endline s ; StdIo.print_newline ()
   | `Never _ ->
       assert false
 

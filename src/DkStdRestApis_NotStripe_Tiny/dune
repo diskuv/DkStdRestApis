@@ -1,0 +1,25 @@
+; Compile the scripts for Dune users and to aid development in an IDE.
+; DkCoder does not need this file!
+
+(executable
+ (name ServerTiny)
+ (public_name stripe-tiny-server)
+ (modes byte exe)
+ (modules ServerTiny)
+ (libraries Stdlib414Shadow DkStdRestApis_NotStripe tiny_httpd)
+ (flags
+  (:standard
+   ; @32: error on unused-value-declaration
+   ; @70: error on missing-mli
+   ; -warn-error
+   ; @32@70
+   ; ---- START
+   ; ---- Same flags as [DuneStanzas.add_executable] so that errors appear during DkCoder
+   ; ---- compile. Not on the end-user's machine!
+   ;
+   ; .... Flag the uses of Stdlib with alerts
+   -open
+   Stdlib414Shadow
+   ; .... need_dkcoder_stdlib: Turn the above uses of Stdlib into fatal alerts.
+   -alert
+   @need_dkcoder_stdlib)))

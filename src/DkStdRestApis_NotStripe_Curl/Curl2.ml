@@ -34,6 +34,12 @@ module type AGENT = sig
   val return : 'c -> 'c thread
 end
 
+let shift_curl1_error = function
+  | Ok v ->
+      Lwt.return v
+  | Error e ->
+      Lwt.fail_with (Curl1.Error.message e)
+
 (** [create_cohttp_curl_lwt_agent ?server_url ?timeout_ms ()] creates
     a Cohttp Curl Lwt web agent for DkStdRestApis.
 
@@ -132,9 +138,9 @@ let create_cohttp_curl_lwt_agent ?server_url ?(timeout_ms = 5000) ?cacerts
               Curl0.set_debugfunction curl0 (fun _curl0 dtype s ->
                   match dtype with
                   | Curl0.DEBUGTYPE_DATA_IN ->
-                      prerr_endline ("CURLIN: " ^ s)
+                      StdIo.prerr_endline ("CURLIN: " ^ s)
                   | Curl0.DEBUGTYPE_DATA_OUT ->
-                      prerr_endline ("CURLOUT: " ^ s)
+                      StdIo.prerr_endline ("CURLOUT: " ^ s)
                   | _ ->
                       () )
         | _ ->
@@ -157,9 +163,12 @@ let create_cohttp_curl_lwt_agent ?server_url ?(timeout_ms = 5000) ?cacerts
         Curl1.submit context request
       in
       let ( let* ) = Lwt.bind in
-      let* resp, response_body =
+      let* ( (resp : (Http.Response.t, Curl1.Error.t) result)
+           , (response_body : (string, Curl1.Error.t) result) ) =
         Lwt.both (Curl1.Response.response reply) (Curl1.Response.body reply)
       in
+      let* resp = shift_curl1_error resp in
+      let* response_body = shift_curl1_error response_body in
       let status : Http.Status.t = Http.Response.status resp in
       let response_headers = Http.Response.headers resp in
       Lwt.return

@@ -1,3 +1,8 @@
+module String = Tr1Stdlib_V414Base.String
+module Map = Tr1Stdlib_V414Base.Map
+module Printf = Tr1Stdlib_V414CRuntime.Printf
+module List = Tr1Stdlib_V414Base.List
+
 (* STEP 1: Module imports and aliases. *)
 open DkStdRestApis_NotStripe
 module BodySerDe' = StripeBodies.BodySerDe'
