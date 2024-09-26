@@ -2,10 +2,10 @@
 ; DkCoder does not need this file!
 
 (executable
- (name ServerTiny)
+ (name Server)
  (public_name stripe-tiny-server)
  (modes byte exe)
- (modules ServerTiny)
+ (modules Server)
  (libraries Stdlib414Shadow DkStdRestApis_NotStripe tiny_httpd)
  (flags
   (:standard
