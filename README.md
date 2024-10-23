@@ -1,106 +1,96 @@
-# DkCoder REST APIs
+# Uber REST APIs
 
-`DkStdRestApis` is a monorepo project containing generated REST client code for multiple REST services.
+`DkUberRestApis` is a project containing generated REST client code for multiple REST services.
 The intent is to be a one-stop shop for the common REST services for OCaml users, especially anyone using [DkCoder](https://github.com/diskuv/dkcoder#readme).
 
-> If you would like to support this project, please consider adding a star to the [DkCoder GitHub project](https://github.com/diskuv/dkcoder). *That is also the place to leave issues and feedback!*
+## Design
 
-## Documents
+The foundation is the [json-data-encoding](https://gitlab.com/nomadic-labs/data-encoding) package.
 
-| Title     | Link                                                                           |
-| --------- | ------------------------------------------------------------------------------ |
-| NotStripe | [src/DkStdRestApis_NotStripe/README.md](src/DkStdRestApis_NotStripe/README.md) |
+For REST services built on top of JSON Schema, `json-data-encoding` is sufficient to describe the requests and responses.
+
+For REST services built on top of OpenAPI, DkUberRestApis adds build tools so that OCaml client code is generated.
+
+For other REST services, DkUberRestApis provides some utilities to help describe those services.
+
+Some design goals:
+
+- The generated clients should be publishable in OCaml's main opam repository.
+- Support vendor-specific extensions to the standards. *This goal means supporting [Stripe's extensions to OpenAPI](https://github.com/stripe/openapi) and AWS SigV4 headers*
+- Have a small number of liberally-licensed runtime dependencies. *This goal rules out the `data-encoding` package with its numerous dependencies especially its non-liberal zarith dependency.*
+- Keep the cross-language interoperability goals for DkCoder and DkSDK by being able to generate non-OCaml clients. *This goal means there should be an intermediate representation of the REST schema.*
+- Don't repeat the downloading and parsing logic of REST specifications, and generation logic of REST clients. *This goal is why there is an "uber" client. An alternative is to commonalize the logic into libraries, which will be developed over time.*
+
+Some desires but not hard-and-fast design goals:
+
+- The REST APIs should be not just for REST clients but also for writing your own REST services. *That is, try not to throw away the bidirectionality of REST encoders.*
 
 ## Licenses
 
-The generated clients in `src/` are liberally licensed with the [LICENSE-Apache2](./LICENSE-Apache2) Apache 2.0 license.
+The `dk`, `dk.cmd` and `__dk.cmake` build tools are [LICENSE-OSL3](./LICENSE-OSL3) OSL 3.0 licensed with prompts for additional licenses for the OCaml-modified LGPL license and DKSDK license. That is a complex mix of free and copyleft licenses so ...
 
-The `dk`, `dk.cmd` and `__dk.cmake` build tools are [LICENSE-OSL3](./LICENSE-OSL3) OSL 3.0 licensed with prompts for additional licenses for the OCaml-modified LGPL license and DkSDK license.
+The project source code under `src/` and generated clients are liberally licensed with the [LICENSE-Apache2](./LICENSE-Apache2) Apache 2.0 license.
 
-## Quick Start
+## APIs
 
-> Prerequisites: opam 2.2.0+. On Unix that is `bash -c "sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh) --version 2.2.0~beta3"` and on Windows that is `winget install opam`
+> The generation requires code that is in DkCoder 0.4 which is not released as of 2024-05-27
 
-Checkout the project:
+The generated OCaml clients are in [src/DkUberRestApis_Std](src/DkUberRestApis_Std).
 
-```shell
-git clone https://github.com/diskuv/DkStdRestApis.git
-cd DkStdRestApis
-```
+### Compiling an API with DkCoder
 
-and create an exploratory opam switch:
+Verify there are no code generation issues by compiling an API like Stripe's with:
 
 ```sh
-# DkStdRestApis requires OCaml 5.2.0+ until OCaml 4.12.3
-# (https://github.com/ocaml/ocaml/pull/13204) is released. DkStdRestApis will be
-# published to opam once APIs + dependencies stabilize.
-opam switch create . 5.2.0 --no-install
-
-# Small set of transitive dependencies; 5 of 21 are build-time dependencies.
-#  ocamlbuild, dune, ocamlfind, stringext, routes, ocaml-syntax-shims, csexp,
-#  topkg, dune-configurator, ptime, fmt, bigstringaf, cstruct, angstrom, hex,
-#  uri, json-data-encoding, jsonm, sexplib0, uutf, ezjsonm,.
-opam install --subpath src/ . --yes --deps-only
-
-# We'll add some backends and dev tools.
-#  1. DkStdRestApis has scaffolding for REST servers. Bring your own
-#  web server backend. Includes an example for [tiny_httpd] (+3 dependencies).
-#  2. REST clients are generated. Bring your own web agent backend. Includes an
-#  example for an unreleased [cohttp-curl-lwt] (+9 deps).
-opam pin add cohttp-curl git+https://github.com/mirage/ocaml-cohttp.git#77fb272f8eac61b9d94067450c75b58fe4c2e122 --yes
-opam pin add tiny_httpd git+https://github.com/c-cube/tiny_httpd.git#9eb3cbfc70d112d09eccada835667b76d1f758f6 --yes
-opam install cohttp-curl-lwt utop ocaml-lsp-server odoc --yes
+git clean -d -f -x _opam _build "#s" src/DkUberRestApis_Std/
+./dk DkRun_V0_4.Run src/DkUberRestApis_Std/Stripe.ml
 ```
 
-and then start exploring the [Stripe REST API](https://docs.stripe.com/api)
-from its [OpenAPI 3.0.0 specification](https://github.com/stripe/openapi#readme):
+### Compiling all APIs with Dune
 
-```ocaml
-$ opam exec dune utop
-
-#require "DkStdRestApis_NotStripe" ;;
-#require "DkStdRestApis_NotStripe.Clients" ;;
-open DkStdRestApis_NotStripe ;;
-open DkStdRestApis_NotStripe_C ;;
-
-(* Do you have a Stripe account? Then:
-   1. Replace the [bearer].
-   2. Add ~cacerts="/etc/ssl/certs/ca-certificates.crt" on Linux; aka. ca-build.crt.
-
-   Otherwise skip to the "Print Curl" section! *)
-module Agent = (val Curl2.create_cohttp_curl_lwt_agent ~server_url:"https://api.stripe.com" ~bearer:"YOUR_STRIPE_API_TEST_SECRET_KEY" ~headers:[("stripe-version", "2024-04-10")] ()) ;;
-module StripeClient = Stripe.Client (Agent) ;;
-
-StripeClient.getCustomers ~limit:1 None ;;
-
-(* Print Curl: Print 'curl ...' commands rather than trying to execute the web request. *)
-
-module Agent = (val CurlCmd.create_agent ~server_url:"https://api.stripe.com" ~bearer:"YOUR_STRIPE_API_TEST_SECRET_KEY" ~headers:[("stripe-version", "2024-04-10")] ()) ;;
-module StripeClient = Stripe.Client (Agent) ;;
-
-CurlCmd.print @@ StripeClient.getCustomers ~limit:1 None ;;
-
-#quit ;;
-```
-
-Okay, we have a way to print Curl commands.
-
-Let's start the server in [ServerTiny.ml](src/DkStdRestApis_NotStripe/ServerTiny.ml):
+On Unix including Cygwin:
 
 ```sh
-$ opam exec -- dune exec src/DkStdRestApis_NotStripe/ServerTiny.exe
-listening on http://127.0.0.1:8080
+git clean -d -f -x _opam _build "#s" src/DkUberRestApis_Std/
+opam switch create . 4.14.2 --no-install
+opam install dune json-data-encoding ptime ezjsonm -y
+cp dune-project.in dune-project
+cp src/DkUberRestApis_Std/dune.in src/DkUberRestApis_Std/dune
+opam exec -- dune build
 ```
 
-and run a couple Curl commands in **another terminal**:
+On Windows in Command Prompt with DkML or opam 2.2:
+
+```dosbatch
+git clean -d -f -x _opam _build "#s" src
+
+REM In opam 2.2, use the following insteaD:
+REM    opam switch create . 4.14.2 --no-install
+dkml init
+
+opam install dune json-data-encoding ptime ezjsonm -y
+COPY dune-project.in dune-project
+COPY src/DkUberRestApis_Std/dune.in src/DkUberRestApis_Std/dune
+opam exec -- dune build
+```
+
+Then do:
 
 ```sh
-$ curl -H "Content-Type: application/x-www-form-urlencoded" http://127.0.0.1:8080/v1/customers/123
-{"error":{"message":"Customer 123 not found.","type":"api_error"}}
-
-$ curl -d "email=elves@northpole.ca" -d "name=Santa Claus" http://127.0.0.1:8080/v1/customers/123
-{"created":1719209196,"email":"elves@northpole.ca","id":"123","livemode":false,"name":"Santa Claus","object":"customer"}
-
-$ curl -H "Content-Type: application/x-www-form-urlencoded" http://127.0.0.1:8080/v1/customers/123
-{"created":1719209196,"email":"elves@northpole.ca","id":"123","livemode":false,"name":"Santa Claus","object":"customer"}
+opam switch create . 4.14.2
+opam install dune
+opam exec -- dune build DkUberRestApis_Std.opam
+opam install ./DkUberRestApis_Std.opam --deps-only
+opam exec -- dune build
 ```
+
+### Generating Stripe
+
+Download the Stripe schema and generate OCaml encoders with:
+
+```sh
+./dk DkRun_V0_4.Run src/DkUberRestApis_Gen/StripeGen.ml --ml src/DkUberRestApis_Std/Stripe.ml --include-odoc
+```
+
+Stripe updates frequently (often once a day).
+Command-line options exist to get a newer Stripe schema than what is available in `src/DkUberRestApis_Std/Stripe.ml`.

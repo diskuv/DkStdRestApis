@@ -1,0 +1,5 @@
+(library
+ (name DkUberRestApis_Std)
+ (public_name DkUberRestApis_Std)
+ (modules (:standard \ open__))
+ (libraries ptime json-data-encoding ezjsonm))
