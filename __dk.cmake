@@ -17,7 +17,7 @@
 # Inputs
 # ------
 # Environment vars:
-#   DKRUN_ENV_URL_BASE - optional
+#   DKTOOL_ENV_URL_BASE - optional
 #   DKML_HOST_ABI - optional
 #   DKCODER_LOGLEVEL - optional
 #   DKCODER_LOGLEVEL_OVERRIDE - optional
@@ -95,11 +95,11 @@ set(__DkRun_V2_2_SHA256_windows_x86_64 15f27327ce6edd4a713fd082a9797f0b71f5a3c10
 set(__DkRun_V2_2_SHA256_windows_x86    1a27d7bf65c2b3428e346017f7fe8dc13bc4263634ec575fc369c6f998c990d8)
 set(__DkRun_V2_2_EOL_YYYY_MM_DD "2025-12-30")
 set(__DkRun_V2_2_EOG_YYYY_MM_DD "2026-06-30")
-#   `Env` is a valid DkCoder version if $DKRUN_ENV_URL_BASE exists. Typically it is a file:// URL.
+#   `Env` is a valid DkCoder version if $DKTOOL_ENV_URL_BASE exists. Typically it is a file:// URL.
 set(__DkRun_Env_URL_BASE)
-if(DEFINED ENV{DKRUN_ENV_URL_BASE})
+if(DEFINED ENV{DKTOOL_ENV_URL_BASE})
     set(__DkRun_Env_COMPILE_VERSION Env)
-    set(__DkRun_Env_URL_BASE "$ENV{DKRUN_ENV_URL_BASE}")
+    set(__DkRun_Env_URL_BASE "$ENV{DKTOOL_ENV_URL_BASE}")
     set(__DkRun_Env_EOL_YYYY_MM_DD "9999-06-30")
     set(__DkRun_Env_EOG_YYYY_MM_DD "9999-12-31")
 endif()
@@ -363,7 +363,7 @@ endfunction()
 # - DKCODER_TOOL - location of the `dkcoder-tool` executable
 # - DKCODER_VERSION - dotted form of DkCoder like 0.2.0.1
 # - DKCODER_RUN - location of the `DkCoder_Edge-Run` executable (here "Edge" means the latest version for the VERSION; aka. the VERSION itself)
-# - DKCODER_RUN_VERSION - `Env` or `V0_2`. Whatever was used to launch in `./dk DkRun_V0_2.Run` (etc.)
+# - DKCODER_TOOL_MODULE - `DkRun_Env.Run` or `DkRun_V0_2.Run`. Whatever was used to launch in `./dk DkRun_V0_2.Run` (etc.)
 # - DKCODER_HELPERS - location of bin directory or DkCoder.bundle/Contents/Helpers on macOS
 # - DKCODER_ETC - location of etc/dkcoder directory
 # - DKCODER_BASE_SITELIB - location of lib/ directory containing the base system that at minimum includes the ocaml-system (ie. lib/ocaml/)
@@ -621,8 +621,8 @@ stdlib="@DKCODER_HOME@/DkCoder.bundle/Contents/Resources/lib/ocaml"]] @ONLY NEWL
     # Export version
     set(DKCODER_VERSION "${compile_version}" PARENT_SCOPE)
 
-    # Export run vid (Env or V0_1)
-    set(DKCODER_RUN_VERSION "${V_id}" PARENT_SCOPE)
+    # Export run module (Env or V0_1)
+    set(DKCODER_TOOL_MODULE "DkRun_${V_id}.Run" PARENT_SCOPE)
 endfunction()
 
 macro(__dkcoder_prep_environment)
@@ -709,7 +709,7 @@ function(__dkcoder_delegate)
         __dkcoder_add_environment_set("DKCODER_NINJA_EXE=${CMAKE_MAKE_PROGRAM}")
     endif()
 
-    # Propagate DKCODER_SHARE and DKCODER_HELPERS and DKCODER_RUN_VERSION.
+    # Propagate DKCODER_SHARE and DKCODER_HELPERS and DKCODER_TOOL_MODULE.
     #   Why not DKCODER_HOST_ABI? DkRun has a hardcoded default (so ABI hardcoding comes from the downloaded DkRun
     #   which is chosen by ./dk). But we don't change the default since a future DkRun may have a better
     #   detection of ABI (ex. ./dk downloads x86_64 for macOS but ABI is detected as arm64).
@@ -729,8 +729,8 @@ function(__dkcoder_delegate)
     elseif(ARG_VERSION VERSION_GREATER 0.4.0.1)
         __dkcoder_add_environment_set("DKCODER_SITELIB=${DKCODER_BASE_SITELIB_NATIVE}")
     endif()
-    __dkcoder_add_environment_set("DKCODER_RUN_VERSION=${DKCODER_RUN_VERSION}")
-    __dkcoder_add_environment_set("DKCODER_RUN_ENV_URL_BASE=${__DkRun_Env_URL_BASE}")
+    __dkcoder_add_environment_set("DKCODER_TOOL_MODULE=${DKCODER_TOOL_MODULE}")
+    __dkcoder_add_environment_set("DKCODER_TOOL_ENV_URL_BASE=${__DkRun_Env_URL_BASE}")
     __dkcoder_add_environment_set("DKCODER_PWD=${DKCODER_PWD}")
     __dkcoder_add_environment_set("DKCODER_ARG0=${DKCODER_ARG0}")
 
@@ -813,6 +813,7 @@ SET DK_WORKDIR=
 
 REM Clear variables that influence __dk.cmake. They are not part of DkCoder API.
 SET DKRUN_ENV_URL_BASE=
+SET DKTOOL_ENV_URL_BASE=
 
 "@CMAKE_COMMAND_NATIVE@" -E env @envMods_DOS@ -- @entryExec_PRECOMMAND@"@entryExec_NATIVE@" @dkcoder_ARGS@
 ]]
@@ -831,6 +832,7 @@ unset DK_PROG_INSTALLED_LOCATION
 
 # Clear variables that influence __dk.cmake. They are not part of DkCoder API.
 unset DKRUN_ENV_URL_BASE
+unset DKTOOL_ENV_URL_BASE
 
 exec '@CMAKE_COMMAND@' -E env @envMods_DOS@ -- @entryExec_PRECOMMAND@'@entryExec@' @dkcoder_ARGS@
 ]]
@@ -984,9 +986,9 @@ Environment variables:
         set(__dkrun_compile_version "${__DkRun_${__dkrun_v_id}_COMPILE_VERSION}")
 
         # Validation
-        if(library STREQUAL "Env" AND NOT DEFINED ENV{DKRUN_ENV_URL_BASE})
+        if(library STREQUAL "Env" AND NOT DEFINED ENV{DKTOOL_ENV_URL_BASE})
             # alert: do not expose unsanitized user-supplied data
-            message(FATAL_ERROR "Problem: We want you to use the DKRUN_ENV_URL_BASE environment variable.\n\nSolution: DkSDK subscribers should contact their DkSDK Support representative.")
+            message(FATAL_ERROR "Problem: We want you to use the DKTOOL_ENV_URL_BASE environment variable.\n\nSolution: DkSDK subscribers should contact their DkSDK Support representative.")
         elseif(NOT __dkrun_compile_version)
             __dkcoder_error_wrong_version("")
         endif()
