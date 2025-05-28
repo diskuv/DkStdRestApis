@@ -36,7 +36,7 @@ REM Invoke-WebRequest guidelines
 REM 1. Use $ProgressPreference = 'SilentlyContinue' always. Terrible slowdown w/o it.
 REM    https://stackoverflow.com/questions/28682642
 
-SET _DK_PROJ_DIR=%~dp0
+SET DKCODER_PROJECT_DIR=%~dp0
 SET DKCODER_PWD=%CD%
 
 REM Update within dksdk-coder:
@@ -51,17 +51,28 @@ SET DK_VER=2.3.202505280211
 SET DK_CKSUM_WINDOWS_X86=
 SET DK_CKSUM_WINDOWS_X86_64=db6484a9a456cb9dfc2172bfcff3414ea92a2732d0e24e9ee013bd9962818651
 
-REM --------- Quiet and Away Detection ---------
-REM Enabled? If suffix of the first argument is "Quiet" or "Away"
-REM Example: DkRun_Project.RunQuiet
-REM Example: DkRun_Project.RunAway
+REM --------- Quiet Detection ---------
+REM Enabled? If suffix of the first argument is "Quiet"
+REM Example: `StdStd_V0_1.RunQuiet`
+REM Edge Case: `--fixed-length-modules false RunQuiet` for IDE integration
 
 SET DK_ARG1=%1
+SET DK_ARG3=%3
 SET DK_QUIET=0
-SET DK_AWAY=0
-IF "%DK_ARG1:~-5%" == "Quiet" SET DK_QUIET=1
-IF "%DK_ARG1:~-4%" == "Away" SET DK_AWAY=1
+SET _XCOPY_SWITCHES=
+SET _DKEXE_OPTIONS=
+IF "%DK_ARG1:~-5%" == "Quiet" (
+    SET DK_QUIET=1
+    SET _XCOPY_SWITCHES=/q
+    SET _DKEXE_OPTIONS=-l ERROR
+)
+IF "%DK_ARG3:~-5%" == "Quiet" (
+    SET DK_QUIET=1
+    SET _XCOPY_SWITCHES=/q
+    SET _DKEXE_OPTIONS=-l ERROR
+)
 SET DK_ARG1=
+SET DK_ARG3=
 
 REM --------- Data Home ---------
 
@@ -96,7 +107,7 @@ IF "%PROGRAMFILES(x86)%" == "" (
             %DK_CKSUM_WINDOWS_X86%
         REM On error the error message was already displayed.
         IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-        XCOPY /v /g /i /r /n /y /j "%TEMP%\%DK_CKSUM_WINDOWS_X86%\dk.exe" "!DK_EXEDIR!"
+        XCOPY "%TEMP%\%DK_CKSUM_WINDOWS_X86%\dk.exe" "!DK_EXEDIR!" %_XCOPY_SWITCHES% /v /g /i /r /n /y /j >NUL
         IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
         REM It is okay if the temp dir is not cleaned up. No error checking.
         IF NOT "%DK_CKSUM_WINDOWS_X86%" == "" RD "%TEMP%\%DK_CKSUM_WINDOWS_X86%" /s /q
@@ -116,7 +127,7 @@ IF "%PROGRAMFILES(x86)%" == "" (
             %DK_CKSUM_WINDOWS_X86_64%
         REM On error the error message was already displayed.
         IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-        XCOPY /v /g /i /r /n /y /j "%TEMP%\%DK_CKSUM_WINDOWS_X86_64%\dk.exe" "!DK_EXEDIR!"
+        XCOPY "%TEMP%\%DK_CKSUM_WINDOWS_X86_64%\dk.exe" "!DK_EXEDIR!" %_XCOPY_SWITCHES% /v /g /i /r /n /y /j >NUL
         IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
         REM It is okay if the temp dir is not cleaned up. No error checking.
         IF NOT "%DK_CKSUM_WINDOWS_X86_64%" == "" RD "%TEMP%\%DK_CKSUM_WINDOWS_X86_64%" /s /q
@@ -144,30 +155,18 @@ REM -------------- Clear environment -------
 
 SET "DK_QUIET="
 
-REM --------------- Console ----------------
-REM Until https://github.com/ocaml/ocaml/pull/1408 fixed
-REM Confer: https://stackoverflow.com/a/52139735
-2>NUL >NUL TIMEOUT /T 0 && (
-  REM stdin not redirected or piped
-  CHCP 65001 >NUL
-  SET DKCODER_TTY=1
-) || (
-  REM stdin has been redirected or is receiving piped input
-  SET DKCODER_TTY=0
-)
-
 REM -------------- Run dk executable --------------
 
 SET DKCODER_ARG0=%0
 
-IF %DK_AWAY% EQU 0 CD /D "%_DK_PROJ_DIR%"
+CD /D "%DKCODER_PROJECT_DIR%"
 REM     Unset local variables
 SET "DK_DATA_HOME="
-SET "DK_AWAY="
 SET "DK_QUIET="
 SET "_DK_PATH="
-REM     Then run dk.exe. TODO: Use environment variable not --project-dir so quotes aren't needed
-"%DK_EXE%" --project-dir %_DK_PROJ_DIR% %*
+SET "_XCOPY_SWITCHES="
+REM     Then run dk.exe
+"%DK_EXE%" %_DKEXE_OPTIONS% %*
 EXIT /B %ERRORLEVEL%
 
 REM ------ SUBROUTINE [downloadFile]

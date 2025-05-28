@@ -36,12 +36,16 @@ cksum256_linux_x86_64=6b9542a0f8b4730cccf929f7df59133a0590457c30d98047d34d5dba66
 
 dk_pwd=$PWD
 
-# --- Quiet or Away mode detection ---
-# Any command like ./dk DkRun_V0_1.RunQuiet that ends in "Quiet".
+# --- Quiet mode detection ---
+# Any command like ./dk StdStd_V0_1.RunQuiet that ends in "Quiet".
 # However, for user safety won't quiet a command if `sudo` is required.
+#
+# Enabled? If suffix of the first argument is "Quiet"
+# Example: `StdStd_V0_1.RunQuiet`
+# Edge Case: `--fixed-length-modules false RunQuiet` for IDE integration
 
 DKCODER_QUIET=0
-DKCODER_AWAY=0
+_DKEXE_OPTIONS=
 run_maybe_quiet() {
   "$@" >&2 # Always redirect stdout to stderr in this script
 }
@@ -54,14 +58,24 @@ if [ $# -ge 1 ]; then
   case "$1" in
     *Quiet)
       DKCODER_QUIET=1
+      _DKEXE_OPTIONS="-l ERROR"
       run_maybe_quiet() {
         "$@" > /dev/null 2> /dev/null
       }
       printf_maybe_quiet() {
         true
       } ;;
-    *Away)
-      DKCODER_AWAY=1
+  esac
+  case "${3:-}" in # Edge Case
+    *Quiet)
+      DKCODER_QUIET=1
+      _DKEXE_OPTIONS="-l ERROR"
+      run_maybe_quiet() {
+        "$@" > /dev/null 2> /dev/null
+      }
+      printf_maybe_quiet() {
+        true
+      } ;;
   esac
 fi
 
@@ -499,9 +513,9 @@ autodetect_system_binaries
 autodetect_buildhost_arch
 
 # Use the project tree as the current directory
-PROJ_DIR=$(dirname "$0")
-PROJ_DIR=$(cd "$PROJ_DIR" && pwd)
-cd "$PROJ_DIR"
+DKCODER_PROJECT_DIR=$(dirname "$0")
+DKCODER_PROJECT_DIR=$(cd "$DKCODER_PROJECT_DIR" && pwd)
+cd "$DKCODER_PROJECT_DIR"
 
 # --- DkCoder data home ---
 
@@ -515,8 +529,8 @@ fi
 #   2. Check if CI since many CI providers can only cache content in a subdirectory
 #      of the project.
 if [ -z "$tools_dir" ] && [ "${CI:-}" = true ]; then
-  install -d "$PROJ_DIR/.z-dk/tools"
-  tools_dir="$PROJ_DIR/.z-dk/tools"
+  install -d "$DKCODER_PROJECT_DIR/.z-dk/tools"
+  tools_dir="$DKCODER_PROJECT_DIR/.z-dk/tools"
 fi
 #   3. Check in locations rooted under /opt/diskuv
 #      We look under a /opt/diskuv early because
@@ -653,19 +667,13 @@ fi
 # Set DK_EXE
 DK_EXE="$destdir/dk"
 
-# --- Console ---
-
-if [ -t 0 ]; then
-  dk_tty=1
-else
-  dk_tty=0
-fi
-
 # --- Run dk executable ---
 
-if [ "$DKCODER_AWAY" -eq 0 ]; then cd "$PROJ_DIR"; fi
+#   We already changed to DKCODER_PROJECT_DIR earlier. Be explicit anyway.
+cd "$DKCODER_PROJECT_DIR"
 
 export DKCODER_ARG0="$0"
-export DKCODER_TTY=$dk_tty
 export DKCODER_PWD="$dk_pwd"
-exec "$DK_EXE" --project-dir "$PROJ_DIR" "$@"
+export DKCODER_PROJECT_DIR
+#   shellcheck disable=SC2086
+exec "$DK_EXE" $_DKEXE_OPTIONS "$@"
