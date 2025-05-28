@@ -15,7 +15,7 @@ The intent is to be a one-stop shop for the common REST services for OCaml users
 
 The generated clients in `src/` are liberally licensed with the [LICENSE-Apache2](./LICENSE-Apache2) Apache 2.0 license.
 
-The `dk`, `dk.cmd` and `__dk.cmake` build tools are [LICENSE-OSL3](./LICENSE-OSL3) OSL 3.0 licensed with prompts for additional licenses for the OCaml-modified LGPL license and DkSDK license.
+The `dk` and `dk.cmd` build tools are [LICENSE-OSL3](./LICENSE-OSL3) OSL 3.0 licensed with prompts for additional licenses for the OCaml-modified LGPL license and DkSDK license.
 
 ## Quick Start
 
