@@ -36,15 +36,20 @@ REM Invoke-WebRequest guidelines
 REM 1. Use $ProgressPreference = 'SilentlyContinue' always. Terrible slowdown w/o it.
 REM    https://stackoverflow.com/questions/28682642
 
-SET DK_PROJ_DIR=%~dp0
+SET _DK_PROJ_DIR=%~dp0
 SET DKCODER_PWD=%CD%
 
-REM packaging/specs/2.3.202505220140.json
-SET DK_VER=2.3.202505220140
-REM    files[]/path: dist/dk-windows*
-REM     (empty if the architecture is not supported)
+REM Update within dksdk-coder:
+REM   f_dk() { jq -r 'def ck(p): .files[] | select(.path == p).checksum.sha256; { majminpat_ver:.listing_unencrypted.version, ck_windows_x86_64:(ck("dist/dk-windows_x86_64.exe") // ""), ck_windows_x86:(ck("dist/dk-windows_x86.exe") // ""), fn:input_filename } | "REM "+.fn+"\n"+"SET DK_VER="+.majminpat_ver+"\n"+"SET DK_CKSUM_WINDOWS_X86="+.ck_windows_x86+"\n"+"SET DK_CKSUM_WINDOWS_X86_64="+.ck_windows_x86_64 ' $1 }
+REM   eval $(awk '$2=="f_dk()" {$1=""; print}' dk-new.cmd | tr -d '\r') # avoids typing the line above
+REM   f_dk packaging/specs/2.3.202505280211.json
+REM
+REM   Empty value if the architecture is not supported.
+REM
+REM packaging/specs/2.3.202505280211.json
+SET DK_VER=2.3.202505280211
 SET DK_CKSUM_WINDOWS_X86=
-SET DK_CKSUM_WINDOWS_X86_64=21863e6ba0f69afcb92f56d9814deb934cc143f1e1da8e06766ddbb5c7759246
+SET DK_CKSUM_WINDOWS_X86_64=db6484a9a456cb9dfc2172bfcff3414ea92a2732d0e24e9ee013bd9962818651
 
 REM --------- Quiet and Away Detection ---------
 REM Enabled? If suffix of the first argument is "Quiet" or "Away"
@@ -155,15 +160,14 @@ REM -------------- Run dk executable --------------
 
 SET DKCODER_ARG0=%0
 
-IF %DK_AWAY% EQU 0 CD /D %DK_PROJ_DIR%
+IF %DK_AWAY% EQU 0 CD /D "%_DK_PROJ_DIR%"
 REM     Unset local variables
 SET "DK_DATA_HOME="
 SET "DK_AWAY="
-SET "DK_PROJ_DIR="
 SET "DK_QUIET="
 SET "_DK_PATH="
-REM     Then run dk.exe
-"%DK_EXE%" %*
+REM     Then run dk.exe. TODO: Use environment variable not --project-dir so quotes aren't needed
+"%DK_EXE%" --project-dir %_DK_PROJ_DIR% %*
 EXIT /B %ERRORLEVEL%
 
 REM ------ SUBROUTINE [downloadFile]

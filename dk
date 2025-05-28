@@ -22,14 +22,17 @@
 
 set -euf
 
-# packaging/specs/2.3.202505220140.json
-majminpat_ver=2.3.202505220140
-#   files[]/path: dk-*
-cksum256_darwin_arm64=fa2c76c7530e39d97e0e45f1f85f9eb93eff0f59e0e56b1b40afdb8e6a07c936
-cksum256_darwin_x86_64=0a499f6dac44235f7c01fba7740bec6ae1fef7dab1165a0e8132b6d561023e39
-#   files[]/path: dist/dk-*
-cksum256_linux_x86=fcbfb4f002ddc0800210ee119edfa413293d406ea749c8ac0f5452e4a9e91c08
-cksum256_linux_x86_64=2cdc07d59e9c82946863c0a44e61b570090eaead209bfe8d4f1bb5ca682126cf
+# Update within dksdk-coder:
+#   f_dk() { jq -r 'def ck(p): .files[] | select(.path == p).checksum.sha256; { majminpat_ver:.listing_unencrypted.version, ck_darwin_arm64:ck("dk-darwin_arm64"), ck_darwin_x86_64:ck("dk-darwin_x86_64"), ck_linux_x86_64:ck("dist/dk-linux_x86_64"), ck_linux_x86:ck("dist/dk-linux_x86"), fn:input_filename } | "# "+.fn+"\n"+"majminpat_ver="+.majminpat_ver+"\n"+"cksum256_darwin_arm64="+.ck_darwin_arm64+"\n"+"cksum256_darwin_x86_64="+.ck_darwin_x86_64+"\n"+"cksum256_linux_x86="+.ck_linux_x86+"\n"+"cksum256_linux_x86_64="+.ck_linux_x86_64 ' $1 }
+#   eval $(awk '$2=="f_dk()" {$1=""; print}' dk-new) # avoids typing the line above
+#   f_dk packaging/specs/2.3.202505280211.json
+#
+# packaging/specs/2.3.202505280211.json
+majminpat_ver=2.3.202505280211
+cksum256_darwin_arm64=cfad5fadc5b2c4b61c2b299d237db6506cc673fce98686bf5978a010fc8b6945
+cksum256_darwin_x86_64=095dc6a22f27aa918d1b582791a647829e111e9dbae9f5549c8f60ab5294f884
+cksum256_linux_x86=c2ef7e6d1d496851fcd2b1d9f9cd14a2559e0baa7b807f5cdcd38a6e78a8fd3f
+cksum256_linux_x86_64=6b9542a0f8b4730cccf929f7df59133a0590457c30d98047d34d5dba6633d20d
 
 dk_pwd=$PWD
 
@@ -665,4 +668,4 @@ if [ "$DKCODER_AWAY" -eq 0 ]; then cd "$PROJ_DIR"; fi
 export DKCODER_ARG0="$0"
 export DKCODER_TTY=$dk_tty
 export DKCODER_PWD="$dk_pwd"
-exec "$DK_EXE" "$@"
+exec "$DK_EXE" --project-dir "$PROJ_DIR" "$@"
