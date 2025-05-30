@@ -26,13 +26,13 @@ set -euf
 #   f_dk() { jq -r 'def ck(p): .files[] | select(.path == p).checksum.sha256; { majminpat_ver:.listing_unencrypted.version, ck_darwin_arm64:ck("dk-darwin_arm64"), ck_darwin_x86_64:ck("dk-darwin_x86_64"), ck_linux_x86_64:ck("dist/dk-linux_x86_64"), ck_linux_x86:ck("dist/dk-linux_x86"), fn:input_filename } | "# "+.fn+"\n"+"majminpat_ver="+.majminpat_ver+"\n"+"cksum256_darwin_arm64="+.ck_darwin_arm64+"\n"+"cksum256_darwin_x86_64="+.ck_darwin_x86_64+"\n"+"cksum256_linux_x86="+.ck_linux_x86+"\n"+"cksum256_linux_x86_64="+.ck_linux_x86_64 ' $1 }
 #   eval $(awk '$2=="f_dk()" {$1=""; print}' dk-new) # avoids typing the line above
 #   f_dk packaging/specs/2.3.202505280211.json
-#
-# packaging/specs/2.3.202505280211.json
-majminpat_ver=2.3.202505280211
-cksum256_darwin_arm64=cfad5fadc5b2c4b61c2b299d237db6506cc673fce98686bf5978a010fc8b6945
-cksum256_darwin_x86_64=095dc6a22f27aa918d1b582791a647829e111e9dbae9f5549c8f60ab5294f884
-cksum256_linux_x86=c2ef7e6d1d496851fcd2b1d9f9cd14a2559e0baa7b807f5cdcd38a6e78a8fd3f
-cksum256_linux_x86_64=6b9542a0f8b4730cccf929f7df59133a0590457c30d98047d34d5dba6633d20d
+# -------------------------------------
+# packaging/specs/2.3.202505282324.json
+majminpat_ver=2.3.202505282324
+cksum256_darwin_arm64=2a85f4e9a823bc371639f9856189399414d87bd9c938be843c3f579183750e0c
+cksum256_darwin_x86_64=057995e1e6ba23049be2096a80cce0ab8c303e74c6d877d2c0f7a2c42cdf487a
+cksum256_linux_x86=3bf9c1c71faac7b0750870c5e51997ddc5d06887701fcee3ac28b1a5fb5e3a0d
+cksum256_linux_x86_64=df93ac0895c4c0099a21744768b0a42eb62eb54be9c3ed4c799cc7054ec8e982
 
 dk_pwd=$PWD
 

@@ -45,11 +45,11 @@ REM   eval $(awk '$2=="f_dk()" {$1=""; print}' dk-new.cmd | tr -d '\r') # avoids
 REM   f_dk packaging/specs/2.3.202505280211.json
 REM
 REM   Empty value if the architecture is not supported.
-REM
-REM packaging/specs/2.3.202505280211.json
-SET DK_VER=2.3.202505280211
+REM -------------------------------------
+REM packaging/specs/2.3.202505282324.json
+SET DK_VER=2.3.202505282324
 SET DK_CKSUM_WINDOWS_X86=
-SET DK_CKSUM_WINDOWS_X86_64=db6484a9a456cb9dfc2172bfcff3414ea92a2732d0e24e9ee013bd9962818651
+SET DK_CKSUM_WINDOWS_X86_64=40b191e00e083854bb05e9d6af26bc00943030a85c24de1a0ad44edaa794b879
 
 REM --------- Quiet Detection ---------
 REM Enabled? If suffix of the first argument is "Quiet"
