@@ -1,9 +1,9 @@
 # DkCoder REST APIs
 
 `DkStdRestApis` is a monorepo project containing generated REST client code for multiple REST services.
-The intent is to be a one-stop shop for the common REST services for OCaml users, especially anyone using [DkCoder](https://github.com/diskuv/dkcoder#readme).
+The intent is to be a one-stop shop for the common REST services for OCaml users, especially anyone using [DkCoder](https://github.com/diskuv/dk#readme).
 
-> If you would like to support this project, please consider adding a star to the [DkCoder GitHub project](https://github.com/diskuv/dkcoder). *That is also the place to leave issues and feedback!*
+> If you would like to support this project, please consider adding a star to the [DkCoder GitHub project](https://github.com/diskuv/dk). *That is also the place to leave issues and feedback!*
 
 ## Documents
 

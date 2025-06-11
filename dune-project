@@ -15,7 +15,7 @@
 (maintainers "Diskuv, Inc. <opensource+dkml@support.diskuv.com>")
 (authors "Diskuv, Inc. <opensource+dkml@support.diskuv.com>")
 (homepage "https://diskuv.com/dksdk/coder/2024-intro-scripting/")
-(bug_reports "https://github.com/diskuv/dkcoder/issues")
+(bug_reports "https://github.com/diskuv/dk/issues")
 
 (package
   (name DkStdRestApis_NotStripe)

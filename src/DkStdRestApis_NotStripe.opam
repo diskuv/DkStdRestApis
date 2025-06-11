@@ -6,7 +6,7 @@ authors: ["Diskuv, Inc. <opensource+dkml@support.diskuv.com>"]
 # Apache 2.0 for generated code and OSL 3.0 for dk and dk.cmd.
 license: "Apache-2.0 AND OSL-3.0"
 homepage: "https://diskuv.com/dksdk/coder/2024-intro-scripting/"
-bug-reports: "https://github.com/diskuv/dkcoder/issues"
+bug-reports: "https://github.com/diskuv/dk/issues"
 depends: [
   "dune" {>= "3.0"}
   "ocaml" {>= "4.14"}
