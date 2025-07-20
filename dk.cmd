@@ -42,15 +42,14 @@ SET DKCODER_PWD=%CD%
 REM Update within dksdk-coder:
 REM   f_dk() { jq -r 'def ck(p): .files[] | select(.path == p).checksum.sha256; { majminpat_ver:.listing_unencrypted.version, ck_windows_x86_64:(ck("dk-windows_x86_64.exe") // ""), ck_windows_x86:(ck("dk-windows_x86.exe") // ""), fn:input_filename } | "REM "+.fn+"\n"+"SET DK_VER="+.majminpat_ver+"\n"+"SET DK_CKSUM_WINDOWS_X86="+.ck_windows_x86+"\n"+"SET DK_CKSUM_WINDOWS_X86_64="+.ck_windows_x86_64 ' $1; }
 REM   eval $(awk '$2=="f_dk()" {$1=""; print}' dk.cmd | tr -d '\r') # avoids typing the line above
-REM   f_dk packaging/specs/2.3.202505280211.json
+REM   f_dk ../dksdk-coder/packaging/specs/2.4.202507191916-signed.json
 REM
 REM   Empty value if the architecture is not supported.
 REM -------------------------------------
-REM packaging/specs/2.4.202506160116-signed.json
-SET DK_VER=2.4.202506160116-signed
-SET DK_CKSUM_WINDOWS_X86=eff29e2099681ec8978fa1c439976d3be03313bdf777320df9e41df5c3593e17
-SET DK_CKSUM_WINDOWS_X86_64=8c41e4bfb552fc6ca503f41d772d1749a43cc7a3baa19633f60f64c734a55d43
-REM note: DK_CKSUM_WINDOWS_X86 has no distribution (stdexport) yet, and also dk.exe affected by https://github.com/diskuv/dk/issues/5.
+REM ../dksdk-coder/packaging/specs/2.4.202507191916-signed.json
+SET DK_VER=2.4.202507191916-signed
+SET DK_CKSUM_WINDOWS_X86=07fcb9c724e32e17304b3d721d9b1892f106bb871cf72acfef6083c3439fea93
+SET DK_CKSUM_WINDOWS_X86_64=2c8477a83ce8e5cc8c4e6daef6976ace69db897fa87dc3ec8fcd1d17cc323f17
 
 REM --------- Quiet Detection ---------
 REM Enabled? If suffix of the first argument is "Quiet"
@@ -62,15 +61,18 @@ SET DK_ARG3=%3
 SET DK_QUIET=0
 SET _XCOPY_SWITCHES=
 SET _DKEXE_OPTIONS=
+REM     Remove double-quotes from DK_ARG<i> or else the IF will fail with syntax error.
+IF NOT "%DK_ARG1%" == "" SET DK_ARG1=%DK_ARG1:"=%
+IF NOT "%DK_ARG3%" == "" SET DK_ARG3=%DK_ARG3:"=%
 IF "%DK_ARG1:~-5%" == "Quiet" (
     SET DK_QUIET=1
     SET _XCOPY_SWITCHES=/q
-    SET _DKEXE_OPTIONS=-l ERROR
+    SET "_DKEXE_OPTIONS=-l ERROR"
 )
 IF "%DK_ARG3:~-5%" == "Quiet" (
     SET DK_QUIET=1
     SET _XCOPY_SWITCHES=/q
-    SET _DKEXE_OPTIONS=-l ERROR
+    SET "_DKEXE_OPTIONS=-l ERROR"
 )
 SET DK_ARG1=
 SET DK_ARG3=
