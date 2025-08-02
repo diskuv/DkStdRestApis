@@ -27,12 +27,12 @@ set -euf
 #   eval $(awk '$2=="f_dk()" {$1=""; print}' dk) # avoids typing the line above
 #   f_dk ../dksdk-coder/packaging/specs/2.4.202507191916-signed.json
 # -------------------------------------
-# ../dksdk-coder/packaging/specs/2.4.202507191916-signed.json
-majminpat_ver=2.4.202507191916-signed
-cksum256_darwin_arm64=042eeb4dca74dbb2e67da7e08b7bfe087813b732d4937b992e0a941ce5df13fa
-cksum256_darwin_x86_64=32ab47b4455ed29ce7d406789dc6891220c5ec0be2e4ca0ae0534b752e658117
-cksum256_linux_x86=97a3fb8bb8e05f9dad5b335b28b49661749504d157d4a4cb2fa15dd7b26a9f1d
-cksum256_linux_x86_64=47554e12a363a1a9da0f09ae4096638d4adaa23b1c0fb4c477ed68a84c822bf9
+# ../dksdk-coder/packaging/specs/2.4.202508011516-signed.json
+majminpat_ver=2.4.202508011516-signed
+cksum256_darwin_arm64=aedc1831f3dc4af8c3fd9eefcf4fd2edf9b0f47e3534e382e20368ff15857393
+cksum256_darwin_x86_64=f6e8d64c16757a7ceb9c16f3d65d4a8a1464cf33182966d1e8a135fcfd104449
+cksum256_linux_x86=c6a46d60ab4c567ef3c2d9c0287a42e098a1776d725f3659555c2ebe3e0e73b7
+cksum256_linux_x86_64=b7f75cc9993c3e024a41777eff32f79a6aee687e39ee2878dcdf4a1dfec0141b
 
 dk_pwd=$PWD
 

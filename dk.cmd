@@ -46,10 +46,10 @@ REM   f_dk ../dksdk-coder/packaging/specs/2.4.202507191916-signed.json
 REM
 REM   Empty value if the architecture is not supported.
 REM -------------------------------------
-REM ../dksdk-coder/packaging/specs/2.4.202507191916-signed.json
-SET DK_VER=2.4.202507191916-signed
-SET DK_CKSUM_WINDOWS_X86=07fcb9c724e32e17304b3d721d9b1892f106bb871cf72acfef6083c3439fea93
-SET DK_CKSUM_WINDOWS_X86_64=2c8477a83ce8e5cc8c4e6daef6976ace69db897fa87dc3ec8fcd1d17cc323f17
+REM ../dksdk-coder/packaging/specs/2.4.202508011516-signed.json
+SET DK_VER=2.4.202508011516-signed
+SET DK_CKSUM_WINDOWS_X86=4719f427122c9696a286c0aefa17c5ab284e0856e149f01ad75d676f2a0c8cc8
+SET DK_CKSUM_WINDOWS_X86_64=68514ecd6d4ba6508acab15745473f2a00a51e09a78e1d72fa284d68704093d7
 
 REM --------- Quiet Detection ---------
 REM Enabled? If suffix of the first argument is "Quiet"
